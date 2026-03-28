@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capy Dashboard — Live Odds</title>
+  <meta name="description" content="Real-time odds comparison across every major sportsbook." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,900;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --amber: #BA7517;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --green: #1D9E75;
+      --green-light: #EAF3DE;
+      --green-dark: #27500A;
+      --red: #D85A30;
+      --red-light: #FAECE7;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --text-hint: #9b9b9b;
+      --border: rgba(0,0,0,0.08);
+      --border-mid: rgba(0,0,0,0.15);
+      --surface: #fff;
+      --surface-2: #f7f6f3;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: #f5f4f1; line-height: 1.5; }
+
+    /* NAV */
+    nav { background: #fff; border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
+    .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; }
+    .btn-small { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 6px; border: none; background: var(--amber); color: #fff; cursor: pointer; text-decoration: none; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; margin-right: 4px; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    /* LAYOUT */
+    .main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+    .stat-card { background: var(--surface); border-radius: var(--radius-sm); padding: 12px 16px; border: 0.5px solid var(--border); }
+    .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); margin-bottom: 4px; }
+    .stat-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--text); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.amber { color: var(--amber); }
+
+    /* FILTERS */
+    .filters { display: flex; align-items: center; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .filter-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .filter-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .filter-btn.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+    .filter-right { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-hint); font-family: 'DM Mono', monospace; }
+
+    /* GAME CARDS */
+    .games { display: flex; flex-direction: column; gap: 10px; }
+    .game-card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; transition: border-color 0.15s; }
+    .game-card:hover { border-color: var(--border-mid); }
+    .game-card.best-value { border-color: var(--green); border-width: 1.5px; }
+
+    .game-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; gap: 8px; }
+    .game-teams { font-size: 15px; font-weight: 600; color: var(--text); }
+    .game-time { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-hint); }
+    .game-tags { display: flex; align-items: center; gap: 6px; }
+    .sport-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.3px; }
+    .tag-nba { background: #E6F1FB; color: #185FA5; }
+    .tag-nfl { background: #FAECE7; color: #993C1D; }
+    .tag-mlb { background: #EAF3DE; color: #3B6D11; }
+    .tag-nhl { background: #EEEDFE; color: #534AB7; }
+    .value-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--green-light); color: var(--green-dark); }
+
+    /* ODDS TABLE */
+    .odds-table { width: 100%; padding: 0 16px 14px; overflow-x: auto; }
+    .odds-grid { display: grid; gap: 4px; min-width: 500px; }
+    .odds-grid-6 { grid-template-columns: 130px repeat(5, 1fr); }
+    .odds-col-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); padding: 6px 4px 2px; text-align: center; }
+    .odds-row-label { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; padding: 6px 4px; }
+    .odds-cell { background: var(--surface-2); border-radius: 6px; padding: 6px 4px; text-align: center; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.12s; border: 1px solid transparent; }
+    .odds-cell:hover { border-color: var(--amber); }
+    .odds-cell.best { background: var(--green-light); color: var(--green-dark); font-weight: 700; }
+    .odds-cell.worst { color: var(--text-hint); }
+    .odds-cell.locked { filter: blur(4px); cursor: pointer; user-select: none; }
+    .odds-divider { grid-column: 1 / -1; height: 0.5px; background: var(--border); margin: 4px 0; }
+
+    /* BOOK HEADERS */
+    .book-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text-hint); text-align: center; padding: 6px 4px 2px; }
+
+    /* LOADING */
+    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; gap: 12px; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--amber-light); border-top-color: var(--amber); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 13px; color: var(--text-muted); }
+
+    /* EMPTY STATE */
+    .empty { text-align: center; padding: 4rem 2rem; }
+    .empty-icon { font-size: 48px; margin-bottom: 1rem; display: block; }
+    .empty-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+    .empty-sub { font-size: 14px; color: var(--text-muted); }
+
+    /* SOFT GATE MODAL */
+    .gate-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+    .gate-overlay.show { display: flex; }
+    .gate-modal { background: var(--surface); border-radius: 16px; padding: 2rem; max-width: 400px; width: 100%; text-align: center; }
+    .gate-capy { font-size: 48px; display: block; margin-bottom: 12px; }
+    .gate-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+    .gate-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+    .gate-input { width: 100%; font-family: 'Inter', sans-serif; font-size: 14px; padding: 11px 14px; border-radius: 8px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text); outline: none; margin-bottom: 10px; }
+    .gate-input:focus { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-light); }
+    .gate-btn { width: 100%; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; padding: 12px; border-radius: 8px; border: none; background: var(--amber); color: #fff; cursor: pointer; margin-bottom: 10px; transition: opacity 0.15s; }
+    .gate-btn:hover { opacity: 0.88; }
+    .gate-skip { font-size: 12px; color: var(--text-hint); cursor: pointer; text-decoration: underline; }
+    .gate-skip:hover { color: var(--text-muted); }
+    .gate-success { display: none; }
+    .gate-success-text { font-size: 14px; color: var(--green); font-weight: 600; margin-bottom: 12px; }
+
+    /* AFFILIATE BAR */
+    .affiliate-bar { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 12px 16px; margin-top: 1rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .aff-text { font-size: 13px; color: var(--text-muted); flex: 1; min-width: 180px; }
+    .aff-text strong { color: var(--text); }
+    .aff-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .aff-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 6px; border: 0.5px solid var(--border-mid); background: var(--surface-2); color: var(--text); cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .aff-btn:hover { background: var(--amber-light); border-color: var(--amber); color: var(--amber-dark); }
+
+    /* FOOTER */
+    .dash-footer { text-align: center; padding: 1.5rem; font-size: 11px; color: var(--text-hint); margin-top: 1rem; }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .nav-inner { padding: 0.75rem 1rem; }
+      .main { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="logo-mark">🐾</div>
+        Capy
+      </a>
+      <div class="nav-right">
+        <span style="font-size:12px;color:var(--text-muted);"><span class="live-dot"></span>Live odds</span>
+        <span class="nav-badge">Founding rate — $7/mo</span>
+        <a href="/#signup" class="btn-small">Go Pro</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Games today</div>
+        <div class="stat-value" id="stat-games">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Books tracked</div>
+        <div class="stat-value amber">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Best edge</div>
+        <div class="stat-value green" id="stat-edge">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last updated</div>
+        <div class="stat-value" id="stat-time" style="font-size:14px;">—</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterSport('all', this)">All sports</button>
+      <button class="filter-btn" onclick="filterSport('basketball_nba', this)">NBA</button>
+      <button class="filter-btn" onclick="filterSport('americanfootball_nfl', this)">NFL</button>
+      <button class="filter-btn" onclick="filterSport('baseball_mlb', this)">MLB</button>
+      <button class="filter-btn" onclick="filterSport('icehockey_nhl', this)">NHL</button>
+      <div class="filter-right"><span class="live-dot"></span>Auto-refreshes every 5 min</div>
+    </div>
+
+    <div class="games" id="games-container">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Fetching live odds across all books...</div>
+      </div>
+    </div>
+
+    <div class="affiliate-bar">
+      <div class="aff-text"><strong>Ready to bet?</strong> Open an account at the book with the best line and claim your signup bonus.</div>
+      <div class="aff-links">
+        <a href="YOUR_DRAFTKINGS_AFFILIATE_LINK" target="_blank" class="aff-btn">DraftKings</a>
+        <a href="YOUR_FANDUEL_AFFILIATE_LINK" target="_blank" class="aff-btn">FanDuel</a>
+        <a href="YOUR_BETMGM_AFFILIATE_LINK" target="_blank" class="aff-btn">BetMGM</a>
+        <a href="YOUR_CAESARS_AFFILIATE_LINK" target="_blank" class="aff-btn">Caesars</a>
+      </div>
+    </div>
+
+    <div class="dash-footer">
+      Must be 21+ to bet. Gambling problem? Call 1-800-GAMBLER. Odds subject to change. &nbsp;·&nbsp; <a href="/" style="color:var(--amber);">Back to Capy</a>
+    </div>
+
+  </div>
+
+  <!-- SOFT GATE MODAL -->
+  <div class="gate-overlay" id="gate-overlay">
+    <div class="gate-modal">
+      <div class="gate-form" id="gate-form">
+        <span class="gate-capy">🦫</span>
+        <div class="gate-title">Join the herd to unlock</div>
+        <p class="gate-sub">Enter your email for free access to line movement history, best bet alerts, and more.</p>
+        <input type="email" class="gate-input" id="gate-email" placeholder="your@email.com" />
+        <button class="gate-btn" onclick="handleGateSubmit()">Get free access</button>
+        <div class="gate-skip" onclick="closeGate()">Maybe later</div>
+      </div>
+      <div class="gate-success" id="gate-success">
+        <span class="gate-capy">🦫</span>
+        <div class="gate-success-text">You're in the herd!</div>
+        <div class="gate-title">Welcome to Capy</div>
+        <p class="gate-sub" style="margin-bottom:1rem;">Check your email — we just sent you a confirmation. Full access unlocked.</p>
+        <button class="gate-btn" onclick="closeGate()">Start exploring</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BOOKS = ['DraftKings','FanDuel','BetMGM','Caesars','PointsBet'];
+    const BOOK_SHORT = ['DK','FD','MGM','Czrs','PB'];
+    const SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
+    const SPORT_LABELS = { basketball_nba:'NBA', americanfootball_nfl:'NFL', baseball_mlb:'MLB', icehockey_nhl:'NHL' };
+
+    let allGames = [];
+    let currentSport = 'all';
+    let userEmail = localStorage.getItem('capy_email') || null;
+    let gateShown = false;
+
+    async function fetchOdds() {
+      try {
+        const results = await Promise.all(
+          SPORTS.map(s => fetch(`/.netlify/functions/odds?sport=${s}`).then(r => r.json()).catch(() => []))
+        );
+        allGames = results.flat().filter(g => g && g.bookmakers && g.bookmakers.length);
+        renderGames();
+        updateStats();
+        updateClock();
+      } catch(e) {
+        showFallback();
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('stat-games').textContent = allGames.length || '—';
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('stat-time').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+    }
+
+    function filterSport(sport, el) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      currentSport = sport;
+      renderGames();
+    }
+
+    function renderGames() {
+      const container = document.getElementById('games-container');
+      const filtered = currentSport === 'all' ? allGames : allGames.filter(g => g.sport_key === currentSport);
+
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div class="empty">
+            <span class="empty-icon">🦫</span>
+            <div class="empty-title">No games right now</div>
+            <div class="empty-sub">Check back closer to game time — we update every 5 minutes.</div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map((game, idx) => buildGameCard(game, idx)).join('');
+    }
+
+    function buildGameCard(game, idx) {
+      const sport = game.sport_key;
+      const tagClass = 'tag-' + (SPORT_LABELS[sport] || 'nba').toLowerCase();
+      const label = SPORT_LABELS[sport] || sport;
+      const time = new Date(game.commence_time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+      const isFirst = idx === 0;
+
+      const books = BOOKS.map(b => game.bookmakers?.find(bk => bk.title.toLowerCase().includes(b.toLowerCase().slice(0,4))));
+
+      const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
+      const spreadRows = buildOddsRows(game, books, 'spreads', isFirst);
+      const totalRows = buildOddsRows(game, books, 'totals', isFirst);
+
+      return `
+        <div class="game-card ${isFirst ? 'best-value' : ''}">
+          <div class="game-header">
+            <div class="game-teams">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team}</div>
+            <div class="game-tags">
+              <span class="sport-tag ${tagClass}">${label}</span>
+              <span class="game-time">${time}</span>
+              ${isFirst ? '<span class="value-badge">Best value</span>' : ''}
+            </div>
+          </div>
+          <div class="odds-table">
+            <div class="odds-grid odds-grid-6">
+              <div class="odds-col-header"></div>
+              ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
+              ${h2hRows}
+              <div class="odds-divider"></div>
+              ${spreadRows}
+              <div class="odds-divider"></div>
+              ${totalRows}
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function buildOddsRows(game, books, market, isFirst) {
+      const outcomes = ['away', 'home', 'over', 'under'];
+      const labels = {
+        h2h: [game.away_team?.split(' ').pop() + ' ML', game.home_team?.split(' ').pop() + ' ML'],
+        spreads: [game.away_team?.split(' ').pop() + ' spread', game.home_team?.split(' ').pop() + ' spread'],
+        totals: ['Over', 'Under']
+      };
+      const rows = labels[market];
+      if (!rows) return '';
+
+      return rows.map((label, ri) => {
+        const side = ri === 0 ? (market === 'totals' ? 'Over' : game.away_team) : (market === 'totals' ? 'Under' : game.home_team);
+        const vals = books.map(book => {
+          if (!book) return null;
+          const mkt = book.markets?.find(m => m.key === market);
+          const outcome = mkt?.outcomes?.find(o => o.name === side);
+          if (!outcome) return null;
+          if (market === 'spreads') return `${outcome.point > 0 ? '+' : ''}${outcome.point}`;
+          if (market === 'totals') return `${ri === 0 ? 'o' : 'u'}${outcome.point}`;
+          return outcome.price > 0 ? `+${outcome.price}` : `${outcome.price}`;
+        });
+
+        const numVals = vals.map(v => v ? parseFloat(v.replace(/[ou+]/g,'')) : null);
+        const validNums = numVals.filter(v => v !== null);
+        const best = validNums.length ? (market === 'h2h' || market === 'totals' ? Math.max(...validNums) : Math.max(...validNums)) : null;
+        const worst = validNums.length ? Math.min(...validNums) : null;
+
+        const cells = vals.map((v, i) => {
+          if (!v) return `<div class="odds-cell" style="color:var(--text-hint);">—</div>`;
+          const num = numVals[i];
+          const isBest = num === best;
+          const isWorst = num === worst && num !== best;
+          const isLocked = !isFirst && !userEmail && i > 2;
+          return `<div class="odds-cell ${isBest ? 'best' : ''} ${isWorst ? 'worst' : ''} ${isLocked ? 'locked' : ''}" 
+            onclick="${isLocked ? 'showGate()' : ''}">${v}</div>`;
+        });
+
+        return `<div class="odds-row-label" style="font-size:11px;">${label}</div>${cells.join('')}`;
+      }).join('');
+    }
+
+    function showFallback() {
+      document.getElementById('games-container').innerHTML = `
+        <div class="empty">
+          <span class="empty-icon">🦫</span>
+          <div class="empty-title">Odds loading soon</div>
+          <div class="empty-sub">We're fetching live data. Refresh in a moment.</div>
+        </div>`;
+    }
+
+    function showGate() {
+      if (gateShown) return;
+      document.getElementById('gate-overlay').classList.add('show');
+    }
+
+    function closeGate() {
+      document.getElementById('gate-overlay').classList.remove('show');
+      gateShown = true;
+    }
+
+    function handleGateSubmit() {
+      const email = document.getElementById('gate-email').value;
+      if (!email || !email.includes('@')) {
+        document.getElementById('gate-email').style.borderColor = '#D85A30';
+        setTimeout(() => { document.getElementById('gate-email').style.borderColor = ''; }, 1500);
+        return;
+      }
+      userEmail = email;
+      localStorage.setItem('capy_email', email);
+      document.getElementById('gate-form').style.display = 'none';
+      document.getElementById('gate-success').style.display = 'block';
+      window.open(`https://getcapy.beehiiv.com/subscribe?email=${encodeURIComponent(email)}`, '_blank');
+      renderGames();
+    }
+
+    document.getElementById('gate-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleGateSubmit();
+    });
+
+    setTimeout(() => {
+      if (!userEmail) showGate();
+    }, 45000);
+
+    fetchOdds();
+    setInterval(fetchOdds, 300000);
+  </script>
+
+</body>
+</html>
