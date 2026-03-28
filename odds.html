@@ -231,6 +231,7 @@
 
   <script>
     const BOOKS = ['DraftKings','FanDuel','BetMGM','Caesars','PointsBet'];
+    const BOOK_KEYS = ['draftkings','fanduel','betmgm','caesars','pointsbet'];
     const BOOK_SHORT = ['DK','FD','MGM','Czrs','PB'];
     const SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
     const SPORT_LABELS = { basketball_nba:'NBA', americanfootball_nfl:'NFL', baseball_mlb:'MLB', icehockey_nhl:'NHL' };
@@ -294,7 +295,8 @@
       const time = new Date(game.commence_time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
       const isFirst = idx === 0;
 
-      const books = BOOKS.map(b => game.bookmakers?.find(bk => bk.title.toLowerCase().includes(b.toLowerCase().slice(0,4))));
+      if (idx === 0) console.log('Available books:', game.bookmakers?.map(b => b.key + ' / ' + b.title));
+      const books = BOOK_KEYS.map(k => game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) || game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5))));
 
       const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
       const spreadRows = buildOddsRows(game, books, 'spreads', isFirst);
