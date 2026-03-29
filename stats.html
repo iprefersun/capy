@@ -746,17 +746,23 @@
     divTeams.forEach((t, i) => {
       // Use divAbbr (TEAM_RECORDS key) — not ESPN's t.abbr — for the record lookup
       const rec = getRecord(t.divAbbr);
-      const [wStr, lStr] = rec ? rec.split('-') : ['', ''];
-      const w = parseInt(wStr, 10);
-      const l = parseInt(lStr, 10);
-      const pct = (!isNaN(w) && !isNaN(l) && w + l > 0) ? (w / (w + l)).toFixed(3).slice(1) : '—';
-      console.log('[row]', t.name, '| divAbbr:', t.divAbbr, '| rec:', rec, '| split:', [wStr, lStr], '| w:', w, 'l:', l, '| pct:', pct);
+      const recParts = rec ? rec.split('-') : [];
+      const wins = parseInt(recParts[0], 10);
+      const losses = parseInt(recParts[1], 10);
+      const winPct = (!isNaN(wins) && !isNaN(losses) && wins + losses > 0)
+        ? (wins / (wins + losses)).toFixed(3).slice(1)
+        : '—';
+      console.log('[row]', t.name, '| divAbbr:', t.divAbbr, '| rec:', rec, '| wins:', wins, 'losses:', losses, '| winPct:', winPct);
       const isCurrent = t.id === currentTeamId;
-      html += `<tr style="${isCurrent ? 'background:var(--amber-light);' : ''}">
-        <td class="rank-cell">${i + 1}</td>
-        <td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')" style="${isCurrent ? 'color:var(--amber-dark);font-weight:700;' : ''}">${t.name}</td>
-        <td>${isNaN(w) ? '—' : w}</td><td>${isNaN(l) ? '—' : l}</td><td>${pct}</td>
-      </tr>`;
+      const rowStyle = isCurrent ? 'background:var(--amber-light);' : '';
+      const nameStyle = isCurrent ? 'color:var(--amber-dark);font-weight:700;' : '';
+      html += '<tr style="' + rowStyle + '">'
+        + '<td class="rank-cell">' + (i + 1) + '</td>'
+        + '<td onclick="selectTeam(\'' + t.id + '\', \'' + t.name.replace(/'/g, "\\'") + '\')" style="' + nameStyle + '">' + t.name + '</td>'
+        + '<td>' + (isNaN(wins) ? '—' : wins) + '</td>'
+        + '<td>' + (isNaN(losses) ? '—' : losses) + '</td>'
+        + '<td>' + winPct + '</td>'
+        + '</tr>';
     });
 
     html += `</tbody></table>`;
