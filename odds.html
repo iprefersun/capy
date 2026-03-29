@@ -244,7 +244,7 @@
     async function fetchOdds() {
       try {
         const results = await Promise.all(
-          SPORTS.map(s => fetch(`/./api/odds/odds?sport=${s}`).then(r => r.json()).catch(() => []))
+          SPORTS.map(s => fetch(`/api?sport=${s}`).then(r => r.json()).catch(() => []))
         );
         allGames = results.flat().filter(g => g && g.bookmakers && g.bookmakers.length);
         renderGames();
@@ -412,3 +412,6 @@
     fetchOdds();
     setInterval(fetchOdds, 300000);
   </script>
+
+</body>
+</html>
