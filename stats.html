@@ -268,13 +268,57 @@
     icehockey_nhl: { espn: 'hockey/nhl', label: 'NHL', statCols: ['G','A','PTS','+/-'], statKeys: ['goals','assists','points','plusMinus'] }
   };
 
+  const DIVISIONS = {
+    basketball_nba: [
+      { conf: 'Eastern Conference', name: 'Atlantic',  abbrs: ['BOS','BKN','NYK','PHI','TOR'] },
+      { conf: 'Eastern Conference', name: 'Central',   abbrs: ['CHI','CLE','DET','IND','MIL'] },
+      { conf: 'Eastern Conference', name: 'Southeast', abbrs: ['ATL','CHA','MIA','ORL','WAS'] },
+      { conf: 'Western Conference', name: 'Northwest', abbrs: ['DEN','MIN','OKC','POR','UTA'] },
+      { conf: 'Western Conference', name: 'Pacific',   abbrs: ['GSW','LAC','LAL','PHX','SAC'] },
+      { conf: 'Western Conference', name: 'Southwest', abbrs: ['DAL','HOU','MEM','NOP','SAS'] },
+    ],
+    americanfootball_nfl: [
+      { conf: 'AFC', name: 'AFC East',  abbrs: ['BUF','MIA','NE','NYJ'] },
+      { conf: 'AFC', name: 'AFC North', abbrs: ['BAL','CIN','CLE','PIT'] },
+      { conf: 'AFC', name: 'AFC South', abbrs: ['HOU','IND','JAX','TEN'] },
+      { conf: 'AFC', name: 'AFC West',  abbrs: ['DEN','KC','LV','LAC'] },
+      { conf: 'NFC', name: 'NFC East',  abbrs: ['DAL','NYG','PHI','WSH'] },
+      { conf: 'NFC', name: 'NFC North', abbrs: ['CHI','DET','GB','MIN'] },
+      { conf: 'NFC', name: 'NFC South', abbrs: ['ATL','CAR','NO','TB'] },
+      { conf: 'NFC', name: 'NFC West',  abbrs: ['ARI','LAR','SF','SEA'] },
+    ],
+    baseball_mlb: [
+      { conf: 'American League', name: 'AL East',    abbrs: ['BAL','BOS','NYY','TB','TOR'] },
+      { conf: 'American League', name: 'AL Central', abbrs: ['CWS','CLE','DET','KC','MIN'] },
+      { conf: 'American League', name: 'AL West',    abbrs: ['HOU','LAA','OAK','SEA','TEX'] },
+      { conf: 'National League', name: 'NL East',    abbrs: ['ATL','MIA','NYM','PHI','WSH'] },
+      { conf: 'National League', name: 'NL Central', abbrs: ['CHC','CIN','MIL','PIT','STL'] },
+      { conf: 'National League', name: 'NL West',    abbrs: ['ARI','COL','LAD','SD','SF'] },
+    ],
+    icehockey_nhl: [
+      { conf: 'Eastern Conference', name: 'Atlantic',     abbrs: ['BOS','BUF','DET','FLA','MTL','OTT','TBL','TOR'] },
+      { conf: 'Eastern Conference', name: 'Metropolitan', abbrs: ['CAR','CBJ','NJD','NYI','NYR','PHI','PIT','WSH'] },
+      { conf: 'Western Conference', name: 'Central',      abbrs: ['ARI','CHI','COL','DAL','MIN','NSH','STL','WPG'] },
+      { conf: 'Western Conference', name: 'Pacific',      abbrs: ['ANA','CGY','EDM','LAK','SJS','SEA','VAN','VGK'] },
+    ],
+  };
+
+  function parseWinPct(record) {
+    if (!record) return 0;
+    const [w, l] = record.split('-').map(Number);
+    if (isNaN(w) || isNaN(l) || w + l === 0) return 0;
+    return w / (w + l);
+  }
+
+  function fmtPct(pct) {
+    return pct.toFixed(3).replace(/^0/, '');
+  }
+
   let currentSport = 'basketball_nba';
   let currentTeamId = null;
   let currentTeamName = null;
   let currentSort = 'az';
   let teamsCache = {};
-  let standingsCache = {};
-  let standingsTeamCache = {};
 
   // ─── SPORT SELECTION ───────────────────────────────────────────────
   async function selectSport(sport, el) {
@@ -331,99 +375,17 @@
   }
 
   function applySort() {
-    if (currentSort === 'az') {
-      if (teamsCache[currentSport]) renderTeamList(teamsCache[currentSport]);
-      return;
-    }
-    if (standingsTeamCache[currentSport]) {
-      currentSort === 'standings' ? renderTeamListByStandings() : renderTeamListByDivision();
-    } else {
-      const listEl = document.getElementById('team-list');
-      listEl.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading...</span></div>`;
-      fetchStandingsTeamData(currentSport).then(() => {
-        if (currentSort === 'standings') renderTeamListByStandings();
-        else if (currentSort === 'division') renderTeamListByDivision();
-      });
-    }
+    const teams = teamsCache[currentSport];
+    if (!teams) return;
+    if (currentSort === 'az') { renderTeamList(teams); return; }
+    if (currentSort === 'standings') { renderTeamListByStandings(teams); return; }
+    if (currentSort === 'division') { renderTeamListByDivision(teams); return; }
   }
 
-  async function fetchStandingsTeamData(sport) {
-    if (standingsTeamCache[sport]) return;
-    const espn = SPORT_MAP[sport].espn;
-    try {
-      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${espn}/standings`);
-      const data = await res.json();
-      standingsCache[sport] = data;
-
-      if (sport === 'basketball_nba') {
-        console.log('[standings] raw NBA response:', JSON.stringify(data).slice(0, 2000));
-      }
-
-      const groups = [];
-
-      // Handle two possible shapes:
-      // Shape A: data.children[] → each child has children[] (conferences → divisions)
-      // Shape B: data.children[] → each child directly has standings.entries[]
-      const topLevel = data.children || [];
-
-      topLevel.forEach(conf => {
-        const confName = conf.name || conf.abbreviation || '';
-        const hasDivisions = conf.children?.length > 0;
-
-        if (hasDivisions) {
-          // Shape A: conferences containing divisions
-          conf.children.forEach(div => {
-            const divName = div.name || div.abbreviation || '';
-            const entries = div.standings?.entries || [];
-            const teams = entries.map(entryToTeam);
-            if (teams.length) groups.push({ name: `${confName} — ${divName}`, teams });
-          });
-        } else {
-          // Shape B: conferences directly containing entries
-          const entries = conf.standings?.entries || [];
-          const teams = entries.map(entryToTeam);
-          if (teams.length) groups.push({ name: confName, teams });
-        }
-      });
-
-      // Fallback: data itself has standings.entries (flat response)
-      if (!groups.length && data.standings?.entries?.length) {
-        groups.push({ name: '', teams: data.standings.entries.map(entryToTeam) });
-      }
-
-      const flat = groups.flatMap(g => g.teams).sort((a, b) => b.winPct - a.winPct);
-      console.log('[standings] groups built:', groups.map(g => `${g.name}(${g.teams.length})`));
-      standingsTeamCache[sport] = { groups, flat };
-    } catch(e) {
-      console.error('[standings] fetch error:', e.message);
-      standingsTeamCache[sport] = { groups: [], flat: [] };
-    }
-  }
-
-  function entryToTeam(entry) {
-    const stats = entry.stats || [];
-    const wins = stats.find(s => s.name === 'wins')?.displayValue || '0';
-    const losses = stats.find(s => s.name === 'losses')?.displayValue || '0';
-    // Try winPercent stat first; fall back to calculating from wins/losses
-    let winPct = parseFloat(stats.find(s => s.name === 'winPercent')?.value ?? NaN);
-    if (isNaN(winPct)) {
-      const w = parseInt(wins, 10), l = parseInt(losses, 10);
-      winPct = (w + l > 0) ? w / (w + l) : 0;
-    }
-    const record = (wins !== '0' || losses !== '0') ? `${wins}-${losses}` : '';
-    return {
-      id: entry.team?.id,
-      name: entry.team?.displayName || '—',
-      record,
-      winPct
-    };
-  }
-
-  function renderTeamListByStandings() {
+  function renderTeamListByStandings(teams) {
     const listEl = document.getElementById('team-list');
-    const data = standingsTeamCache[currentSport];
-    if (!data?.flat.length) { listEl.innerHTML = `<div class="empty-note">No standings data available.</div>`; return; }
-    listEl.innerHTML = data.flat.map((t, i) => `
+    const sorted = [...teams].sort((a, b) => parseWinPct(b.record) - parseWinPct(a.record));
+    listEl.innerHTML = sorted.map((t, i) => `
       <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
         <div class="team-item-rank">${i + 1}</div>
         <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
@@ -431,20 +393,27 @@
       </div>`).join('');
   }
 
-  function renderTeamListByDivision() {
+  function renderTeamListByDivision(teams) {
     const listEl = document.getElementById('team-list');
-    const data = standingsTeamCache[currentSport];
-    if (!data?.groups.length) { listEl.innerHTML = `<div class="empty-note">No standings data available.</div>`; return; }
+    const divs = DIVISIONS[currentSport] || [];
+    if (!divs.length) { renderTeamList(teams); return; }
+
+    // Map abbr -> team for quick lookup
+    const byAbbr = {};
+    for (const t of teams) byAbbr[t.abbr] = t;
+
     let html = '';
-    data.groups.forEach(group => {
-      html += `<div class="team-group-label">${group.name}</div>`;
-      html += group.teams.map(t => `
+    divs.forEach(div => {
+      const divTeams = div.abbrs.map(a => byAbbr[a]).filter(Boolean);
+      if (!divTeams.length) return;
+      html += `<div class="team-group-label">${div.name}</div>`;
+      html += divTeams.map(t => `
         <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
           <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
           <div class="team-item-record">${t.record}</div>
         </div>`).join('');
     });
-    listEl.innerHTML = html;
+    listEl.innerHTML = html || `<div class="empty-note">No teams found.</div>`;
   }
 
   function renderTeamList(teams) {
@@ -587,7 +556,7 @@
     `;
 
     renderRoster(rosterData);
-    loadStandings();
+    renderStandings();
     loadInjuries(currentTeamId);
   }
 
@@ -665,64 +634,51 @@
   }
 
   // ─── STANDINGS ──────────────────────────────────────────────────────
-  async function loadStandings() {
-    const el = document.getElementById('standings-body');
-    const espn = SPORT_MAP[currentSport].espn;
-
-    if (standingsCache[currentSport]) {
-      renderStandings(standingsCache[currentSport]);
-      return;
-    }
-
-    try {
-      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${espn}/standings`);
-      const data = await res.json();
-      standingsCache[currentSport] = data;
-      renderStandings(data);
-    } catch(e) {
-      el.innerHTML = `<div class="empty-note">Couldn't load standings.</div>`;
-    }
-  }
-
-  function renderStandings(data) {
+  function renderStandings() {
     const el = document.getElementById('standings-body');
     if (!el) return;
 
-    const groups = data.children || data.standings?.entries ? [data] : (data.children || []);
+    const teams = teamsCache[currentSport];
+    if (!teams?.length) {
+      el.innerHTML = `<div class="empty-note">No standings data available.</div>`;
+      return;
+    }
+
+    const divs = DIVISIONS[currentSport] || [];
+    const byAbbr = {};
+    for (const t of teams) byAbbr[t.abbr] = t;
+
+    // Group by conference, sort each conference by win%
+    const confMap = {};
+    if (divs.length) {
+      divs.forEach(div => {
+        if (!confMap[div.conf]) confMap[div.conf] = [];
+        div.abbrs.forEach(a => { if (byAbbr[a]) confMap[div.conf].push(byAbbr[a]); });
+      });
+    } else {
+      confMap['League'] = [...teams];
+    }
 
     let html = '';
-    groups.forEach(group => {
-      const entries = group.standings?.entries || [];
-      const groupName = group.name || group.abbreviation || '';
-
-      if (groupName) {
-        html += `<table class="standings-table" style="margin-bottom:16px;">
-          <thead><tr>
-            <th colspan="2">${groupName}</th>
-            <th>W</th><th>L</th><th>PCT</th><th>GB</th><th>Strk</th>
-          </tr></thead>
-          <tbody>`;
-
-        entries.forEach((entry, i) => {
-          const name = entry.team?.displayName || '—';
-          const isCurrentTeam = name === currentTeamName;
-          const stats = entry.stats || [];
-          const wins = stats.find(s => s.name === 'wins')?.displayValue || '0';
-          const losses = stats.find(s => s.name === 'losses')?.displayValue || '0';
-          const w = parseInt(wins, 10), l = parseInt(losses, 10);
-          const pct = (w + l > 0) ? (w / (w + l)).toFixed(3).replace(/^0/, '') : '.000';
-          const gb = stats.find(s => s.name === 'gamesBehind')?.displayValue || '—';
-          const streak = stats.find(s => s.name === 'streak')?.displayValue || '—';
-
-          html += `<tr style="${isCurrentTeam ? 'background:var(--amber-light);' : ''}">
-            <td class="rank-cell">${i + 1}</td>
-            <td onclick="selectTeam('${entry.team?.id}', '${name.replace(/'/g,"\\'")}')" style="${isCurrentTeam ? 'color:var(--amber-dark);font-weight:700;' : ''}">${name}</td>
-            <td>${wins}</td><td>${losses}</td><td>${pct}</td><td>${gb}</td><td>${streak}</td>
-          </tr>`;
-        });
-
-        html += `</tbody></table>`;
-      }
+    Object.entries(confMap).forEach(([confName, confTeams]) => {
+      const sorted = confTeams.sort((a, b) => parseWinPct(b.record) - parseWinPct(a.record));
+      html += `<table class="standings-table" style="margin-bottom:16px;">
+        <thead><tr>
+          <th colspan="2">${confName}</th>
+          <th>W</th><th>L</th><th>PCT</th>
+        </tr></thead>
+        <tbody>`;
+      sorted.forEach((t, i) => {
+        const [w, l] = (t.record || '0-0').split('-').map(Number);
+        const pct = fmtPct(parseWinPct(t.record));
+        const isCurrentTeam = t.id === currentTeamId;
+        html += `<tr style="${isCurrentTeam ? 'background:var(--amber-light);' : ''}">
+          <td class="rank-cell">${i + 1}</td>
+          <td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')" style="${isCurrentTeam ? 'color:var(--amber-dark);font-weight:700;' : ''}">${t.name}</td>
+          <td>${isNaN(w) ? '—' : w}</td><td>${isNaN(l) ? '—' : l}</td><td>${pct}</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
     });
 
     el.innerHTML = html || `<div class="empty-note">No standings data available.</div>`;
