@@ -750,6 +750,7 @@
       const w = parseInt(wStr, 10);
       const l = parseInt(lStr, 10);
       const pct = (!isNaN(w) && !isNaN(l) && w + l > 0) ? (w / (w + l)).toFixed(3).slice(1) : '—';
+      console.log('[row]', t.name, '| divAbbr:', t.divAbbr, '| rec:', rec, '| split:', [wStr, lStr], '| w:', w, 'l:', l, '| pct:', pct);
       const isCurrent = t.id === currentTeamId;
       html += `<tr style="${isCurrent ? 'background:var(--amber-light);' : ''}">
         <td class="rank-cell">${i + 1}</td>
