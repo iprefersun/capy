@@ -527,19 +527,6 @@
       fetchPropsForTeam(teamName);
 
       renderTeamPanel(teamData, rosterData);
-
-      // Watch #division-body for any overwrites after renderStandings runs
-      const divEl = document.getElementById('division-body');
-      if (divEl) {
-        if (window._divObserver) window._divObserver.disconnect();
-        window._divObserver = new MutationObserver(mutations => {
-          for (const m of mutations) {
-            console.log('[MutationObserver] #division-body changed | new innerHTML:', m.target.innerHTML.slice(0, 300));
-          }
-        });
-        window._divObserver.observe(divEl, { childList: true, subtree: true, characterData: true });
-        console.log('[MutationObserver] watching #division-body');
-      }
     } catch(e) {
       panel.innerHTML = `<div class="empty-note">Couldn't load team data. Try again.</div>`;
     }
@@ -635,8 +622,8 @@
     `;
 
     renderRoster(rosterData);
-    renderStandings();
     loadInjuries(currentTeamId);
+    renderStandings();
   }
 
   // ─── ROSTER ─────────────────────────────────────────────────────────
@@ -648,17 +635,11 @@
       return;
     }
 
-    console.log('[roster] rosterData keys:', Object.keys(rosterData));
-    console.log('[roster] athletes raw:', JSON.stringify(rosterData.athletes).slice(0, 500));
-
     const raw = rosterData.athletes || [];
 
     // Detect flat vs grouped: flat array has player objects (with displayName/jersey),
     // grouped array has group objects (with items[])
     const isFlat = raw.length > 0 && (raw[0].displayName || raw[0].fullName) && !raw[0].items;
-
-    console.log('[roster] isFlat:', isFlat, '| first entry keys:', raw[0] ? Object.keys(raw[0]) : 'empty');
-    if (raw[0]) console.log('[roster] first entry full:', JSON.stringify(raw[0]).slice(0, 600));
 
     let groups;
     if (isFlat) {
@@ -671,13 +652,6 @@
     if (!groups.length) {
       bodyEl.innerHTML = `<div class="empty-note">No roster data available.</div>`;
       return;
-    }
-
-    // NBA: log first group and first athlete for structure diagnosis
-    if (currentSport === 'basketball_nba') {
-      console.log('[roster] first group full:', JSON.stringify(groups[0]).slice(0, 800));
-      const firstAthlete = groups[0]?.items?.[0] ?? (isFlat ? groups[0] : null);
-      console.log('[roster] first athlete full:', JSON.stringify(firstAthlete).slice(0, 800));
     }
 
     const GROUP_LABELS = {
@@ -713,8 +687,6 @@
     if (!group) return;
 
     const athletes = group.items || [];
-    console.log('[roster] showRosterGroup', idx, '| athletes count:', athletes.length);
-    if (athletes[0]) console.log('[roster] first athlete:', JSON.stringify(athletes[0]).slice(0, 600));
 
     if (!athletes.length) {
       bodyEl.innerHTML = `<div class="empty-note">No players in this group.</div>`;
@@ -766,7 +738,6 @@
 
   function renderStandings() {
     const el = document.getElementById('division-body');
-    console.log('[renderStandings called] el exists:', !!el, '| current innerHTML:', el ? el.innerHTML.slice(0, 200) : 'N/A');
     if (!el) return;
 
     const teams = teamsCache[currentSport];
@@ -774,13 +745,6 @@
 
     const currentTeamObj = teams.find(t => t.id === currentTeamId);
     const currentAbbr = currentTeamObj?.abbr;
-
-    // Debug: compare TEAM_RECORDS keys vs teamsCache abbreviations
-    const recordKeys = Object.keys(TEAM_RECORDS[currentSport] || {}).slice(0, 5);
-    const cacheAbbrs = teams.slice(0, 5).map(t => t.abbr);
-    console.log('[division] TEAM_RECORDS keys (first 5):', recordKeys);
-    console.log('[division] teamsCache abbrs (first 5):', cacheAbbrs);
-    console.log('[division] selected team:', currentTeamObj?.name, '| ESPN abbr:', currentAbbr, '| TEAM_RECORDS lookup:', TEAM_RECORDS[currentSport]?.[currentAbbr] ?? 'NOT FOUND');
 
     // Find the division — match ESPN abbr against DIVISIONS abbrs with flexible comparison
     const allDivs = DIVISIONS[currentSport] || [];
@@ -809,7 +773,6 @@
       const pct = (!isNaN(wins) && !isNaN(losses) && wins + losses > 0)
         ? (wins / (wins + losses)).toFixed(3).slice(1)
         : '—';
-      console.log('[row]', t.name, '| divAbbr:', t.divAbbr, '| rec:', rec, '| wins:', wins, 'losses:', losses, '| pct:', pct);
       const isCurrent = t.id === currentTeamId;
       const rowStyle = isCurrent ? 'background:var(--amber-light);' : '';
       const nameStyle = isCurrent ? 'color:var(--amber-dark);font-weight:700;' : '';
@@ -823,7 +786,6 @@
     });
 
     html += `</tbody></table>`;
-    console.log('[renderStandings writing] html length:', html.length, '| html:', html.slice(0, 500));
     el.innerHTML = html;
   }
 
