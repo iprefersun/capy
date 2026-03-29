@@ -635,8 +635,26 @@
       return;
     }
 
-    // ESPN returns athletes grouped by position group
-    const groups = rosterData.athletes || [];
+    console.log('[roster] rosterData keys:', Object.keys(rosterData));
+    console.log('[roster] athletes raw:', JSON.stringify(rosterData.athletes).slice(0, 500));
+
+    const raw = rosterData.athletes || [];
+
+    // Detect flat vs grouped: flat array has player objects (with displayName/jersey),
+    // grouped array has group objects (with items[])
+    const isFlat = raw.length > 0 && (raw[0].displayName || raw[0].fullName) && !raw[0].items;
+
+    console.log('[roster] isFlat:', isFlat, '| first entry keys:', raw[0] ? Object.keys(raw[0]) : 'empty');
+    if (raw[0]) console.log('[roster] first entry full:', JSON.stringify(raw[0]).slice(0, 600));
+
+    let groups;
+    if (isFlat) {
+      // Flat array — wrap in a single synthetic group
+      groups = [{ displayName: 'All Players', items: raw }];
+    } else {
+      groups = raw;
+    }
+
     if (!groups.length) {
       bodyEl.innerHTML = `<div class="empty-note">No roster data available.</div>`;
       return;
@@ -660,6 +678,9 @@
     if (!group) return;
 
     const athletes = group.items || [];
+    console.log('[roster] showRosterGroup', idx, '| athletes count:', athletes.length);
+    if (athletes[0]) console.log('[roster] first athlete:', JSON.stringify(athletes[0]).slice(0, 600));
+
     if (!athletes.length) {
       bodyEl.innerHTML = `<div class="empty-note">No players in this group.</div>`;
       return;
