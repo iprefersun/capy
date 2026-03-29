@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       t.name?.toLowerCase().includes(needle) ||
       t.city?.toLowerCase().includes(needle)
     );
+    console.log('[stats] team search:', team ? `found ${team.full_name} (id=${team.id})` : `no match for "${teamName}"`);
     if (!team) return res.status(200).json([]);
 
     // 2. Fetch players for that team
@@ -29,6 +30,7 @@ export default async function handler(req, res) {
     const playersData = await playersRes.json();
 
     const players = playersData.data || [];
+    console.log('[stats] players fetched:', players.length);
     if (!players.length) return res.status(200).json([]);
 
     // 3. Fetch season averages for all players in one request
@@ -64,6 +66,7 @@ export default async function handler(req, res) {
 
     res.status(200).json(result);
   } catch (err) {
+    console.error('[stats] error:', err.message, err.stack);
     res.status(200).json([]);
   }
 }
