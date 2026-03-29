@@ -718,6 +718,13 @@
     const currentTeamObj = teams.find(t => t.id === currentTeamId);
     const currentAbbr = currentTeamObj?.abbr;
 
+    // Debug: compare TEAM_RECORDS keys vs teamsCache abbreviations
+    const recordKeys = Object.keys(TEAM_RECORDS[currentSport] || {}).slice(0, 5);
+    const cacheAbbrs = teams.slice(0, 5).map(t => t.abbr);
+    console.log('[division] TEAM_RECORDS keys (first 5):', recordKeys);
+    console.log('[division] teamsCache abbrs (first 5):', cacheAbbrs);
+    console.log('[division] selected team:', currentTeamObj?.name, '| ESPN abbr:', currentAbbr, '| TEAM_RECORDS lookup:', TEAM_RECORDS[currentSport]?.[currentAbbr] ?? 'NOT FOUND');
+
     // Find the division — match ESPN abbr against DIVISIONS abbrs with flexible comparison
     const allDivs = DIVISIONS[currentSport] || [];
     const div = allDivs.find(d =>
