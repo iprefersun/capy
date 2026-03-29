@@ -503,7 +503,7 @@
       <!-- ROSTER / STATS -->
       <div class="section">
         <div class="section-header">
-          <div class="section-title">Roster & stats</div>
+          <div class="section-title">Roster</div>
           <span class="section-badge badge-free">Free</span>
         </div>
         <div class="section-body">
@@ -601,34 +601,34 @@
       return;
     }
 
-    const cols = SPORT_MAP[currentSport].statCols;
-
     bodyEl.innerHTML = `
       <table class="stats-table">
         <thead>
           <tr>
             <th>#</th>
             <th style="text-align:left;">Player</th>
-            <th>Age</th>
-            ${cols.map(c => `<th>${c}</th>`).join('')}
+            <th>Pos</th>
+            <th>Ht</th>
+            <th>Wt</th>
+            <th>Country</th>
           </tr>
         </thead>
         <tbody>
           ${athletes.map(a => {
-            const name = a.displayName || a.fullName || [a.firstName, a.lastName].filter(Boolean).join(' ') || '—';
+            const name = a.displayName || a.fullName || '—';
             const jersey = a.jersey || '—';
-            const age = a.age || '—';
-            const pos = a.position?.abbreviation || '';
-            const statVals = cols.map(() => '—');
+            const pos = a.position?.abbreviation || '—';
+            const ht = a.displayHeight || a.height || '—';
+            const wt = a.displayWeight || (a.weight ? `${a.weight} lbs` : '—');
+            const country = a.birthPlace?.country || '—';
             return `
               <tr>
                 <td style="color:var(--text-hint);font-family:'DM Mono',monospace;font-size:11px;">${jersey}</td>
-                <td>
-                  <div class="player-name-cell">${name}</div>
-                  <div class="player-pos-cell">${pos}</div>
-                </td>
-                <td>${age}</td>
-                ${statVals.map(v => `<td>${v}</td>`).join('')}
+                <td><div class="player-name-cell">${name}</div></td>
+                <td>${pos}</td>
+                <td>${ht}</td>
+                <td>${wt}</td>
+                <td>${country}</td>
               </tr>`;
           }).join('')}
         </tbody>
