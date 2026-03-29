@@ -753,6 +753,7 @@
 
   function renderStandings() {
     const el = document.getElementById('division-body');
+    console.log('[renderStandings called] el exists:', !!el, '| current innerHTML:', el ? el.innerHTML.slice(0, 200) : 'N/A');
     if (!el) return;
 
     const teams = teamsCache[currentSport];
@@ -809,6 +810,7 @@
     });
 
     html += `</tbody></table>`;
+    console.log('[renderStandings writing] html length:', html.length, '| html:', html.slice(0, 500));
     el.innerHTML = html;
   }
 
