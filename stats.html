@@ -555,17 +555,6 @@
         </div>
       </div>
 
-      <!-- STANDINGS -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-title">League standings</div>
-          <span class="section-badge badge-free">Free</span>
-        </div>
-        <div class="section-body" id="standings-body">
-          <div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading standings...</span></div>
-        </div>
-      </div>
-
       <!-- ROSTER / STATS -->
       <div class="section">
         <div class="section-header">
@@ -604,6 +593,15 @@
             <div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading injury report...</span></div>
           </div>
         </div>
+      </div>
+
+      <!-- DIVISION STANDING -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Division standing</div>
+          <span class="section-badge badge-free">Free</span>
+        </div>
+        <div id="division-body"></div>
       </div>
 
       <!-- LINE MOVEMENT — PRO -->
@@ -701,63 +699,44 @@
       </table>`;
   }
 
-  // ─── STANDINGS ──────────────────────────────────────────────────────
+  // ─── DIVISION STANDING ──────────────────────────────────────────────
   function renderStandings() {
-    const el = document.getElementById('standings-body');
+    const el = document.getElementById('division-body');
     if (!el) return;
 
     const teams = teamsCache[currentSport];
-    if (!teams?.length) {
-      el.innerHTML = `<div class="empty-note">No standings data available.</div>`;
-      return;
-    }
+    if (!teams?.length) { el.innerHTML = `<div class="empty-note">No data.</div>`; return; }
 
-    const divs = DIVISIONS[currentSport] || [];
     const byAbbr = {};
     for (const t of teams) byAbbr[t.abbr] = t;
 
-    // Build conference → divisions structure
-    const confOrder = [];
-    const confDivs = {};
-    divs.forEach(div => {
-      if (!confDivs[div.conf]) { confDivs[div.conf] = []; confOrder.push(div.conf); }
-      confDivs[div.conf].push(div);
-    });
-    if (!confOrder.length) confOrder.push('League'), confDivs['League'] = [{ name: '', abbrs: teams.map(t => t.abbr) }];
+    const currentTeamObj = teams.find(t => t.id === currentTeamId);
+    const currentAbbr = currentTeamObj?.abbr;
 
-    let html = '';
-    confOrder.forEach(confName => {
-      html += `<table class="standings-table" style="margin-bottom:20px;">
-        <thead><tr>
-          <th colspan="2">${confName}</th>
-          <th>W</th><th>L</th><th>PCT</th>
-        </tr></thead>
-        <tbody>`;
+    const div = (DIVISIONS[currentSport] || []).find(d => d.abbrs.includes(currentAbbr));
+    if (!div) { el.innerHTML = `<div class="empty-note">Division data not available.</div>`; return; }
 
-      confDivs[confName].forEach(div => {
-        // Division sub-header row
-        if (div.name) {
-          html += `<tr class="standings-divider"><td colspan="5">${div.name}</td></tr>`;
-        }
-        const divTeams = div.abbrs.map(a => byAbbr[a]).filter(Boolean)
-          .sort((a, b) => parseWinPct(getRecord(b.abbr)) - parseWinPct(getRecord(a.abbr)));
-        divTeams.forEach((t, i) => {
-          const rec = getRecord(t.abbr);
-          const [w, l] = rec ? rec.split('-').map(Number) : [0, 0];
-          const pct = rec ? fmtPct(parseWinPct(rec)) : '.000';
-          const isCurrentTeam = t.id === currentTeamId;
-          html += `<tr style="${isCurrentTeam ? 'background:var(--amber-light);' : ''}">
-            <td class="rank-cell">${i + 1}</td>
-            <td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')" style="${isCurrentTeam ? 'color:var(--amber-dark);font-weight:700;' : ''}">${t.name}</td>
-            <td>${isNaN(w) ? '—' : w}</td><td>${isNaN(l) ? '—' : l}</td><td>${pct}</td>
-          </tr>`;
-        });
-      });
+    const divTeams = div.abbrs.map(a => byAbbr[a]).filter(Boolean)
+      .sort((a, b) => parseWinPct(getRecord(b.abbr)) - parseWinPct(getRecord(a.abbr)));
 
-      html += `</tbody></table>`;
+    let html = `<table class="standings-table"><thead><tr>
+        <th></th><th style="text-align:left;">Team</th><th>W</th><th>L</th><th>PCT</th>
+      </tr></thead><tbody>`;
+
+    divTeams.forEach((t, i) => {
+      const rec = getRecord(t.abbr);
+      const [w, l] = rec ? rec.split('-').map(Number) : [0, 0];
+      const pct = rec ? fmtPct(parseWinPct(rec)) : '.000';
+      const isCurrent = t.id === currentTeamId;
+      html += `<tr style="${isCurrent ? 'background:var(--amber-light);' : ''}">
+        <td class="rank-cell">${i + 1}</td>
+        <td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')" style="${isCurrent ? 'color:var(--amber-dark);font-weight:700;' : ''}">${t.name}</td>
+        <td>${isNaN(w) ? '—' : w}</td><td>${isNaN(l) ? '—' : l}</td><td>${pct}</td>
+      </tr>`;
     });
 
-    el.innerHTML = html || `<div class="empty-note">No standings data available.</div>`;
+    html += `</tbody></table>`;
+    el.innerHTML = html;
   }
 
   // ─── PLAYER PROPS ───────────────────────────────────────────────────
