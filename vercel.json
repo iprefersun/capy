@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/odds", "destination": "/odds.html" },
-    { "source": "/api/odds", "destination": "/api/odds" }
+    { "source": "/odds", "destination": "/odds.html" }
   ]
 }
