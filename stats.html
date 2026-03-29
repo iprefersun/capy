@@ -579,9 +579,10 @@
     }
 
     // Build tabs per position group
-    tabsEl.innerHTML = groups.map((g, i) => `
-      <button class="inner-tab ${i === 0 ? 'active' : ''}" onclick="showRosterGroup(${i})">${g.position || g.displayName || 'Players'}</button>
-    `).join('');
+    tabsEl.innerHTML = groups.map((g, i) => {
+      const label = g.displayName || (typeof g.position === 'string' ? g.position : g.position?.displayName) || 'Players';
+      return `<button class="inner-tab ${i === 0 ? 'active' : ''}" onclick="showRosterGroup(${i})">${label}</button>`;
+    }).join('');
 
     // Store groups globally for tab switching
     window._rosterGroups = groups;
@@ -594,7 +595,7 @@
     const bodyEl = document.getElementById('roster-body');
     if (!group) return;
 
-    const athletes = group.items || group.athletes || [];
+    const athletes = group.items || [];
     if (!athletes.length) {
       bodyEl.innerHTML = `<div class="empty-note">No players in this group.</div>`;
       return;
@@ -614,17 +615,17 @@
         </thead>
         <tbody>
           ${athletes.map(a => {
-            const stats = a.statistics || [];
+            const name = a.displayName || a.fullName || [a.firstName, a.lastName].filter(Boolean).join(' ') || '—';
             const jersey = a.jersey || '—';
             const age = a.age || '—';
-            // Try to pull stats by name matching
+            const pos = a.position?.abbreviation || '';
             const statVals = cols.map(() => '—');
             return `
               <tr>
                 <td style="color:var(--text-hint);font-family:'DM Mono',monospace;font-size:11px;">${jersey}</td>
                 <td>
-                  <div class="player-name-cell">${a.displayName || a.fullName || '—'}</div>
-                  <div class="player-pos-cell">${a.position?.abbreviation || ''}</div>
+                  <div class="player-name-cell">${name}</div>
+                  <div class="player-pos-cell">${pos}</div>
                 </td>
                 <td>${age}</td>
                 ${statVals.map(v => `<td>${v}</td>`).join('')}
