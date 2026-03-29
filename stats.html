@@ -283,6 +283,9 @@
     currentSport = sport;
     currentTeamId = null;
     currentTeamName = null;
+    // Reset sort to A-Z
+    currentSort = 'az';
+    document.querySelectorAll('.sort-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
     document.getElementById('main-panel').innerHTML = `
       <div class="welcome">
         <span class="welcome-icon">🦫</span>
@@ -352,40 +355,66 @@
       const data = await res.json();
       standingsCache[sport] = data;
 
-      const rawGroups = data.children?.length ? data.children : (data.standings ? [data] : []);
+      if (sport === 'basketball_nba') {
+        console.log('[standings] raw NBA response:', JSON.stringify(data).slice(0, 2000));
+      }
+
       const groups = [];
 
-      rawGroups.forEach(conf => {
+      // Handle two possible shapes:
+      // Shape A: data.children[] → each child has children[] (conferences → divisions)
+      // Shape B: data.children[] → each child directly has standings.entries[]
+      const topLevel = data.children || [];
+
+      topLevel.forEach(conf => {
         const confName = conf.name || conf.abbreviation || '';
-        const subGroups = conf.children || [];
-        if (subGroups.length) {
-          subGroups.forEach(div => {
+        const hasDivisions = conf.children?.length > 0;
+
+        if (hasDivisions) {
+          // Shape A: conferences containing divisions
+          conf.children.forEach(div => {
             const divName = div.name || div.abbreviation || '';
-            const teams = (div.standings?.entries || []).map(entryToTeam);
+            const entries = div.standings?.entries || [];
+            const teams = entries.map(entryToTeam);
             if (teams.length) groups.push({ name: `${confName} — ${divName}`, teams });
           });
         } else {
-          const teams = (conf.standings?.entries || []).map(entryToTeam);
+          // Shape B: conferences directly containing entries
+          const entries = conf.standings?.entries || [];
+          const teams = entries.map(entryToTeam);
           if (teams.length) groups.push({ name: confName, teams });
         }
       });
 
+      // Fallback: data itself has standings.entries (flat response)
+      if (!groups.length && data.standings?.entries?.length) {
+        groups.push({ name: '', teams: data.standings.entries.map(entryToTeam) });
+      }
+
       const flat = groups.flatMap(g => g.teams).sort((a, b) => b.winPct - a.winPct);
+      console.log('[standings] groups built:', groups.map(g => `${g.name}(${g.teams.length})`));
       standingsTeamCache[sport] = { groups, flat };
     } catch(e) {
+      console.error('[standings] fetch error:', e.message);
       standingsTeamCache[sport] = { groups: [], flat: [] };
     }
   }
 
   function entryToTeam(entry) {
     const stats = entry.stats || [];
-    const winPct = parseFloat(stats.find(s => s.name === 'winPercent')?.value ?? 0);
-    const wins = stats.find(s => s.name === 'wins')?.displayValue || '—';
-    const losses = stats.find(s => s.name === 'losses')?.displayValue || '—';
+    const wins = stats.find(s => s.name === 'wins')?.displayValue || '0';
+    const losses = stats.find(s => s.name === 'losses')?.displayValue || '0';
+    // Try winPercent stat first; fall back to calculating from wins/losses
+    let winPct = parseFloat(stats.find(s => s.name === 'winPercent')?.value ?? NaN);
+    if (isNaN(winPct)) {
+      const w = parseInt(wins, 10), l = parseInt(losses, 10);
+      winPct = (w + l > 0) ? w / (w + l) : 0;
+    }
+    const record = (wins !== '0' || losses !== '0') ? `${wins}-${losses}` : '';
     return {
       id: entry.team?.id,
       name: entry.team?.displayName || '—',
-      record: (wins !== '—' && losses !== '—') ? `${wins}-${losses}` : '',
+      record,
       winPct
     };
   }
