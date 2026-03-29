@@ -527,6 +527,19 @@
       fetchPropsForTeam(teamName);
 
       renderTeamPanel(teamData, rosterData);
+
+      // Watch #division-body for any overwrites after renderStandings runs
+      const divEl = document.getElementById('division-body');
+      if (divEl) {
+        if (window._divObserver) window._divObserver.disconnect();
+        window._divObserver = new MutationObserver(mutations => {
+          for (const m of mutations) {
+            console.log('[MutationObserver] #division-body changed | new innerHTML:', m.target.innerHTML.slice(0, 300));
+          }
+        });
+        window._divObserver.observe(divEl, { childList: true, subtree: true, characterData: true });
+        console.log('[MutationObserver] watching #division-body');
+      }
     } catch(e) {
       panel.innerHTML = `<div class="empty-note">Couldn't load team data. Try again.</div>`;
     }
