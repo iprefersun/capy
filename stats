@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capy Stats — Team & Player Explorer</title>
+  <meta name="description" content="Browse team standings, player stats, props, and injury reports for NBA, NFL, MLB, and NHL." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,900;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --amber: #BA7517;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --green: #1D9E75;
+      --green-light: #EAF3DE;
+      --green-dark: #27500A;
+      --red: #D85A30;
+      --red-light: #FAECE7;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --text-hint: #9b9b9b;
+      --border: rgba(0,0,0,0.08);
+      --border-mid: rgba(0,0,0,0.15);
+      --surface: #fff;
+      --surface-2: #f7f6f3;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: #f5f4f1; line-height: 1.5; }
+
+    /* NAV */
+    nav { background: #fff; border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
+    .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; }
+    .btn-small { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 6px; border: none; background: var(--amber); color: #fff; cursor: pointer; text-decoration: none; }
+    .nav-link { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .nav-link:hover { color: var(--text); }
+
+    /* LAYOUT */
+    .page { max-width: 1200px; margin: 0 auto; padding: 1.5rem; display: grid; grid-template-columns: 280px 1fr; gap: 1.25rem; align-items: start; }
+
+    /* SIDEBAR */
+    .sidebar { position: sticky; top: 68px; display: flex; flex-direction: column; gap: 10px; }
+
+    .sidebar-card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
+    .sidebar-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); padding: 12px 14px 6px; }
+
+    /* SPORT TABS */
+    .sport-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; }
+    .sport-tab { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-mid); background: var(--surface-2); color: var(--text-muted); cursor: pointer; transition: all 0.15s; text-align: center; }
+    .sport-tab:hover { border-color: var(--amber); color: var(--amber); }
+    .sport-tab.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+    .sport-tab .sport-emoji { display: block; font-size: 18px; margin-bottom: 2px; }
+
+    /* TEAM LIST */
+    .team-list { display: flex; flex-direction: column; max-height: 480px; overflow-y: auto; }
+    .team-list::-webkit-scrollbar { width: 4px; }
+    .team-list::-webkit-scrollbar-track { background: transparent; }
+    .team-list::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+    .team-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; cursor: pointer; border-bottom: 0.5px solid var(--border); transition: background 0.1s; }
+    .team-item:last-child { border-bottom: none; }
+    .team-item:hover { background: var(--surface-2); }
+    .team-item.active { background: var(--amber-light); }
+    .team-item-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .team-item-record { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-hint); }
+    .team-item-rank { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 4px; background: var(--surface-2); color: var(--text-hint); display: flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0; }
+    .team-item.active .team-item-rank { background: var(--amber); color: #fff; }
+
+    /* MAIN PANEL */
+    .main-panel { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+
+    /* WELCOME STATE */
+    .welcome { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 3rem 2rem; text-align: center; }
+    .welcome-icon { font-size: 52px; display: block; margin-bottom: 1rem; }
+    .welcome-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+    .welcome-sub { font-size: 14px; color: var(--text-muted); max-width: 340px; margin: 0 auto; }
+
+    /* SECTION CARD */
+    .section { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 0.5px solid var(--border); }
+    .section-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 900; color: var(--text); }
+    .section-badge { font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+    .badge-free { background: var(--green-light); color: var(--green-dark); }
+    .badge-pro { background: var(--amber-light); color: var(--amber-dark); }
+    .section-body { padding: 16px 18px; }
+
+    /* TEAM HERO */
+    .team-hero { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .team-hero-name { font-family: 'Fraunces', serif; font-size: clamp(22px, 3vw, 32px); font-weight: 900; color: var(--text); }
+    .team-hero-sport { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-hint); margin-bottom: 4px; }
+    .team-hero-record { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+    .team-hero-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .hero-stat { text-align: right; }
+    .hero-stat-val { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--text); }
+    .hero-stat-val.green { color: var(--green); }
+    .hero-stat-val.amber { color: var(--amber); }
+    .hero-stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-hint); margin-top: 2px; }
+
+    /* STATS TABLE */
+    .stats-table { width: 100%; border-collapse: collapse; }
+    .stats-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); text-align: left; padding: 6px 10px; border-bottom: 0.5px solid var(--border); }
+    .stats-table th:not(:first-child) { text-align: right; }
+    .stats-table td { font-size: 13px; padding: 9px 10px; border-bottom: 0.5px solid var(--border); color: var(--text); }
+    .stats-table td:not(:first-child) { font-family: 'DM Mono', monospace; font-size: 12px; text-align: right; color: var(--text-muted); }
+    .stats-table tr:last-child td { border-bottom: none; }
+    .stats-table tr:hover td { background: var(--surface-2); }
+    .player-name-cell { font-weight: 600; }
+    .player-pos-cell { font-size: 10px; color: var(--text-hint); margin-top: 1px; }
+    .stat-highlight { color: var(--green) !important; font-weight: 700 !important; }
+
+    /* STANDINGS TABLE */
+    .standings-table { width: 100%; border-collapse: collapse; }
+    .standings-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); padding: 6px 10px; border-bottom: 0.5px solid var(--border); text-align: right; }
+    .standings-table th:first-child { text-align: left; }
+    .standings-table td { font-size: 13px; padding: 9px 10px; border-bottom: 0.5px solid var(--border); text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+    .standings-table td:first-child { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); text-align: left; cursor: pointer; }
+    .standings-table td:first-child:hover { color: var(--amber); }
+    .standings-table tr:last-child td { border-bottom: none; }
+    .standings-table tr:hover td { background: var(--surface-2); }
+    .standings-table .rank-cell { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-hint); width: 28px; }
+    .standings-divider td { background: var(--surface-2); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); padding: 4px 10px; text-align: left !important; font-family: 'Inter', sans-serif !important; color: var(--text-hint) !important; font-size: 10px !important; cursor: default !important; }
+    .standings-divider td:hover { background: var(--surface-2) !important; }
+
+    /* PROPS TABLE */
+    .props-grid { display: flex; flex-direction: column; gap: 6px; }
+    .prop-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--surface-2); border-radius: var(--radius-sm); gap: 8px; flex-wrap: wrap; }
+    .prop-player { font-size: 13px; font-weight: 600; color: var(--text); }
+    .prop-type { font-size: 11px; color: var(--text-hint); margin-top: 1px; }
+    .prop-line { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text-muted); }
+    .prop-odds { display: flex; gap: 6px; }
+    .prop-odd-btn { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: var(--surface); border: 0.5px solid var(--border-mid); color: var(--text); }
+    .prop-odd-btn.best { background: var(--green-light); color: var(--green-dark); border-color: var(--green); }
+
+    /* INJURY LIST */
+    .injury-list { display: flex; flex-direction: column; gap: 8px; }
+    .injury-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--surface-2); border-radius: var(--radius-sm); flex-wrap: wrap; gap: 8px; }
+    .injury-player { font-size: 13px; font-weight: 600; color: var(--text); }
+    .injury-detail { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+    .injury-status { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .status-out { background: var(--red-light); color: var(--red); }
+    .status-doubtful { background: var(--red-light); color: var(--red); }
+    .status-questionable { background: var(--amber-light); color: var(--amber-dark); }
+    .status-probable { background: var(--green-light); color: var(--green-dark); }
+    .status-day-to-day { background: var(--amber-light); color: var(--amber-dark); }
+
+    /* PRO GATE */
+    .pro-gate { background: var(--surface-2); border-radius: var(--radius-sm); padding: 2rem; text-align: center; border: 1.5px dashed var(--border-mid); }
+    .pro-gate-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+    .pro-gate-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+    .pro-gate-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6; }
+
+    /* LOADING / EMPTY */
+    .spinner-wrap { display: flex; align-items: center; justify-content: center; padding: 2.5rem; gap: 10px; }
+    .spinner { width: 24px; height: 24px; border: 2.5px solid var(--amber-light); border-top-color: var(--amber); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-text { font-size: 13px; color: var(--text-muted); }
+    .empty-note { font-size: 13px; color: var(--text-hint); text-align: center; padding: 1.5rem; }
+
+    /* TABS inside section */
+    .inner-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .inner-tab { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface-2); color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
+    .inner-tab:hover { border-color: var(--amber); color: var(--amber); }
+    .inner-tab.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+
+    /* FOOTER */
+    .page-footer { text-align: center; padding: 1.5rem; font-size: 11px; color: var(--text-hint); grid-column: 1 / -1; }
+
+    @media (max-width: 768px) {
+      .page { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .team-list { max-height: 260px; }
+      .team-hero-stats { gap: 1rem; }
+    }
+    @media (max-width: 480px) {
+      .sport-tabs { grid-template-columns: repeat(4, 1fr); }
+      .sport-tab .sport-emoji { font-size: 14px; }
+      .sport-tab { font-size: 11px; padding: 6px 4px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="logo-mark">🐾</div>
+      Capy
+    </a>
+    <div class="nav-right">
+      <a href="/odds" class="nav-link">← Live odds</a>
+      <span class="nav-badge">Founding rate — $7/mo</span>
+      <a href="/#signup" class="btn-small">Go Pro</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-section-title">Sport</div>
+      <div class="sport-tabs">
+        <button class="sport-tab active" onclick="selectSport('basketball_nba', this)">
+          <span class="sport-emoji">🏀</span>NBA
+        </button>
+        <button class="sport-tab" onclick="selectSport('americanfootball_nfl', this)">
+          <span class="sport-emoji">🏈</span>NFL
+        </button>
+        <button class="sport-tab" onclick="selectSport('baseball_mlb', this)">
+          <span class="sport-emoji">⚾</span>MLB
+        </button>
+        <button class="sport-tab" onclick="selectSport('icehockey_nhl', this)">
+          <span class="sport-emoji">🏒</span>NHL
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-section-title">Teams</div>
+      <div class="team-list" id="team-list">
+        <div class="spinner-wrap">
+          <div class="spinner"></div>
+          <span class="spinner-text">Loading teams...</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN PANEL -->
+  <main class="main-panel" id="main-panel">
+    <div class="welcome">
+      <span class="welcome-icon">🦫</span>
+      <div class="welcome-title">Pick a team to explore</div>
+      <div class="welcome-sub">Select a sport and team from the sidebar to see standings, player stats, props, and injury reports.</div>
+    </div>
+  </main>
+
+  <div class="page-footer">
+    Must be 21+ to bet. Gambling problem? Call 1-800-GAMBLER. Odds subject to change. &nbsp;·&nbsp; <a href="/" style="color:var(--amber);">Back to Capy</a>
+  </div>
+
+</div>
+
+<script>
+  const SPORT_MAP = {
+    basketball_nba: { espn: 'basketball/nba', label: 'NBA', statCols: ['PTS','REB','AST','FG%'], statKeys: ['avgPoints','avgRebounds','avgAssists','fieldGoalPct'] },
+    americanfootball_nfl: { espn: 'football/nfl', label: 'NFL', statCols: ['YDS','TD','INT','RAT'], statKeys: ['passingYards','passingTouchdowns','interceptions','passerRating'] },
+    baseball_mlb: { espn: 'baseball/mlb', label: 'MLB', statCols: ['AVG','HR','RBI','OPS'], statKeys: ['avg','homeRuns','RBI','OPS'] },
+    icehockey_nhl: { espn: 'hockey/nhl', label: 'NHL', statCols: ['G','A','PTS','+/-'], statKeys: ['goals','assists','points','plusMinus'] }
+  };
+
+  let currentSport = 'basketball_nba';
+  let currentTeamId = null;
+  let currentTeamName = null;
+  let teamsCache = {};
+  let standingsCache = {};
+
+  // ─── SPORT SELECTION ───────────────────────────────────────────────
+  async function selectSport(sport, el) {
+    document.querySelectorAll('.sport-tab').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    currentSport = sport;
+    currentTeamId = null;
+    currentTeamName = null;
+    document.getElementById('main-panel').innerHTML = `
+      <div class="welcome">
+        <span class="welcome-icon">🦫</span>
+        <div class="welcome-title">Pick a team to explore</div>
+        <div class="welcome-sub">Select a team from the sidebar to see standings, player stats, props, and injury reports.</div>
+      </div>`;
+    await loadTeamList(sport);
+  }
+
+  // ─── TEAM LIST ──────────────────────────────────────────────────────
+  async function loadTeamList(sport) {
+    const listEl = document.getElementById('team-list');
+    listEl.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading teams...</span></div>`;
+
+    if (teamsCache[sport]) {
+      renderTeamList(teamsCache[sport]);
+      return;
+    }
+
+    try {
+      const espn = SPORT_MAP[sport].espn;
+      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${espn}/teams?limit=50`);
+      const data = await res.json();
+      const teams = data.sports?.[0]?.leagues?.[0]?.teams?.map(t => ({
+        id: t.team.id,
+        name: t.team.displayName,
+        abbr: t.team.abbreviation,
+        record: t.team.record?.items?.[0]?.summary || ''
+      })).sort((a, b) => a.name.localeCompare(b.name)) || [];
+      teamsCache[sport] = teams;
+      renderTeamList(teams);
+    } catch(e) {
+      listEl.innerHTML = `<div class="empty-note">Couldn't load teams. Try refreshing.</div>`;
+    }
+  }
+
+  function renderTeamList(teams) {
+    const listEl = document.getElementById('team-list');
+    if (!teams.length) {
+      listEl.innerHTML = `<div class="empty-note">No teams found.</div>`;
+      return;
+    }
+    listEl.innerHTML = teams.map((t, i) => `
+      <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
+        <div class="team-item-rank">${i + 1}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="team-item-name">${t.name}</div>
+        </div>
+        <div class="team-item-record">${t.record}</div>
+      </div>`).join('');
+  }
+
+  // ─── TEAM SELECTION ─────────────────────────────────────────────────
+  async function selectTeam(teamId, teamName) {
+    currentTeamId = teamId;
+    currentTeamName = teamName;
+
+    // update sidebar highlight
+    document.querySelectorAll('.team-item').forEach(el => {
+      el.classList.toggle('active', el.onclick?.toString().includes(`'${teamId}'`));
+    });
+
+    const panel = document.getElementById('main-panel');
+    panel.innerHTML = `<div class="spinner-wrap" style="padding:4rem;"><div class="spinner"></div><span class="spinner-text">Loading ${teamName}...</span></div>`;
+
+    const espn = SPORT_MAP[currentSport].espn;
+
+    try {
+      const [teamRes, rosterRes] = await Promise.all([
+        fetch(`https://site.api.espn.com/apis/site/v2/sports/${espn}/teams/${teamId}`),
+        fetch(`https://site.api.espn.com/apis/site/v2/sports/${espn}/teams/${teamId}/roster`)
+      ]);
+      const teamData = await teamRes.json();
+      const rosterData = await rosterRes.json();
+
+      // Also fetch props in background — don't block render
+      fetchPropsForTeam(teamName);
+
+      renderTeamPanel(teamData, rosterData);
+    } catch(e) {
+      panel.innerHTML = `<div class="empty-note">Couldn't load team data. Try again.</div>`;
+    }
+  }
+
+  // ─── RENDER TEAM PANEL ──────────────────────────────────────────────
+  function renderTeamPanel(teamData, rosterData) {
+    const panel = document.getElementById('main-panel');
+    const team = teamData.team;
+    const record = team?.record?.items?.[0]?.summary || '—';
+    const label = SPORT_MAP[currentSport].label;
+
+    panel.innerHTML = `
+      <!-- HERO -->
+      <div class="team-hero">
+        <div>
+          <div class="team-hero-sport">${label}</div>
+          <div class="team-hero-name">${team.displayName}</div>
+          <div class="team-hero-record">${record}</div>
+        </div>
+        <div class="team-hero-stats" id="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-val">—</div>
+            <div class="hero-stat-label">Win %</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STANDINGS -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">League standings</div>
+          <span class="section-badge badge-free">Free</span>
+        </div>
+        <div class="section-body" id="standings-body">
+          <div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading standings...</span></div>
+        </div>
+      </div>
+
+      <!-- ROSTER / STATS -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Roster & stats</div>
+          <span class="section-badge badge-free">Free</span>
+        </div>
+        <div class="section-body">
+          <div class="inner-tabs" id="roster-tabs"></div>
+          <div id="roster-body">
+            <div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading roster...</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAYER PROPS -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Player props</div>
+          <span class="section-badge badge-free">Free</span>
+        </div>
+        <div class="section-body">
+          <div id="props-body">
+            <div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Fetching props from sportsbooks...</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INJURIES -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Injury report</div>
+          <span class="section-badge badge-free">Free</span>
+        </div>
+        <div class="section-body">
+          <div id="injury-body">
+            <div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading injury report...</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LINE MOVEMENT — PRO -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Line movement</div>
+          <span class="section-badge badge-pro">Pro</span>
+        </div>
+        <div class="section-body">
+          <div class="pro-gate">
+            <span class="pro-gate-icon">📈</span>
+            <div class="pro-gate-title">Track how lines move</div>
+            <div class="pro-gate-sub">See opening lines, sharp money moves, and public betting percentages for every upcoming game involving this team.</div>
+            <a href="/#signup" class="btn-small">Unlock for $7/mo</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    renderRoster(rosterData);
+    loadStandings();
+    loadInjuries(currentTeamId);
+  }
+
+  // ─── ROSTER ─────────────────────────────────────────────────────────
+  function renderRoster(rosterData) {
+    const tabsEl = document.getElementById('roster-tabs');
+    const bodyEl = document.getElementById('roster-body');
+    if (!rosterData) {
+      bodyEl.innerHTML = `<div class="empty-note">No roster data available.</div>`;
+      return;
+    }
+
+    // ESPN returns athletes grouped by position group
+    const groups = rosterData.athletes || [];
+    if (!groups.length) {
+      bodyEl.innerHTML = `<div class="empty-note">No roster data available.</div>`;
+      return;
+    }
+
+    // Build tabs per position group
+    tabsEl.innerHTML = groups.map((g, i) => `
+      <button class="inner-tab ${i === 0 ? 'active' : ''}" onclick="showRosterGroup(${i})">${g.position || g.displayName || 'Players'}</button>
+    `).join('');
+
+    // Store groups globally for tab switching
+    window._rosterGroups = groups;
+    showRosterGroup(0);
+  }
+
+  function showRosterGroup(idx) {
+    document.querySelectorAll('.inner-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+    const group = window._rosterGroups?.[idx];
+    const bodyEl = document.getElementById('roster-body');
+    if (!group) return;
+
+    const athletes = group.items || group.athletes || [];
+    if (!athletes.length) {
+      bodyEl.innerHTML = `<div class="empty-note">No players in this group.</div>`;
+      return;
+    }
+
+    const cols = SPORT_MAP[currentSport].statCols;
+
+    bodyEl.innerHTML = `
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th style="text-align:left;">Player</th>
+            <th>Age</th>
+            ${cols.map(c => `<th>${c}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${athletes.map(a => {
+            const stats = a.statistics || [];
+            const jersey = a.jersey || '—';
+            const age = a.age || '—';
+            // Try to pull stats by name matching
+            const statVals = cols.map(() => '—');
+            return `
+              <tr>
+                <td style="color:var(--text-hint);font-family:'DM Mono',monospace;font-size:11px;">${jersey}</td>
+                <td>
+                  <div class="player-name-cell">${a.displayName || a.fullName || '—'}</div>
+                  <div class="player-pos-cell">${a.position?.abbreviation || ''}</div>
+                </td>
+                <td>${age}</td>
+                ${statVals.map(v => `<td>${v}</td>`).join('')}
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  // ─── STANDINGS ──────────────────────────────────────────────────────
+  async function loadStandings() {
+    const el = document.getElementById('standings-body');
+    const espn = SPORT_MAP[currentSport].espn;
+
+    if (standingsCache[currentSport]) {
+      renderStandings(standingsCache[currentSport]);
+      return;
+    }
+
+    try {
+      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${espn}/standings`);
+      const data = await res.json();
+      standingsCache[currentSport] = data;
+      renderStandings(data);
+    } catch(e) {
+      el.innerHTML = `<div class="empty-note">Couldn't load standings.</div>`;
+    }
+  }
+
+  function renderStandings(data) {
+    const el = document.getElementById('standings-body');
+    if (!el) return;
+
+    const groups = data.children || data.standings?.entries ? [data] : (data.children || []);
+
+    let html = '';
+    groups.forEach(group => {
+      const entries = group.standings?.entries || [];
+      const groupName = group.name || group.abbreviation || '';
+
+      if (groupName) {
+        html += `<table class="standings-table" style="margin-bottom:16px;">
+          <thead><tr>
+            <th colspan="2">${groupName}</th>
+            <th>W</th><th>L</th><th>PCT</th><th>GB</th><th>Strk</th>
+          </tr></thead>
+          <tbody>`;
+
+        entries.forEach((entry, i) => {
+          const name = entry.team?.displayName || '—';
+          const isCurrentTeam = name === currentTeamName;
+          const stats = entry.stats || [];
+          const wins = stats.find(s => s.name === 'wins')?.displayValue || '—';
+          const losses = stats.find(s => s.name === 'losses')?.displayValue || '—';
+          const pct = stats.find(s => s.name === 'winPercent' || s.name === 'playoffSeed')?.displayValue || '—';
+          const gb = stats.find(s => s.name === 'gamesBehind')?.displayValue || '—';
+          const streak = stats.find(s => s.name === 'streak')?.displayValue || '—';
+
+          html += `<tr style="${isCurrentTeam ? 'background:var(--amber-light);' : ''}">
+            <td class="rank-cell">${i + 1}</td>
+            <td onclick="selectTeam('${entry.team?.id}', '${name.replace(/'/g,"\\'")}')" style="${isCurrentTeam ? 'color:var(--amber-dark);font-weight:700;' : ''}">${name}</td>
+            <td>${wins}</td><td>${losses}</td><td>${pct}</td><td>${gb}</td><td>${streak}</td>
+          </tr>`;
+        });
+
+        html += `</tbody></table>`;
+      }
+    });
+
+    el.innerHTML = html || `<div class="empty-note">No standings data available.</div>`;
+  }
+
+  // ─── PLAYER PROPS ───────────────────────────────────────────────────
+  async function fetchPropsForTeam(teamName) {
+    const el = document.getElementById('props-body');
+    if (!el) return;
+
+    try {
+      const res = await fetch(`/api/odds?sport=${currentSport}`);
+      const games = await res.json();
+      if (!Array.isArray(games)) throw new Error('bad response');
+
+      // Find games involving this team
+      const teamGames = games.filter(g =>
+        g.home_team?.toLowerCase().includes(teamName.split(' ').pop().toLowerCase()) ||
+        g.away_team?.toLowerCase().includes(teamName.split(' ').pop().toLowerCase())
+      );
+
+      if (!teamGames.length) {
+        el.innerHTML = `<div class="empty-note">No upcoming games found for ${teamName}. Props appear closer to game time.</div>`;
+        return;
+      }
+
+      // Pull moneyline + spread odds for this team across all books
+      const game = teamGames[0];
+      const books = game.bookmakers || [];
+      const isHome = game.home_team?.toLowerCase().includes(teamName.split(' ').pop().toLowerCase());
+      const side = isHome ? game.home_team : game.away_team;
+      const opp = isHome ? game.away_team : game.home_team;
+
+      const propRows = [];
+
+      books.forEach(book => {
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        const spread = book.markets?.find(m => m.key === 'spreads');
+        const totals = book.markets?.find(m => m.key === 'totals');
+
+        const ml = h2h?.outcomes?.find(o => o.name === side);
+        const sp = spread?.outcomes?.find(o => o.name === side);
+        const ou = totals?.outcomes?.find(o => o.name === 'Over');
+
+        if (ml) propRows.push({ book: book.title, type: 'Moneyline', line: '', price: ml.price });
+        if (sp) propRows.push({ book: book.title, type: 'Spread', line: `${sp.point > 0 ? '+' : ''}${sp.point}`, price: sp.price });
+        if (ou) propRows.push({ book: book.title, type: 'Game Total (O)', line: `o${ou.point}`, price: ou.price });
+      });
+
+      if (!propRows.length) {
+        el.innerHTML = `<div class="empty-note">No props available yet for this team's next game.</div>`;
+        return;
+      }
+
+      // Group by type, find best price per type
+      const byType = {};
+      propRows.forEach(p => {
+        if (!byType[p.type]) byType[p.type] = [];
+        byType[p.type].push(p);
+      });
+
+      const gameTime = new Date(game.commence_time).toLocaleString('en-US', {weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+
+      el.innerHTML = `
+        <div style="font-size:12px;color:var(--text-hint);margin-bottom:10px;font-family:'DM Mono',monospace;">
+          vs ${opp} · ${gameTime}
+        </div>
+        <div class="props-grid">
+          ${Object.entries(byType).map(([type, rows]) => {
+            const best = Math.max(...rows.map(r => r.price));
+            return rows.map(r => `
+              <div class="prop-item">
+                <div>
+                  <div class="prop-player">${side.split(' ').slice(-1)[0]} — ${type}</div>
+                  <div class="prop-type">${r.book}</div>
+                </div>
+                <div class="prop-odds">
+                  ${r.line ? `<span class="prop-line">${r.line}</span>` : ''}
+                  <span class="prop-odd-btn ${r.price === best ? 'best' : ''}">${r.price > 0 ? '+' : ''}${r.price}</span>
+                </div>
+              </div>`).join('');
+          }).join('')}
+        </div>`;
+    } catch(e) {
+      if (document.getElementById('props-body')) {
+        document.getElementById('props-body').innerHTML = `<div class="empty-note">Props unavailable right now.</div>`;
+      }
+    }
+  }
+
+  // ─── INJURIES ───────────────────────────────────────────────────────
+  async function loadInjuries(teamId) {
+    const el = document.getElementById('injury-body');
+    if (!el) return;
+    const espn = SPORT_MAP[currentSport].espn;
+
+    try {
+      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${espn}/teams/${teamId}/injuries`);
+      const data = await res.json();
+      const injuries = data.injuries || [];
+
+      if (!injuries.length) {
+        el.innerHTML = `<div class="empty-note">No injuries reported for this team. ✅</div>`;
+        return;
+      }
+
+      const statusClass = s => {
+        const sl = (s || '').toLowerCase().replace(/\s+/g, '-');
+        if (sl.includes('out')) return 'status-out';
+        if (sl.includes('doubtful')) return 'status-doubtful';
+        if (sl.includes('questionable')) return 'status-questionable';
+        if (sl.includes('probable')) return 'status-probable';
+        return 'status-day-to-day';
+      };
+
+      el.innerHTML = `<div class="injury-list">
+        ${injuries.map(inj => `
+          <div class="injury-item">
+            <div>
+              <div class="injury-player">${inj.athlete?.displayName || '—'}</div>
+              <div class="injury-detail">${inj.athlete?.position?.abbreviation || ''} · ${inj.details?.type || inj.type || 'Injury'}</div>
+            </div>
+            <span class="injury-status ${statusClass(inj.status)}">${inj.status || 'Questionable'}</span>
+          </div>`).join('')}
+      </div>`;
+    } catch(e) {
+      if (document.getElementById('injury-body')) {
+        document.getElementById('injury-body').innerHTML = `<div class="empty-note">Injury data unavailable.</div>`;
+      }
+    }
+  }
+
+  // ─── INIT ────────────────────────────────────────────────────────────
+  loadTeamList('basketball_nba');
+</script>
+
+</body>
+</html>
