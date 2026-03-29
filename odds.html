@@ -256,20 +256,9 @@
     }
 
     function updateStats() {
-      try {
-        document.getElementById('stat-games').textContent = allGames.length || '—';
-        let bestEdge = 0;
-        allGames.forEach(game => {
-          if (!game.bookmakers || !game.bookmakers.length) return;
-          const teamNames = [game.home_team, game.away_team];
-          teamNames.forEach(team => {
-            const prices = game.bookmakers
-              .map(b => {
-                const h2h = b.markets && b.markets.find(m => m.key === 'h2h');
-                if (!h2h) return null;
-                const outcome = h2h.outcomes && h2h.outcomes.find(o => o.name === team);
-                return outcome ? outcome.price : null;
-              })
+      document.getElementById('stat-games').textContent = allGames.length || '—';
+      document.getElementById('stat-edge').textContent = '—';
+    })
               .filter(p => p !== null && !isNaN(p));
             if (prices.length < 2) return;
             const edge = Math.max(...prices) - Math.min(...prices);
@@ -405,4 +394,17 @@
     }
 
     function closeGate() {
-      document.getElementById('gate-overlay').classL
+      document.getElementById('gate-overlay').classList.remove('show');
+      gateShown = true;
+    }
+
+    function handleGateSubmit() {
+      const email = document.getElementById('gate-email').value;
+      if (!email || !email.includes('@')) {
+        document.getElementById('gate-email').style.borderColor = '#D85A30';
+        setTimeout(() => { document.getElementById('gate-email').style.borderColor = ''; }, 1500);
+        return;
+      }
+      userEmail = email;
+      localStorage.setItem('capy_email', email);
+      document.getElementById('gate-form').style.disp
