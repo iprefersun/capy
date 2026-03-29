@@ -307,7 +307,7 @@
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}">
           <div class="game-header">
-            <div class="game-teams" style="cursor:pointer;" onclick="window.location=''${gameUrl}'">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team} <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:6px;">View breakdown →</span></div>
+            <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team} <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:6px;">View breakdown →</span></div>
             <div class="game-tags">
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
