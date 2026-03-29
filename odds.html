@@ -258,17 +258,6 @@
     function updateStats() {
       document.getElementById('stat-games').textContent = allGames.length || '—';
       document.getElementById('stat-edge').textContent = '—';
-    })
-              .filter(p => p !== null && !isNaN(p));
-            if (prices.length < 2) return;
-            const edge = Math.max(...prices) - Math.min(...prices);
-            if (edge > bestEdge) bestEdge = edge;
-          });
-        });
-        document.getElementById('stat-edge').textContent = bestEdge > 0 ? '+' + Math.round(bestEdge) : '—';
-      } catch(e) {
-        document.getElementById('stat-edge').textContent = '—';
-      }
     }
 
     function updateClock() {
