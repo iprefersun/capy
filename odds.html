@@ -257,6 +257,27 @@
 
     function updateStats() {
       document.getElementById('stat-games').textContent = allGames.length || '—';
+      
+      let bestEdge = 0;
+      allGames.forEach(game => {
+        if (!game.bookmakers) return;
+        game.bookmakers.forEach(book => {
+          const h2h = book.markets?.find(m => m.key === 'h2h');
+          if (!h2h) return;
+          h2h.outcomes.forEach(outcome => {
+            const allPrices = game.bookmakers
+              .map(b => b.markets?.find(m => m.key === 'h2h')?.outcomes?.find(o => o.name === outcome.name)?.price)
+              .filter(p => p !== undefined && p !== null);
+            if (allPrices.length < 2) return;
+            const max = Math.max(...allPrices);
+            const min = Math.min(...allPrices);
+            const edge = max - min;
+            if (edge > bestEdge) bestEdge = edge;
+          });
+        });
+      });
+      
+      document.getElementById('stat-edge').textContent = bestEdge > 0 ? '+' + bestEdge : '—';
     }
 
     function updateClock() {
@@ -388,30 +409,4 @@
 
     function handleGateSubmit() {
       const email = document.getElementById('gate-email').value;
-      if (!email || !email.includes('@')) {
-        document.getElementById('gate-email').style.borderColor = '#D85A30';
-        setTimeout(() => { document.getElementById('gate-email').style.borderColor = ''; }, 1500);
-        return;
-      }
-      userEmail = email;
-      localStorage.setItem('capy_email', email);
-      document.getElementById('gate-form').style.display = 'none';
-      document.getElementById('gate-success').style.display = 'block';
-      window.open(`https://getcapy.beehiiv.com/subscribe?email=${encodeURIComponent(email)}`, '_blank');
-      renderGames();
-    }
-
-    document.getElementById('gate-email').addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleGateSubmit();
-    });
-
-    setTimeout(() => {
-      if (!userEmail) showGate();
-    }, 45000);
-
-    fetchOdds();
-    setInterval(fetchOdds, 300000);
-  </script>
-
-</body>
-</html>
+      if (!em
