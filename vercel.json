@@ -1,13 +1,6 @@
 {
   "rewrites": [
-    { "source": "/odds", "destination": "/odds.html" }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" }
-      ]
-    }
+    { "source": "/odds", "destination": "/odds.html" },
+    { "source": "/game", "destination": "/game.html" }
   ]
 }
