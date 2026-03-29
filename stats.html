@@ -298,9 +298,69 @@
     icehockey_nhl: [
       { conf: 'Eastern Conference', name: 'Atlantic',     abbrs: ['BOS','BUF','DET','FLA','MTL','OTT','TBL','TOR'] },
       { conf: 'Eastern Conference', name: 'Metropolitan', abbrs: ['CAR','CBJ','NJD','NYI','NYR','PHI','PIT','WSH'] },
-      { conf: 'Western Conference', name: 'Central',      abbrs: ['ARI','CHI','COL','DAL','MIN','NSH','STL','WPG'] },
+      { conf: 'Western Conference', name: 'Central',      abbrs: ['UTAH','CHI','COL','DAL','MIN','NSH','STL','WPG'] },
       { conf: 'Western Conference', name: 'Pacific',      abbrs: ['ANA','CGY','EDM','LAK','SJS','SEA','VAN','VGK'] },
     ],
+  };
+
+  // 2024-25 final records (NBA/NHL) and 2024 final records (NFL/MLB) — most recent complete seasons
+  const TEAM_RECORDS = {
+    basketball_nba: {
+      // Atlantic
+      BOS:'61-21', NYK:'51-31', PHI:'38-44', TOR:'30-52', BKN:'22-60',
+      // Central
+      CLE:'64-18', IND:'50-32', MIL:'48-34', DET:'41-41', CHI:'39-43',
+      // Southeast
+      MIA:'46-36', ATL:'43-39', ORL:'41-41', WAS:'21-61', CHA:'19-63',
+      // Northwest
+      OKC:'68-14', DEN:'50-32', MIN:'49-33', UTA:'30-52', POR:'21-61',
+      // Pacific
+      LAL:'50-32', GSW:'48-34', SAC:'42-40', LAC:'37-45', PHX:'36-46',
+      // Southwest
+      HOU:'52-30', DAL:'49-33', MEM:'46-36', SAS:'25-57', NOP:'22-60',
+    },
+    americanfootball_nfl: {
+      // AFC East
+      BUF:'13-4', MIA:'8-9', NYJ:'5-12', NE:'4-13',
+      // AFC North
+      BAL:'12-5', PIT:'10-7', CIN:'9-8', CLE:'3-14',
+      // AFC South
+      HOU:'10-7', IND:'8-9', JAX:'4-13', TEN:'3-14',
+      // AFC West
+      KC:'15-2', LAC:'10-7', DEN:'10-7', LV:'4-13',
+      // NFC East
+      PHI:'14-3', WSH:'12-5', DAL:'7-10', NYG:'3-14',
+      // NFC North
+      DET:'15-2', MIN:'14-3', GB:'11-6', CHI:'5-12',
+      // NFC South
+      TB:'10-7', ATL:'8-9', NO:'5-12', CAR:'5-12',
+      // NFC West
+      LAR:'10-7', SEA:'10-7', ARI:'8-9', SF:'6-11',
+    },
+    baseball_mlb: {
+      // AL East
+      NYY:'94-68', BAL:'91-71', BOS:'81-81', TB:'80-82', TOR:'74-88',
+      // AL Central
+      CLE:'92-69', KC:'86-76', DET:'86-76', MIN:'82-80', CWS:'41-121',
+      // AL West
+      HOU:'88-74', SEA:'85-77', TEX:'78-84', OAK:'69-93', LAA:'63-99',
+      // NL East
+      PHI:'95-67', ATL:'89-73', NYM:'89-73', WSH:'71-91', MIA:'62-100',
+      // NL Central
+      MIL:'93-69', STL:'83-79', CHC:'83-79', CIN:'77-85', PIT:'76-86',
+      // NL West
+      LAD:'98-64', SD:'93-69', ARI:'89-73', SF:'80-82', COL:'61-101',
+    },
+    icehockey_nhl: {
+      // Atlantic
+      FLA:'58-18', TOR:'52-22', BOS:'47-25', TBL:'44-30', DET:'41-33', BUF:'39-35', OTT:'38-37', MTL:'32-42',
+      // Metropolitan
+      WSH:'55-20', CAR:'52-23', NJD:'51-25', NYR:'49-26', PHI:'41-32', PIT:'38-37', NYI:'35-38', CBJ:'30-44',
+      // Central
+      WPG:'57-18', DAL:'52-22', COL:'50-24', MIN:'47-28', STL:'43-31', NSH:'39-37', UTAH:'35-40', CHI:'28-46',
+      // Pacific
+      VGK:'54-21', EDM:'50-24', LAK:'46-29', SEA:'42-32', VAN:'43-32', CGY:'38-35', ANA:'32-42', SJS:'23-48',
+    },
   };
 
   function parseWinPct(record) {
@@ -312,6 +372,10 @@
 
   function fmtPct(pct) {
     return pct.toFixed(3).replace(/^0/, '');
+  }
+
+  function getRecord(abbr) {
+    return TEAM_RECORDS[currentSport]?.[abbr] || '';
   }
 
   let currentSport = 'basketball_nba';
@@ -384,13 +448,16 @@
 
   function renderTeamListByStandings(teams) {
     const listEl = document.getElementById('team-list');
-    const sorted = [...teams].sort((a, b) => parseWinPct(b.record) - parseWinPct(a.record));
-    listEl.innerHTML = sorted.map((t, i) => `
-      <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
-        <div class="team-item-rank">${i + 1}</div>
-        <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
-        <div class="team-item-record">${t.record}</div>
-      </div>`).join('');
+    const sorted = [...teams].sort((a, b) => parseWinPct(getRecord(b.abbr)) - parseWinPct(getRecord(a.abbr)));
+    listEl.innerHTML = sorted.map((t, i) => {
+      const rec = getRecord(t.abbr);
+      return `
+        <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
+          <div class="team-item-rank">${i + 1}</div>
+          <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
+          <div class="team-item-record">${rec}</div>
+        </div>`;
+    }).join('');
   }
 
   function renderTeamListByDivision(teams) {
@@ -398,20 +465,24 @@
     const divs = DIVISIONS[currentSport] || [];
     if (!divs.length) { renderTeamList(teams); return; }
 
-    // Map abbr -> team for quick lookup
     const byAbbr = {};
     for (const t of teams) byAbbr[t.abbr] = t;
 
     let html = '';
     divs.forEach(div => {
-      const divTeams = div.abbrs.map(a => byAbbr[a]).filter(Boolean);
+      const divTeams = div.abbrs.map(a => byAbbr[a]).filter(Boolean)
+        .sort((a, b) => parseWinPct(getRecord(b.abbr)) - parseWinPct(getRecord(a.abbr)));
       if (!divTeams.length) return;
       html += `<div class="team-group-label">${div.name}</div>`;
-      html += divTeams.map(t => `
-        <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
-          <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
-          <div class="team-item-record">${t.record}</div>
-        </div>`).join('');
+      html += divTeams.map((t, i) => {
+        const rec = getRecord(t.abbr);
+        return `
+          <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
+            <div class="team-item-rank">${i + 1}</div>
+            <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
+            <div class="team-item-record">${rec}</div>
+          </div>`;
+      }).join('');
     });
     listEl.innerHTML = html || `<div class="empty-note">No teams found.</div>`;
   }
@@ -422,13 +493,10 @@
       listEl.innerHTML = `<div class="empty-note">No teams found.</div>`;
       return;
     }
-    listEl.innerHTML = teams.map((t, i) => `
+    listEl.innerHTML = teams.map(t => `
       <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
-        <div class="team-item-rank">${i + 1}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="team-item-name">${t.name}</div>
-        </div>
-        <div class="team-item-record">${t.record}</div>
+        <div class="team-item-rank" style="font-size:9px;width:auto;padding:0 5px;border-radius:3px;">${t.abbr}</div>
+        <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
       </div>`).join('');
   }
 
@@ -648,36 +716,44 @@
     const byAbbr = {};
     for (const t of teams) byAbbr[t.abbr] = t;
 
-    // Group by conference, sort each conference by win%
-    const confMap = {};
-    if (divs.length) {
-      divs.forEach(div => {
-        if (!confMap[div.conf]) confMap[div.conf] = [];
-        div.abbrs.forEach(a => { if (byAbbr[a]) confMap[div.conf].push(byAbbr[a]); });
-      });
-    } else {
-      confMap['League'] = [...teams];
-    }
+    // Build conference → divisions structure
+    const confOrder = [];
+    const confDivs = {};
+    divs.forEach(div => {
+      if (!confDivs[div.conf]) { confDivs[div.conf] = []; confOrder.push(div.conf); }
+      confDivs[div.conf].push(div);
+    });
+    if (!confOrder.length) confOrder.push('League'), confDivs['League'] = [{ name: '', abbrs: teams.map(t => t.abbr) }];
 
     let html = '';
-    Object.entries(confMap).forEach(([confName, confTeams]) => {
-      const sorted = confTeams.sort((a, b) => parseWinPct(b.record) - parseWinPct(a.record));
-      html += `<table class="standings-table" style="margin-bottom:16px;">
+    confOrder.forEach(confName => {
+      html += `<table class="standings-table" style="margin-bottom:20px;">
         <thead><tr>
           <th colspan="2">${confName}</th>
           <th>W</th><th>L</th><th>PCT</th>
         </tr></thead>
         <tbody>`;
-      sorted.forEach((t, i) => {
-        const [w, l] = (t.record || '0-0').split('-').map(Number);
-        const pct = fmtPct(parseWinPct(t.record));
-        const isCurrentTeam = t.id === currentTeamId;
-        html += `<tr style="${isCurrentTeam ? 'background:var(--amber-light);' : ''}">
-          <td class="rank-cell">${i + 1}</td>
-          <td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')" style="${isCurrentTeam ? 'color:var(--amber-dark);font-weight:700;' : ''}">${t.name}</td>
-          <td>${isNaN(w) ? '—' : w}</td><td>${isNaN(l) ? '—' : l}</td><td>${pct}</td>
-        </tr>`;
+
+      confDivs[confName].forEach(div => {
+        // Division sub-header row
+        if (div.name) {
+          html += `<tr class="standings-divider"><td colspan="5">${div.name}</td></tr>`;
+        }
+        const divTeams = div.abbrs.map(a => byAbbr[a]).filter(Boolean)
+          .sort((a, b) => parseWinPct(getRecord(b.abbr)) - parseWinPct(getRecord(a.abbr)));
+        divTeams.forEach((t, i) => {
+          const rec = getRecord(t.abbr);
+          const [w, l] = rec ? rec.split('-').map(Number) : [0, 0];
+          const pct = rec ? fmtPct(parseWinPct(rec)) : '.000';
+          const isCurrentTeam = t.id === currentTeamId;
+          html += `<tr style="${isCurrentTeam ? 'background:var(--amber-light);' : ''}">
+            <td class="rank-cell">${i + 1}</td>
+            <td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')" style="${isCurrentTeam ? 'color:var(--amber-dark);font-weight:700;' : ''}">${t.name}</td>
+            <td>${isNaN(w) ? '—' : w}</td><td>${isNaN(l) ? '—' : l}</td><td>${pct}</td>
+          </tr>`;
+        });
       });
+
       html += `</tbody></table>`;
     });
 
