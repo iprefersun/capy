@@ -177,8 +177,8 @@
     </div>
 
     <div class="filters">
-      <button class="filter-btn active" onclick="filterSport('all', this)">All sports</button>
-      <button class="filter-btn" onclick="filterSport('basketball_nba', this)">NBA</button>
+      <button class="filter-btn" onclick="filterSport('all', this)">All sports</button>
+      <button class="filter-btn active" onclick="filterSport('basketball_nba', this)">NBA</button>
       <button class="filter-btn" onclick="filterSport('americanfootball_nfl', this)">NFL</button>
       <button class="filter-btn" onclick="filterSport('baseball_mlb', this)">MLB</button>
       <button class="filter-btn" onclick="filterSport('icehockey_nhl', this)">NHL</button>
@@ -236,23 +236,31 @@
     const SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
     const SPORT_LABELS = { basketball_nba:'NBA', americanfootball_nfl:'NFL', baseball_mlb:'MLB', icehockey_nhl:'NHL' };
 
+    let cache = {};
     let allGames = [];
-    let currentSport = 'all';
+    let currentSport = 'basketball_nba';
     let userEmail = localStorage.getItem('capy_email') || null;
     let gateShown = false;
 
-    async function fetchOdds() {
+    async function fetchSport(sport) {
+      if (cache[sport]) return cache[sport];
       try {
-        const results = await Promise.all(
-          SPORTS.map(s => fetch(`/api/odds?sport=${s}`).then(r => r.json()).catch(() => []))
-        );
-        allGames = results.flat().filter(g => g && g.bookmakers && g.bookmakers.length);
-        renderGames();
-        updateStats();
-        updateClock();
+        const res = await fetch(`/api/odds?sport=${sport}`);
+        const data = await res.json();
+        const games = Array.isArray(data) ? data.filter(g => g && g.bookmakers && g.bookmakers.length) : [];
+        cache[sport] = games;
+        return games;
       } catch(e) {
-        showFallback();
+        cache[sport] = [];
+        return [];
       }
+    }
+
+    async function fetchOdds() {
+      allGames = await fetchSport(currentSport);
+      renderGames();
+      updateStats();
+      updateClock();
     }
 
     function updateStats() {
@@ -265,11 +273,27 @@
       document.getElementById('stat-time').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
     }
 
-    function filterSport(sport, el) {
+    async function filterSport(sport, el) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       currentSport = sport;
+
+      // show spinner while loading
+      document.getElementById('games-container').innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <div class="loading-text">Fetching live odds...</div>
+        </div>`;
+
+      if (sport === 'all') {
+        const results = await Promise.all(SPORTS.map(s => fetchSport(s)));
+        allGames = results.flat();
+      } else {
+        allGames = await fetchSport(sport);
+      }
+
       renderGames();
+      updateStats();
     }
 
     function renderGames() {
@@ -384,19 +408,4 @@
     }
 
     function closeGate() {
-      document.getElementById('gate-overlay').classList.remove('show');
-      gateShown = true;
-    }
-
-    function handleGateSubmit() {
-      const email = document.getElementById('gate-email').value;
-      if (!email || !email.includes('@')) {
-        document.getElementById('gate-email').style.borderColor = '#D85A30';
-        setTimeout(() => { document.getElementById('gate-email').style.borderColor = ''; }, 1500);
-        return;
-      }
-      userEmail = email;
-      localStorage.setItem('capy_email', email);
-      document.getElementById('gate-form').style.display = 'none';
-      document.getElementById('gate-success').style.display = 'block';
-      window.open(`https://getcapy.beehiiv.com/subsc
+      document.
