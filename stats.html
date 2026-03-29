@@ -700,6 +700,14 @@
   }
 
   // ─── DIVISION STANDING ──────────────────────────────────────────────
+  // ESPN abbreviations (e.g. "GS") may differ from TEAM_RECORDS keys (e.g. "GSW").
+  // findTeamByDivAbbr does a flexible match so we can always use the TEAM_RECORDS abbr
+  // for the record lookup regardless of what ESPN returns.
+  function findTeamByDivAbbr(teams, divAbbr) {
+    return teams.find(t => t.abbr === divAbbr)
+      || teams.find(t => divAbbr.startsWith(t.abbr) || t.abbr.startsWith(divAbbr));
+  }
+
   function renderStandings() {
     const el = document.getElementById('division-body');
     if (!el) return;
@@ -707,31 +715,39 @@
     const teams = teamsCache[currentSport];
     if (!teams?.length) { el.innerHTML = `<div class="empty-note">No data.</div>`; return; }
 
-    const byAbbr = {};
-    for (const t of teams) byAbbr[t.abbr] = t;
-
     const currentTeamObj = teams.find(t => t.id === currentTeamId);
     const currentAbbr = currentTeamObj?.abbr;
 
-    const div = (DIVISIONS[currentSport] || []).find(d => d.abbrs.includes(currentAbbr));
+    // Find the division — match ESPN abbr against DIVISIONS abbrs with flexible comparison
+    const allDivs = DIVISIONS[currentSport] || [];
+    const div = allDivs.find(d =>
+      d.abbrs.some(a => a === currentAbbr || a.startsWith(currentAbbr) || currentAbbr?.startsWith(a))
+    );
     if (!div) { el.innerHTML = `<div class="empty-note">Division data not available.</div>`; return; }
 
-    const divTeams = div.abbrs.map(a => byAbbr[a]).filter(Boolean)
-      .sort((a, b) => parseWinPct(getRecord(b.abbr)) - parseWinPct(getRecord(a.abbr)));
+    // Build divTeams: pair each DIVISIONS abbr (= TEAM_RECORDS key) with its teamsCache entry
+    const divTeams = div.abbrs.map(divAbbr => {
+      const team = findTeamByDivAbbr(teams, divAbbr);
+      return team ? { ...team, divAbbr } : null;
+    }).filter(Boolean)
+      .sort((a, b) => parseWinPct(getRecord(b.divAbbr)) - parseWinPct(getRecord(a.divAbbr)));
 
     let html = `<table class="standings-table"><thead><tr>
         <th></th><th style="text-align:left;">Team</th><th>W</th><th>L</th><th>PCT</th>
       </tr></thead><tbody>`;
 
     divTeams.forEach((t, i) => {
-      const rec = getRecord(t.abbr);
-      const [w, l] = rec ? rec.split('-').map(Number) : [0, 0];
-      const pct = rec ? fmtPct(parseWinPct(rec)) : '.000';
+      // Use divAbbr (TEAM_RECORDS key) — not ESPN's t.abbr — for the record lookup
+      const rec = getRecord(t.divAbbr);
+      const parts = rec ? rec.split('-').map(Number) : [];
+      const w = parts[0] ?? null;
+      const l = parts[1] ?? null;
+      const pct = (w !== null && l !== null && w + l > 0) ? fmtPct(w / (w + l)) : '—';
       const isCurrent = t.id === currentTeamId;
       html += `<tr style="${isCurrent ? 'background:var(--amber-light);' : ''}">
         <td class="rank-cell">${i + 1}</td>
         <td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')" style="${isCurrent ? 'color:var(--amber-dark);font-weight:700;' : ''}">${t.name}</td>
-        <td>${isNaN(w) ? '—' : w}</td><td>${isNaN(l) ? '—' : l}</td><td>${pct}</td>
+        <td>${w ?? '—'}</td><td>${l ?? '—'}</td><td>${pct}</td>
       </tr>`;
     });
 
