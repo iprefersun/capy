@@ -72,6 +72,13 @@
     .team-item-rank { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 4px; background: var(--surface-2); color: var(--text-hint); display: flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0; }
     .team-item.active .team-item-rank { background: var(--amber); color: #fff; }
 
+    /* SORT CONTROLS */
+    .sort-controls { display: flex; gap: 5px; padding: 8px 10px 6px; }
+    .sort-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 0; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface-2); color: var(--text-muted); cursor: pointer; transition: all 0.12s; flex: 1; text-align: center; }
+    .sort-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .sort-btn.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+    .team-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); padding: 8px 14px 4px; background: var(--surface-2); border-bottom: 0.5px solid var(--border); }
+
     /* MAIN PANEL */
     .main-panel { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 
@@ -224,6 +231,11 @@
 
     <div class="sidebar-card">
       <div class="sidebar-section-title">Teams</div>
+      <div class="sort-controls">
+        <button class="sort-btn active" onclick="setSort('az', this)">A–Z</button>
+        <button class="sort-btn" onclick="setSort('standings', this)">Standings</button>
+        <button class="sort-btn" onclick="setSort('division', this)">Division</button>
+      </div>
       <div class="team-list" id="team-list">
         <div class="spinner-wrap">
           <div class="spinner"></div>
@@ -259,8 +271,10 @@
   let currentSport = 'basketball_nba';
   let currentTeamId = null;
   let currentTeamName = null;
+  let currentSort = 'az';
   let teamsCache = {};
   let standingsCache = {};
+  let standingsTeamCache = {};
 
   // ─── SPORT SELECTION ───────────────────────────────────────────────
   async function selectSport(sport, el) {
@@ -284,7 +298,7 @@
     listEl.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading teams...</span></div>`;
 
     if (teamsCache[sport]) {
-      renderTeamList(teamsCache[sport]);
+      applySort();
       return;
     }
 
@@ -299,10 +313,109 @@
         record: t.team.record?.items?.[0]?.summary || ''
       })).sort((a, b) => a.name.localeCompare(b.name)) || [];
       teamsCache[sport] = teams;
-      renderTeamList(teams);
+      applySort();
     } catch(e) {
       listEl.innerHTML = `<div class="empty-note">Couldn't load teams. Try refreshing.</div>`;
     }
+  }
+
+  // ─── SORT CONTROLS ──────────────────────────────────────────────────
+  function setSort(mode, el) {
+    currentSort = mode;
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    applySort();
+  }
+
+  function applySort() {
+    if (currentSort === 'az') {
+      if (teamsCache[currentSport]) renderTeamList(teamsCache[currentSport]);
+      return;
+    }
+    if (standingsTeamCache[currentSport]) {
+      currentSort === 'standings' ? renderTeamListByStandings() : renderTeamListByDivision();
+    } else {
+      const listEl = document.getElementById('team-list');
+      listEl.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading...</span></div>`;
+      fetchStandingsTeamData(currentSport).then(() => {
+        if (currentSort === 'standings') renderTeamListByStandings();
+        else if (currentSort === 'division') renderTeamListByDivision();
+      });
+    }
+  }
+
+  async function fetchStandingsTeamData(sport) {
+    if (standingsTeamCache[sport]) return;
+    const espn = SPORT_MAP[sport].espn;
+    try {
+      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${espn}/standings`);
+      const data = await res.json();
+      standingsCache[sport] = data;
+
+      const rawGroups = data.children?.length ? data.children : (data.standings ? [data] : []);
+      const groups = [];
+
+      rawGroups.forEach(conf => {
+        const confName = conf.name || conf.abbreviation || '';
+        const subGroups = conf.children || [];
+        if (subGroups.length) {
+          subGroups.forEach(div => {
+            const divName = div.name || div.abbreviation || '';
+            const teams = (div.standings?.entries || []).map(entryToTeam);
+            if (teams.length) groups.push({ name: `${confName} — ${divName}`, teams });
+          });
+        } else {
+          const teams = (conf.standings?.entries || []).map(entryToTeam);
+          if (teams.length) groups.push({ name: confName, teams });
+        }
+      });
+
+      const flat = groups.flatMap(g => g.teams).sort((a, b) => b.winPct - a.winPct);
+      standingsTeamCache[sport] = { groups, flat };
+    } catch(e) {
+      standingsTeamCache[sport] = { groups: [], flat: [] };
+    }
+  }
+
+  function entryToTeam(entry) {
+    const stats = entry.stats || [];
+    const winPct = parseFloat(stats.find(s => s.name === 'winPercent')?.value ?? 0);
+    const wins = stats.find(s => s.name === 'wins')?.displayValue || '—';
+    const losses = stats.find(s => s.name === 'losses')?.displayValue || '—';
+    return {
+      id: entry.team?.id,
+      name: entry.team?.displayName || '—',
+      record: (wins !== '—' && losses !== '—') ? `${wins}-${losses}` : '',
+      winPct
+    };
+  }
+
+  function renderTeamListByStandings() {
+    const listEl = document.getElementById('team-list');
+    const data = standingsTeamCache[currentSport];
+    if (!data?.flat.length) { listEl.innerHTML = `<div class="empty-note">No standings data available.</div>`; return; }
+    listEl.innerHTML = data.flat.map((t, i) => `
+      <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
+        <div class="team-item-rank">${i + 1}</div>
+        <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
+        <div class="team-item-record">${t.record}</div>
+      </div>`).join('');
+  }
+
+  function renderTeamListByDivision() {
+    const listEl = document.getElementById('team-list');
+    const data = standingsTeamCache[currentSport];
+    if (!data?.groups.length) { listEl.innerHTML = `<div class="empty-note">No standings data available.</div>`; return; }
+    let html = '';
+    data.groups.forEach(group => {
+      html += `<div class="team-group-label">${group.name}</div>`;
+      html += group.teams.map(t => `
+        <div class="team-item ${t.id === currentTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}', '${t.name.replace(/'/g,"\\'")}')">
+          <div style="flex:1;min-width:0;"><div class="team-item-name">${t.name}</div></div>
+          <div class="team-item-record">${t.record}</div>
+        </div>`).join('');
+    });
+    listEl.innerHTML = html;
   }
 
   function renderTeamList(teams) {
