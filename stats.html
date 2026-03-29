@@ -51,12 +51,20 @@
     .sidebar-card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
     .sidebar-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); padding: 12px 14px 6px; }
 
-    /* SPORT TABS */
-    .sport-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; }
-    .sport-tab { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-mid); background: var(--surface-2); color: var(--text-muted); cursor: pointer; transition: all 0.15s; text-align: center; }
-    .sport-tab:hover { border-color: var(--amber); color: var(--amber); }
-    .sport-tab.active { background: var(--amber); color: #fff; border-color: var(--amber); }
-    .sport-tab .sport-emoji { display: block; font-size: 18px; margin-bottom: 2px; }
+    /* SPORT LIST */
+    .sport-list { display: flex; flex-direction: column; max-height: 360px; overflow-y: auto; }
+    .sport-list::-webkit-scrollbar { width: 4px; }
+    .sport-list::-webkit-scrollbar-track { background: transparent; }
+    .sport-list::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+    .sport-cat-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); padding: 8px 14px 4px; background: var(--surface-2); border-bottom: 0.5px solid var(--border); }
+    .sport-list-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 14px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); background: transparent; border: none; border-bottom: 0.5px solid var(--border); cursor: pointer; text-align: left; transition: background 0.1s; }
+    .sport-list-item:last-child { border-bottom: none; }
+    .sport-list-item:hover { background: var(--surface-2); }
+    .sport-list-item.active { background: var(--amber-light); color: var(--amber-dark); }
+    .sport-list-emoji { font-size: 15px; flex-shrink: 0; }
+
+    /* DIVISION PILL */
+    .div-pill { display: inline-block; font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; margin-top: 6px; font-family: 'DM Mono', monospace; letter-spacing: 0.2px; }
 
     /* TEAM LIST */
     .team-list { display: flex; flex-direction: column; max-height: 480px; overflow-y: auto; }
@@ -185,9 +193,7 @@
       .team-hero-stats { gap: 1rem; }
     }
     @media (max-width: 480px) {
-      .sport-tabs { grid-template-columns: repeat(4, 1fr); }
-      .sport-tab .sport-emoji { font-size: 14px; }
-      .sport-tab { font-size: 11px; padding: 6px 4px; }
+      .sport-list { max-height: 220px; }
     }
   </style>
 </head>
@@ -213,19 +219,32 @@
   <aside class="sidebar">
     <div class="sidebar-card">
       <div class="sidebar-section-title">Sport</div>
-      <div class="sport-tabs">
-        <button class="sport-tab active" onclick="selectSport('basketball_nba', this)">
-          <span class="sport-emoji">🏀</span>NBA
-        </button>
-        <button class="sport-tab" onclick="selectSport('americanfootball_nfl', this)">
-          <span class="sport-emoji">🏈</span>NFL
-        </button>
-        <button class="sport-tab" onclick="selectSport('baseball_mlb', this)">
-          <span class="sport-emoji">⚾</span>MLB
-        </button>
-        <button class="sport-tab" onclick="selectSport('icehockey_nhl', this)">
-          <span class="sport-emoji">🏒</span>NHL
-        </button>
+      <div class="sport-list">
+        <div class="sport-cat-header">Pro Sports</div>
+        <button class="sport-list-item active" onclick="selectSport('basketball_nba', this)"><span class="sport-list-emoji">🏀</span> NBA</button>
+        <button class="sport-list-item" onclick="selectSport('americanfootball_nfl', this)"><span class="sport-list-emoji">🏈</span> NFL</button>
+        <button class="sport-list-item" onclick="selectSport('baseball_mlb', this)"><span class="sport-list-emoji">⚾</span> MLB</button>
+        <button class="sport-list-item" onclick="selectSport('icehockey_nhl', this)"><span class="sport-list-emoji">🏒</span> NHL</button>
+        <div class="sport-cat-header">College</div>
+        <button class="sport-list-item" onclick="showComingSoon('NCAAB', this)"><span class="sport-list-emoji">🏀</span> NCAAB</button>
+        <button class="sport-list-item" onclick="showComingSoon('NCAAF', this)"><span class="sport-list-emoji">🏈</span> NCAAF</button>
+        <div class="sport-cat-header">Soccer</div>
+        <button class="sport-list-item" onclick="showComingSoon('EPL', this)"><span class="sport-list-emoji">⚽</span> EPL</button>
+        <button class="sport-list-item" onclick="showComingSoon('Champions League', this)"><span class="sport-list-emoji">⚽</span> Champions League</button>
+        <button class="sport-list-item" onclick="showComingSoon('La Liga', this)"><span class="sport-list-emoji">⚽</span> La Liga</button>
+        <button class="sport-list-item" onclick="showComingSoon('Bundesliga', this)"><span class="sport-list-emoji">⚽</span> Bundesliga</button>
+        <button class="sport-list-item" onclick="showComingSoon('Serie A', this)"><span class="sport-list-emoji">⚽</span> Serie A</button>
+        <button class="sport-list-item" onclick="showComingSoon('MLS', this)"><span class="sport-list-emoji">⚽</span> MLS</button>
+        <div class="sport-cat-header">Other</div>
+        <button class="sport-list-item" onclick="showComingSoon('MMA', this)"><span class="sport-list-emoji">🥊</span> MMA</button>
+        <button class="sport-list-item" onclick="showComingSoon('F1', this)"><span class="sport-list-emoji">🏎️</span> F1</button>
+        <button class="sport-list-item" onclick="showComingSoon('PGA', this)"><span class="sport-list-emoji">⛳</span> PGA</button>
+        <button class="sport-list-item" onclick="showComingSoon('Tennis', this)"><span class="sport-list-emoji">🎾</span> Tennis</button>
+        <div class="sport-cat-header">Esports</div>
+        <button class="sport-list-item" onclick="showComingSoon('CS2', this)"><span class="sport-list-emoji">🎮</span> CS2</button>
+        <button class="sport-list-item" onclick="showComingSoon('LoL', this)"><span class="sport-list-emoji">🎮</span> LoL</button>
+        <button class="sport-list-item" onclick="showComingSoon('Dota 2', this)"><span class="sport-list-emoji">🎮</span> Dota 2</button>
+        <button class="sport-list-item" onclick="showComingSoon('Valorant', this)"><span class="sport-list-emoji">🎮</span> Valorant</button>
       </div>
     </div>
 
@@ -385,8 +404,23 @@
   let teamsCache = {};
 
   // ─── SPORT SELECTION ───────────────────────────────────────────────
+  function showComingSoon(sportName, el) {
+    document.querySelectorAll('.sport-list-item').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('main-panel').innerHTML = `
+      <div class="section">
+        <div class="section-body" style="text-align:center;padding:3rem 2rem;">
+          <span style="font-size:52px;display:block;margin-bottom:1rem;">🦫</span>
+          <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;">${sportName}</div>
+          <p style="font-size:14px;color:var(--text-muted);max-width:340px;margin:0 auto 1.5rem;line-height:1.6;">
+            We're adding ${sportName} soon. <a href="/#signup" style="color:var(--amber);font-weight:600;">Join the waitlist</a> to get notified.
+          </p>
+        </div>
+      </div>`;
+  }
+
   async function selectSport(sport, el) {
-    document.querySelectorAll('.sport-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sport-list-item').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     currentSport = sport;
     currentTeamId = null;
@@ -533,11 +567,26 @@
   }
 
   // ─── RENDER TEAM PANEL ──────────────────────────────────────────────
+  function buildDivPill(espnAbbr) {
+    const allDivs = DIVISIONS[currentSport] || [];
+    const div = allDivs.find(d =>
+      d.abbrs.some(a => a === espnAbbr || a.startsWith(espnAbbr) || espnAbbr?.startsWith(a))
+    );
+    if (!div) return '';
+    const divAbbr = div.abbrs.find(a => a === espnAbbr || a.startsWith(espnAbbr) || espnAbbr?.startsWith(a));
+    const rec = getRecord(divAbbr || espnAbbr);
+    const sorted = [...div.abbrs].sort((a, b) => parseWinPct(getRecord(b)) - parseWinPct(getRecord(a)));
+    const rank = sorted.indexOf(divAbbr) + 1;
+    const pct = rec ? fmtPct(parseWinPct(rec)) : '—';
+    const confShort = div.conf.replace(' Conference', '');
+    return `<div class="div-pill">${confShort} · ${div.name} · #${rank} · ${rec || '—'} · ${pct}</div>`;
+  }
+
   function renderTeamPanel(teamData, rosterData) {
     const panel = document.getElementById('main-panel');
     const team = teamData.team;
-    const record = team?.record?.items?.[0]?.summary || '—';
     const label = SPORT_MAP[currentSport].label;
+    const divPill = buildDivPill(team.abbreviation);
 
     panel.innerHTML = `
       <!-- HERO -->
@@ -545,7 +594,7 @@
         <div>
           <div class="team-hero-sport">${label}</div>
           <div class="team-hero-name">${team.displayName}</div>
-          <div class="team-hero-record">${record}</div>
+          ${divPill}
         </div>
         <div class="team-hero-stats" id="hero-stats">
           <div class="hero-stat">
@@ -595,15 +644,6 @@
         </div>
       </div>
 
-      <!-- DIVISION STANDING -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-title">Division standing</div>
-          <span class="section-badge badge-free">Free</span>
-        </div>
-        <div id="division-body"></div>
-      </div>
-
       <!-- LINE MOVEMENT — PRO -->
       <div class="section">
         <div class="section-header">
@@ -623,7 +663,6 @@
 
     renderRoster(rosterData);
     loadInjuries(currentTeamId);
-    renderStandings();
   }
 
   // ─── ROSTER ─────────────────────────────────────────────────────────
@@ -725,68 +764,6 @@
           }).join('')}
         </tbody>
       </table>`;
-  }
-
-  // ─── DIVISION STANDING ──────────────────────────────────────────────
-  // ESPN abbreviations (e.g. "GS") may differ from TEAM_RECORDS keys (e.g. "GSW").
-  // findTeamByDivAbbr does a flexible match so we can always use the TEAM_RECORDS abbr
-  // for the record lookup regardless of what ESPN returns.
-  function findTeamByDivAbbr(teams, divAbbr) {
-    return teams.find(t => t.abbr === divAbbr)
-      || teams.find(t => divAbbr.startsWith(t.abbr) || t.abbr.startsWith(divAbbr));
-  }
-
-  function renderStandings() {
-    const el = document.getElementById('division-body');
-    if (!el) return;
-
-    const teams = teamsCache[currentSport];
-    if (!teams?.length) { el.innerHTML = `<div class="empty-note">No data.</div>`; return; }
-
-    const currentTeamObj = teams.find(t => t.id === currentTeamId);
-    const currentAbbr = currentTeamObj?.abbr;
-
-    // Find the division — match ESPN abbr against DIVISIONS abbrs with flexible comparison
-    const allDivs = DIVISIONS[currentSport] || [];
-    const div = allDivs.find(d =>
-      d.abbrs.some(a => a === currentAbbr || a.startsWith(currentAbbr) || currentAbbr?.startsWith(a))
-    );
-    if (!div) { el.innerHTML = `<div class="empty-note">Division data not available.</div>`; return; }
-
-    // Build divTeams: pair each DIVISIONS abbr (= TEAM_RECORDS key) with its teamsCache entry
-    const divTeams = div.abbrs.map(divAbbr => {
-      const team = findTeamByDivAbbr(teams, divAbbr);
-      return team ? { ...team, divAbbr } : null;
-    }).filter(Boolean)
-      .sort((a, b) => parseWinPct(getRecord(b.divAbbr)) - parseWinPct(getRecord(a.divAbbr)));
-
-    let html = `<table class="standings-table"><thead><tr>
-        <th></th><th style="text-align:left;">Team</th><th>W</th><th>L</th><th>PCT</th>
-      </tr></thead><tbody>`;
-
-    divTeams.forEach((t, i) => {
-      // Use divAbbr (TEAM_RECORDS key) — not ESPN's t.abbr — for the record lookup
-      const rec = getRecord(t.divAbbr);
-      const recParts = rec ? rec.split('-') : [];
-      const wins = parseInt(recParts[0], 10);
-      const losses = parseInt(recParts[1], 10);
-      const pct = (!isNaN(wins) && !isNaN(losses) && wins + losses > 0)
-        ? (wins / (wins + losses)).toFixed(3).slice(1)
-        : '—';
-      const isCurrent = t.id === currentTeamId;
-      const rowStyle = isCurrent ? 'background:var(--amber-light);' : '';
-      const nameStyle = isCurrent ? 'color:var(--amber-dark);font-weight:700;' : '';
-      html += `<tr style="${rowStyle}">`
-        + `<td class="rank-cell">${i + 1}</td>`
-        + `<td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g, "\\'")}')" style="${nameStyle}">${t.name}</td>`
-        + `<td>${isNaN(wins) ? '—' : wins}</td>`
-        + `<td>${isNaN(losses) ? '—' : losses}</td>`
-        + `<td>${pct}</td>`
-        + `</tr>`;
-    });
-
-    html += `</tbody></table>`;
-    el.innerHTML = html;
   }
 
   // ─── PLAYER PROPS ───────────────────────────────────────────────────
