@@ -290,6 +290,7 @@
     }
 
     function buildGameCard(game, idx) {
+      const gameUrl = `/game?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
       const sport = game.sport_key;
       const tagClass = 'tag-' + (SPORT_LABELS[sport] || 'nba').toLowerCase();
       const label = SPORT_LABELS[sport] || sport;
@@ -306,7 +307,7 @@
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}">
           <div class="game-header">
-            <div class="game-teams">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team}</div>
+            <div class="game-teams" style="cursor:pointer;" onclick="window.location=''${gameUrl}'">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team} <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:6px;">View breakdown →</span></div>
             <div class="game-tags">
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
@@ -398,21 +399,4 @@
       localStorage.setItem('capy_email', email);
       document.getElementById('gate-form').style.display = 'none';
       document.getElementById('gate-success').style.display = 'block';
-      window.open(`https://getcapy.beehiiv.com/subscribe?email=${encodeURIComponent(email)}`, '_blank');
-      renderGames();
-    }
-
-    document.getElementById('gate-email').addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleGateSubmit();
-    });
-
-    setTimeout(() => {
-      if (!userEmail) showGate();
-    }, 45000);
-
-    fetchOdds();
-    setInterval(fetchOdds, 300000);
-  </script>
-
-</body>
-</html>
+      window.open(`https://getcapy.beehiiv.com/subsc
