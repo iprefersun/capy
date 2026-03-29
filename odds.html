@@ -256,28 +256,30 @@
     }
 
     function updateStats() {
-      document.getElementById('stat-games').textContent = allGames.length || '—';
-      
-      let bestEdge = 0;
-      allGames.forEach(game => {
-        if (!game.bookmakers) return;
-        game.bookmakers.forEach(book => {
-          const h2h = book.markets?.find(m => m.key === 'h2h');
-          if (!h2h) return;
-          h2h.outcomes.forEach(outcome => {
-            const allPrices = game.bookmakers
-              .map(b => b.markets?.find(m => m.key === 'h2h')?.outcomes?.find(o => o.name === outcome.name)?.price)
-              .filter(p => p !== undefined && p !== null);
-            if (allPrices.length < 2) return;
-            const max = Math.max(...allPrices);
-            const min = Math.min(...allPrices);
-            const edge = max - min;
+      try {
+        document.getElementById('stat-games').textContent = allGames.length || '—';
+        let bestEdge = 0;
+        allGames.forEach(game => {
+          if (!game.bookmakers || !game.bookmakers.length) return;
+          const teamNames = [game.home_team, game.away_team];
+          teamNames.forEach(team => {
+            const prices = game.bookmakers
+              .map(b => {
+                const h2h = b.markets && b.markets.find(m => m.key === 'h2h');
+                if (!h2h) return null;
+                const outcome = h2h.outcomes && h2h.outcomes.find(o => o.name === team);
+                return outcome ? outcome.price : null;
+              })
+              .filter(p => p !== null && !isNaN(p));
+            if (prices.length < 2) return;
+            const edge = Math.max(...prices) - Math.min(...prices);
             if (edge > bestEdge) bestEdge = edge;
           });
         });
-      });
-      
-      document.getElementById('stat-edge').textContent = bestEdge > 0 ? '+' + bestEdge : '—';
+        document.getElementById('stat-edge').textContent = bestEdge > 0 ? '+' + Math.round(bestEdge) : '—';
+      } catch(e) {
+        document.getElementById('stat-edge').textContent = '—';
+      }
     }
 
     function updateClock() {
@@ -403,10 +405,4 @@
     }
 
     function closeGate() {
-      document.getElementById('gate-overlay').classList.remove('show');
-      gateShown = true;
-    }
-
-    function handleGateSubmit() {
-      const email = document.getElementById('gate-email').value;
-      if (!em
+      document.getElementById('gate-overlay').classL
