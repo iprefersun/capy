@@ -707,9 +707,10 @@
           const name = entry.team?.displayName || '—';
           const isCurrentTeam = name === currentTeamName;
           const stats = entry.stats || [];
-          const wins = stats.find(s => s.name === 'wins')?.displayValue || '—';
-          const losses = stats.find(s => s.name === 'losses')?.displayValue || '—';
-          const pct = stats.find(s => s.name === 'winPercent' || s.name === 'playoffSeed')?.displayValue || '—';
+          const wins = stats.find(s => s.name === 'wins')?.displayValue || '0';
+          const losses = stats.find(s => s.name === 'losses')?.displayValue || '0';
+          const w = parseInt(wins, 10), l = parseInt(losses, 10);
+          const pct = (w + l > 0) ? (w / (w + l)).toFixed(3).replace(/^0/, '') : '.000';
           const gb = stats.find(s => s.name === 'gamesBehind')?.displayValue || '—';
           const streak = stats.find(s => s.name === 'streak')?.displayValue || '—';
 
