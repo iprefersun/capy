@@ -792,20 +792,20 @@
       const recParts = rec ? rec.split('-') : [];
       const wins = parseInt(recParts[0], 10);
       const losses = parseInt(recParts[1], 10);
-      const winPct = (!isNaN(wins) && !isNaN(losses) && wins + losses > 0)
+      const pct = (!isNaN(wins) && !isNaN(losses) && wins + losses > 0)
         ? (wins / (wins + losses)).toFixed(3).slice(1)
         : '—';
-      console.log('[row]', t.name, '| divAbbr:', t.divAbbr, '| rec:', rec, '| wins:', wins, 'losses:', losses, '| winPct:', winPct);
+      console.log('[row]', t.name, '| divAbbr:', t.divAbbr, '| rec:', rec, '| wins:', wins, 'losses:', losses, '| pct:', pct);
       const isCurrent = t.id === currentTeamId;
       const rowStyle = isCurrent ? 'background:var(--amber-light);' : '';
       const nameStyle = isCurrent ? 'color:var(--amber-dark);font-weight:700;' : '';
-      html += '<tr style="' + rowStyle + '">'
-        + '<td class="rank-cell">' + (i + 1) + '</td>'
-        + '<td onclick="selectTeam(\'' + t.id + '\', \'' + t.name.replace(/'/g, "\\'") + '\')" style="' + nameStyle + '">' + t.name + '</td>'
-        + '<td>' + (isNaN(wins) ? '—' : wins) + '</td>'
-        + '<td>' + (isNaN(losses) ? '—' : losses) + '</td>'
-        + '<td>' + winPct + '</td>'
-        + '</tr>';
+      html += `<tr style="${rowStyle}">`
+        + `<td class="rank-cell">${i + 1}</td>`
+        + `<td onclick="selectTeam('${t.id}', '${t.name.replace(/'/g, "\\'")}')" style="${nameStyle}">${t.name}</td>`
+        + `<td>${isNaN(wins) ? '—' : wins}</td>`
+        + `<td>${isNaN(losses) ? '—' : losses}</td>`
+        + `<td>${pct}</td>`
+        + `</tr>`;
     });
 
     html += `</tbody></table>`;
