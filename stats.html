@@ -660,10 +660,32 @@
       return;
     }
 
+    // NBA: log first group and first athlete for structure diagnosis
+    if (currentSport === 'basketball_nba') {
+      console.log('[roster] first group full:', JSON.stringify(groups[0]).slice(0, 800));
+      const firstAthlete = groups[0]?.items?.[0] ?? (isFlat ? groups[0] : null);
+      console.log('[roster] first athlete full:', JSON.stringify(firstAthlete).slice(0, 800));
+    }
+
+    const GROUP_LABELS = {
+      offense: 'Offense',
+      defense: 'Defense',
+      specialTeams: 'Special Teams',
+      injuredReserveOrOut: 'IR / Out',
+      suspended: 'Suspended',
+      practiceSquad: 'Practice Squad',
+    };
+
+    function groupLabel(g) {
+      const raw = g.name || g.displayName || (typeof g.position === 'string' ? g.position : g.position?.displayName) || '';
+      if (GROUP_LABELS[raw]) return GROUP_LABELS[raw];
+      // Title-case fallback: split on camelCase, capitalize each word
+      return raw.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).trim() || 'Players';
+    }
+
     // Build tabs per position group
     tabsEl.innerHTML = groups.map((g, i) => {
-      const label = g.displayName || (typeof g.position === 'string' ? g.position : g.position?.displayName) || 'Players';
-      return `<button class="inner-tab ${i === 0 ? 'active' : ''}" onclick="showRosterGroup(${i})">${label}</button>`;
+      return `<button class="inner-tab ${i === 0 ? 'active' : ''}" onclick="showRosterGroup(${i})">${groupLabel(g)}</button>`;
     }).join('');
 
     // Store groups globally for tab switching
