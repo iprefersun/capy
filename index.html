@@ -103,7 +103,7 @@
       transition: background 0.15s;
     }
 
-    .nav-link:hover { background: var(--surface-2); }
+    .nav-link:hover { background: var(--surface-2); color: var(--text); }
 
     .btn {
       font-family: 'Inter', sans-serif;
@@ -629,7 +629,7 @@
 
     /* RESPONSIVE */
     @media (max-width: 600px) {
-      .nav-links .nav-link { display: none; }
+      .nav-links .nav-link:not(.nav-link-odds):not(.nav-link-stats) { display: none; }
       .hero { padding: 3rem 0 2rem; }
       .hero-capy { font-size: 60px; }
       .tagline-block { gap: 1.5rem; }
@@ -645,6 +645,8 @@
         Capy
       </a>
       <div class="nav-links">
+        <a href="/odds" class="nav-link nav-link-odds">Live odds</a>
+        <a href="/stats.html" class="nav-link nav-link-stats">Stats</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#pricing" class="nav-link">Pricing</a>
         <a href="#signup" class="btn btn-primary">Get early access</a>
@@ -715,6 +717,16 @@
           <div class="feature-title">CLV tracking</div>
           <div class="feature-desc">See how your bets close versus the opening line. Prove you have a real edge over time.</div>
         </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏥</div>
+          <div class="feature-title">Injury reports</div>
+          <div class="feature-desc">Real-time injury status for every player across all major sports. Never bet blind again.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏆</div>
+          <div class="feature-title">Team & player stats</div>
+          <div class="feature-desc">Full standings, rosters, and player props in one place. Research and bet without switching tabs.</div>
+        </div>
       </div>
     </section>
 
@@ -731,7 +743,7 @@
       </div>
     </section>
 
-<section id="pricing">
+    <section id="pricing">
       <div class="section-label">Pricing</div>
       <div class="section-title">Simple, honest pricing</div>
       <div style="background:var(--amber-light);border:1.5px solid var(--amber);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:1.5rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -868,15 +880,15 @@
       try {
         const sports = [
           'basketball_nba',
-          'americanfootball_nfl', 
+          'americanfootball_nfl',
           'baseball_mlb',
           'icehockey_nhl'
         ];
         const sport = sports[Math.floor(Math.random() * sports.length)];
-        const res = await fetch(`/.netlify/functions/odds?sport=${sport}`);
+        const res = await fetch(`/api/odds?sport=${sport}`);
         const games = await res.json();
-        
-        if (!games || !games.length) {
+
+        if (!Array.isArray(games) || !games.length) {
           loadFallbackTicker();
           return;
         }
@@ -891,7 +903,7 @@
           bookmakers.slice(0, 2).forEach(book => {
             const h2h = book.markets?.find(m => m.key === 'h2h');
             const spreads = book.markets?.find(m => m.key === 'spreads');
-            
+
             if (h2h) {
               const homeOdds = h2h.outcomes?.find(o => o.name === home);
               if (homeOdds) {
