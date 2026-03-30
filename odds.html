@@ -95,6 +95,7 @@
     .odds-cell { background: var(--surface-2); border-radius: 6px; padding: 6px 4px; text-align: center; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.12s; border: 1px solid transparent; }
     .odds-cell:hover { border-color: var(--amber); }
     .odds-cell.best { background: var(--green); color: #fff; font-weight: 700; border-color: var(--green-dark); }
+    .odds-cell.tied-best { background: var(--green-light); color: var(--green-dark); font-weight: 600; border-color: #b8dfc7; }
     .odds-cell.worst { background: #f9ede9; color: #b04020; font-weight: 400; }
     .odds-cell.locked { filter: blur(4px); cursor: pointer; user-select: none; }
     .odds-cell-empty { background: var(--surface-2); color: var(--text-hint); font-size: 11px; cursor: default; }
@@ -840,23 +841,37 @@
         const validNums = numVals.filter(v => v !== null);
         const best = validNums.length ? Math.max(...validNums) : null;
         const worst = validNums.length ? Math.min(...validNums) : null;
-        const bestIdx = best !== null ? numVals.indexOf(best) : -1;
+        const allEqual = best !== null && best === worst && validNums.length > 1;
+        const hasVariance = !allEqual && validNums.length > 1;
+        const bestCount = hasVariance ? validNums.filter(v => v === best).length : 0;
 
         const cells = vals.map((v, i) => {
           if (!v) return `<div class="odds-cell odds-cell-empty" title="This book doesn't offer odds on this game">—</div>`;
           const num = numVals[i];
-          const isBest = num === best;
-          const isWorst = num === worst && num !== best;
           const isLocked = !isFirst && !userEmail && i > 2;
-          // Add bet now link on the best cell in h2h rows
-          const betNow = (isBest && market === 'h2h' && i === bestIdx && BOOK_KEYS[i])
+
+          let cellClass = '';
+          if (hasVariance) {
+            if (num === best) {
+              cellClass = bestCount === 1 ? 'best' : 'tied-best';
+            } else if (num === worst) {
+              cellClass = 'worst';
+            }
+          }
+
+          // Bet now link only on the uniquely best cell in h2h rows
+          const betNow = (cellClass === 'best' && market === 'h2h' && BOOK_KEYS[i])
             ? `<a href="${BOOK_URLS[BOOK_KEYS[i]] || '#'}" target="_blank" rel="noopener" class="bet-now-link" style="display:block;margin-top:3px;" onclick="event.stopPropagation()">Bet →</a>`
             : '';
-          return `<div class="odds-cell ${isBest ? 'best' : ''} ${isWorst ? 'worst' : ''} ${isLocked ? 'locked' : ''}"
+          return `<div class="odds-cell ${cellClass} ${isLocked ? 'locked' : ''}"
             onclick="${isLocked ? 'showGate()' : ''}">${v}${betNow}</div>`;
         });
 
-        return `<div class="odds-row-label" style="font-size:11px;">${label}</div>${cells.join('')}`;
+        const allEqualNote = allEqual
+          ? `<div style="grid-column:1/-1;font-size:10px;color:var(--text-hint);text-align:center;padding:1px 0 3px;letter-spacing:0.2px;">All books equal</div>`
+          : '';
+
+        return `<div class="odds-row-label" style="font-size:11px;">${label}</div>${cells.join('')}${allEqualNote}`;
       }).join('');
     }
 
