@@ -80,13 +80,14 @@
     @media (max-width: 1400px) { .games.grid-view { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 1000px) { .games.grid-view { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 700px)  { .games.grid-view { grid-template-columns: 1fr; } }
-    .game-card.grid-card { cursor: default; }
+    .game-card.grid-card { cursor: default; display: flex; flex-direction: column; }
     .game-card.grid-card .game-header { padding: 10px 14px; }
     .game-card.grid-card .game-teams { font-size: 13px; }
-    .game-card.grid-card .game-edge-row { padding: 6px 14px; }
+    .game-card.grid-card .game-edge-row { padding: 6px 14px; min-height: 36px; }
+    .game-card.grid-card .game-edge-row .game-edge-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .game-card.grid-card .game-edge-big { font-size: 17px; }
     .game-card.grid-card .odds-legend { padding: 4px 14px 2px; }
-    .grid-expand-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 8px 14px; text-align: center; cursor: pointer; transition: background 0.15s; }
+    .grid-expand-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 8px 14px; text-align: center; cursor: pointer; transition: background 0.15s; margin-top: auto; }
     .grid-expand-btn:hover { background: var(--amber); color: #fff; }
 
     .game-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; gap: 8px; }
