@@ -301,7 +301,51 @@
       .game-card:hover { transform: none; }
       .pick-bet-btn { width: 100%; }
     }
+
+    /* ── DARK MODE ────────────────────────────────────────── */
+    body, nav, .game-card, .stat-card, .pick-card, .affiliate-bar, .gate-modal,
+    .method-banner, .filter-btn, .sort-toggle-btn, .view-toggle-btn,
+    .odds-cell, .skeleton-card, .aff-btn, .pick-lock-badge, .grid-expand-btn { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+
+    [data-theme="dark"] {
+      --amber: #e8991e;
+      --amber-light: #2d1f08;
+      --amber-dark: #f5c87a;
+      --green: #22c48a;
+      --green-light: #0a2118;
+      --green-dark: #7dd9b4;
+      --red: #F07050;
+      --red-light: #2a1009;
+      --text: #eeedf0;
+      --text-muted: #9898a4;
+      --text-hint: #505058;
+      --border: rgba(255,255,255,0.07);
+      --border-mid: rgba(255,255,255,0.13);
+      --surface: #1a1d27;
+      --surface-2: #13151f;
+    }
+    [data-theme="dark"] body { background: #0f1117; }
+    [data-theme="dark"] nav { background: #161920; }
+    [data-theme="dark"] .skeleton-line { background: linear-gradient(90deg, #1e2130 25%, #252838 50%, #1e2130 75%); background-size: 200% 100%; }
+    [data-theme="dark"] .method-banner { background: linear-gradient(135deg, #0d241a, #0a1d14); border-color: rgba(34,196,138,0.2); }
+    [data-theme="dark"] .odds-cell.worst { background: #2a1009; color: #f07050; }
+    [data-theme="dark"] .odds-cell.row-alt:not(.best):not(.worst):not(.tied-best):not(.odds-cell-empty) { background: rgba(255,255,255,0.025); }
+    [data-theme="dark"] .odds-row-label.row-alt { background: rgba(255,255,255,0.02); }
+    [data-theme="dark"] .tag-nba { background: #0d1e30; color: #5badee; }
+    [data-theme="dark"] .tag-nfl { background: #2a1009; color: #f09070; }
+    [data-theme="dark"] .tag-mlb { background: #0a1f0d; color: #6dbf70; }
+    [data-theme="dark"] .tag-nhl { background: #1a1640; color: #9d96ee; }
+    [data-theme="dark"] .legend-red { background: #3a1408; border-color: #6b2a18; }
+    [data-theme="dark"] .legend-neutral { background: var(--surface-2); border-color: rgba(255,255,255,0.1); }
+    [data-theme="dark"] .gate-overlay { background: rgba(0,0,0,0.75); }
+    [data-theme="dark"] .gate-input { background: var(--surface-2); }
+    [data-theme="dark"] .grid-expand-btn { background: #1e2535; }
+    [data-theme="dark"] .champion-banner { background: linear-gradient(135deg, #2d1f08, #1a1305); }
+
+    .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
+    .theme-toggle-btn:hover { opacity: 0.8; }
   </style>
+  <script>(function(){var t=localStorage.getItem('capy_theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 
@@ -316,6 +360,7 @@
         <span style="font-size:12px;color:var(--text-muted);"><span class="live-dot"></span>Live odds</span>
         <span class="nav-badge">Founding rate — $7/mo</span>
         <a href="/#signup" class="btn-small">Go Pro</a>
+        <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
       </div>
     </div>
   </nav>
@@ -1211,6 +1256,19 @@
 
     // Init view toggle UI on page load
     updateViewToggleUI();
+
+    // ── Theme toggle ─────────────────────────────────────────────────────
+    function toggleTheme() {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('capy_theme', next);
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = next === 'dark' ? '☀️' : '🌙';
+    }
+    (function() {
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    })();
   </script>
 
 </body>

@@ -245,7 +245,38 @@
     .cs-emoji { font-size: 52px; display: block; margin-bottom: 1rem; }
     .cs-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
     .cs-desc { font-size: 14px; color: var(--text-muted); max-width: 360px; margin: 0 auto 1.25rem; line-height: 1.6; }
+
+    /* ── DARK MODE ────────────────────────────────────────── */
+    body, nav, .sidebar-card, .section, .team-hero, .welcome, .coming-soon-card { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+
+    [data-theme="dark"] {
+      --amber: #e8991e;
+      --amber-light: #2d1f08;
+      --amber-dark: #f5c87a;
+      --green: #22c48a;
+      --green-light: #0a2118;
+      --green-dark: #7dd9b4;
+      --red: #F07050;
+      --red-light: #2a1009;
+      --text: #eeedf0;
+      --text-muted: #9898a4;
+      --text-hint: #505058;
+      --border: rgba(255,255,255,0.07);
+      --border-mid: rgba(255,255,255,0.13);
+      --surface: #1a1d27;
+      --surface-2: #13151f;
+    }
+    [data-theme="dark"] body { background: #0f1117; }
+    [data-theme="dark"] nav { background: #161920; }
+    [data-theme="dark"] .zone-ucl { background: rgba(34,196,138,0.05); }
+    [data-theme="dark"] .zone-rel { background: rgba(240,112,80,0.05); }
+    [data-theme="dark"] .champion-banner { background: linear-gradient(135deg, #2d1f08, #1a1305); }
+    [data-theme="dark"] .intro-banner { background: #0f1117; }
+
+    .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
+    .theme-toggle-btn:hover { opacity: 0.8; }
   </style>
+  <script>(function(){var t=localStorage.getItem('capy_theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 
@@ -259,6 +290,7 @@
       <a href="/odds" class="nav-link">← Live odds</a>
       <span class="nav-badge">Founding rate — $7/mo</span>
       <a href="/#signup" class="btn-small">Go Pro</a>
+      <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
     </div>
   </div>
 </nav>
@@ -1458,6 +1490,19 @@
           Select any team above for detailed stats, props, and injury reports.
         </div>`;
     }
+  })();
+
+  // ── Theme toggle ──────────────────────────────────────────────────────
+  function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('capy_theme', next);
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = next === 'dark' ? '☀️' : '🌙';
+  }
+  (function() {
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
   })();
 </script>
 
