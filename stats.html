@@ -1048,6 +1048,19 @@
         </div>
       </div>
 
+      <!-- TOP PLAYERS -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Top Players This Season</div>
+          <span class="section-badge badge-free">Free</span>
+        </div>
+        <div class="section-body" style="padding:0;">
+          <div id="player-stats-body">
+            <div class="spinner-wrap"><div class="spinner"></div><span class="spinner-text">Loading player stats...</span></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ROSTER / STATS -->
       <div class="section">
         <div class="section-header">
@@ -1107,6 +1120,58 @@
 
     renderRoster(rosterData);
     loadInjuries(currentTeamId);
+    loadPlayerStats(currentTeamName);
+  }
+
+  // ─── PLAYER STATS ───────────────────────────────────────────────────
+  async function loadPlayerStats(teamName) {
+    const el = document.getElementById('player-stats-body');
+    if (!el) return;
+    // Only fetch for NBA (BallDontLie covers NBA)
+    if (currentSport !== 'basketball_nba') {
+      el.innerHTML = `<div class="empty-note">Player season averages are available for NBA teams.</div>`;
+      return;
+    }
+    try {
+      const res = await fetch(`/api/stats?team=${encodeURIComponent(teamName)}`);
+      const data = await res.json();
+
+      // Shaped response from api/stats.js: { players: [...] }
+      const players = data.players;
+      if (!players || !players.length) {
+        el.innerHTML = `<div class="empty-note">No season averages available for this team.</div>`;
+        return;
+      }
+
+      el.innerHTML = `
+        <table class="stats-table" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:8px 14px;">Player</th>
+              <th>Pos</th>
+              <th>PTS</th>
+              <th>REB</th>
+              <th>AST</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${players.map((p, i) => `
+              <tr>
+                <td style="padding:9px 14px;">
+                  <div class="player-name-cell">${p.name}</div>
+                </td>
+                <td>${p.position || '—'}</td>
+                <td class="${i === 0 ? 'stat-highlight' : ''}">${p.pts != null ? p.pts.toFixed(1) : '—'}</td>
+                <td>${p.reb != null ? p.reb.toFixed(1) : '—'}</td>
+                <td>${p.ast != null ? p.ast.toFixed(1) : '—'}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      if (document.getElementById('player-stats-body')) {
+        document.getElementById('player-stats-body').innerHTML = `<div class="empty-note">Player stats unavailable right now.</div>`;
+      }
+    }
   }
 
   // ─── ROSTER ─────────────────────────────────────────────────────────
@@ -1307,7 +1372,7 @@
       const injuries = data.injuries || [];
 
       if (!injuries.length) {
-        el.innerHTML = `<div class="empty-note">No injuries reported for this team. ✅</div>`;
+        el.innerHTML = `<div class="empty-note">No injuries reported for this team. ✅<br><span style="font-size:11px;color:var(--text-hint);display:block;margin-top:4px;">Injury data updates daily — check back closer to tip-off.</span></div>`;
         return;
       }
 
@@ -1332,7 +1397,7 @@
       </div>`;
     } catch(e) {
       if (document.getElementById('injury-body')) {
-        document.getElementById('injury-body').innerHTML = `<div class="empty-note">Injury data unavailable.</div>`;
+        document.getElementById('injury-body').innerHTML = `<div class="empty-note">Injury data unavailable.<br><span style="font-size:11px;color:var(--text-hint);display:block;margin-top:4px;">Injury data updates daily — check back closer to tip-off.</span></div>`;
       }
     }
   }

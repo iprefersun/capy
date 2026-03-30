@@ -1,4 +1,4 @@
-// v2
+// v3 — returns shaped { players } object
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -11,15 +11,13 @@ export default async function handler(req, res) {
     // 1. Find team ID
     const teamsRes = await fetch('https://api.balldontlie.io/v1/teams?per_page=100', { headers });
     const teamsData = await teamsRes.json();
-    console.log('[stats] teams status:', teamsRes.status, 'count:', teamsData.data?.length);
 
     const needle = teamName.toLowerCase();
     const team = teamsData.data?.find(t =>
       t.full_name?.toLowerCase().includes(needle) ||
       t.name?.toLowerCase().includes(needle)
     );
-    console.log('[stats] team match:', team ? `${team.full_name} id=${team.id}` : 'none');
-    if (!team) return res.status(200).json({ error: 'team not found', needle });
+    if (!team) return res.status(200).json({ players: [] });
 
     // 2. Fetch players for that team
     const playersRes = await fetch(
@@ -27,23 +25,38 @@ export default async function handler(req, res) {
       { headers }
     );
     const playersData = await playersRes.json();
-    console.log('[stats] players status:', playersRes.status, 'count:', playersData.data?.length);
 
     const ids = (playersData.data || []).slice(0, 25).map(p => p.id);
-    console.log('[stats] first 25 player ids:', ids);
+    const playerMap = {};
+    (playersData.data || []).forEach(p => { playerMap[p.id] = p; });
 
-    // 3. Fetch season averages for first 25 players
+    if (!ids.length) return res.status(200).json({ players: [] });
+
+    // 3. Fetch season averages (2024 = 2024-25 NBA season)
     const avgUrl = `https://api.balldontlie.io/v1/season_averages?season=2024&${ids.map(id => `player_ids[]=${id}`).join('&')}`;
-    console.log('[stats] avg url:', avgUrl);
-
     const avgRes = await fetch(avgUrl, { headers });
     const avgData = await avgRes.json();
-    console.log('[stats] avg status:', avgRes.status, 'count:', avgData.data?.length);
 
-    // 4. Return raw response for inspection
-    return res.status(200).json(avgData);
+    // 4. Shape: top 8 players by pts, each with name/position/pts/reb/ast
+    const players = (avgData.data || [])
+      .filter(a => a.pts != null && a.pts > 0)
+      .sort((a, b) => (b.pts || 0) - (a.pts || 0))
+      .slice(0, 8)
+      .map(a => {
+        const p = playerMap[a.player_id] || {};
+        return {
+          name: p.first_name && p.last_name ? `${p.first_name} ${p.last_name}` : null,
+          position: p.position || null,
+          pts: a.pts != null ? parseFloat(a.pts.toFixed(1)) : null,
+          reb: a.reb != null ? parseFloat(a.reb.toFixed(1)) : null,
+          ast: a.ast != null ? parseFloat(a.ast.toFixed(1)) : null,
+        };
+      })
+      .filter(p => p.name);
+
+    return res.status(200).json({ players });
   } catch (err) {
-    console.error('[stats] error:', err.message, err.stack);
-    return res.status(500).json({ error: err.message });
+    console.error('[stats] error:', err.message);
+    return res.status(500).json({ error: err.message, players: [] });
   }
 }

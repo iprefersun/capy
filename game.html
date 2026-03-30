@@ -474,14 +474,31 @@
       const home = comps.find(c => c.homeAway === 'home');
       const away = comps.find(c => c.homeAway === 'away');
       const date = new Date(event.date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-      const homeWon = parseInt(home?.score) > parseInt(away?.score);
-      const ourHomeWon = home?.team.displayName.includes(homeTeam.split(' ').pop());
-      const weWon = ourHomeWon ? homeWon : !homeWon;
+      const state = comp?.status?.type?.state || event.status?.type?.state || 'post';
+      const isCompleted = comp?.status?.type?.completed ?? (state === 'post');
+      const isLive = state === 'in';
+
+      if (!isCompleted && !isLive) {
+        // Game hasn't started — show tip-off time instead of score
+        const tipoff = new Date(event.date).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+        return `
+          <div class="h2h-item">
+            <div class="h2h-date">${date}</div>
+            <div class="h2h-teams">${away?.team.displayName} @ ${home?.team.displayName}</div>
+            <div class="h2h-score" style="font-size:12px;color:var(--text-hint);">Upcoming · ${tipoff}</div>
+          </div>`;
+      }
+
+      const homeScore = parseInt(home?.score);
+      const awayScore = parseInt(away?.score);
+      const homeWon = homeScore > awayScore;
+      const ourTeamIsHome = home?.team.displayName?.includes(homeTeam.split(' ').pop());
+      const weWon = ourTeamIsHome ? homeWon : !homeWon;
       return `
         <div class="h2h-item">
           <div class="h2h-date">${date}</div>
           <div class="h2h-teams">${away?.team.displayName} @ ${home?.team.displayName}</div>
-          <div class="h2h-score">${away?.score} - ${home?.score}</div>
+          <div class="h2h-score">${awayScore} - ${homeScore}${isLive ? ' <span style="color:var(--green);font-size:10px;font-weight:700;">LIVE</span>' : ''}</div>
           <span class="h2h-winner ${weWon ? 'win' : 'loss'}">${homeTeam.split(' ').pop()} ${weWon ? 'W' : 'L'}</span>
         </div>`;
     }).join('');

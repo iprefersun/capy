@@ -87,22 +87,57 @@
     .value-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--green-light); color: var(--green-dark); }
 
     /* ODDS TABLE */
-    .odds-table { width: 100%; padding: 0 16px 14px; overflow-x: auto; }
-    .odds-grid { display: grid; gap: 4px; min-width: 500px; }
-    .odds-grid-6 { grid-template-columns: 130px repeat(5, 1fr); }
+    .odds-table { width: 100%; padding: 0 0 14px; overflow-x: auto; }
+    .odds-grid { display: grid; gap: 4px; min-width: 480px; }
+    .odds-grid-6 { grid-template-columns: 140px repeat(5, 1fr); }
     .odds-col-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); padding: 6px 4px 2px; text-align: center; }
-    .odds-row-label { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; padding: 6px 4px; }
-    .odds-cell { background: var(--surface-2); border-radius: 6px; padding: 6px 4px; text-align: center; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.12s; border: 1px solid transparent; }
+    .odds-row-label { font-size: 11px; font-weight: 600; color: var(--text); display: flex; align-items: center; padding: 9px 4px; }
+    .odds-cell { background: var(--surface-2); border-radius: 6px; padding: 9px 12px 9px 4px; text-align: right; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.12s; border: 1px solid transparent; }
     .odds-cell:hover { border-color: var(--amber); }
-    .odds-cell.best { background: var(--green); color: #fff; font-weight: 700; border-color: var(--green-dark); }
-    .odds-cell.tied-best { background: var(--green-light); color: var(--green-dark); font-weight: 600; border-color: #b8dfc7; }
-    .odds-cell.worst { background: #f9ede9; color: #b04020; font-weight: 400; }
+    .odds-cell.best { background: var(--green); color: #fff; border-color: var(--green-dark); }
+    .odds-cell.tied-best { background: var(--green-light); color: var(--green-dark); border-color: #b8dfc7; }
+    .odds-cell.worst { background: #f9ede9; color: #b04020; }
+    .odds-cell.row-alt:not(.best):not(.worst):not(.tied-best):not(.odds-cell-empty) { background: rgba(0,0,0,0.022); }
+    .odds-row-label.row-alt { background: rgba(0,0,0,0.015); border-radius: 4px; }
     .odds-cell.locked { filter: blur(4px); cursor: pointer; user-select: none; }
-    .odds-cell-empty { background: var(--surface-2); color: var(--text-hint); font-size: 11px; cursor: default; }
-    .odds-divider { grid-column: 1 / -1; height: 0.5px; background: var(--border); margin: 4px 0; }
+    .odds-cell-empty { background: var(--surface-2); color: var(--text-hint); font-size: 11px; cursor: default; text-align: center; padding: 9px 4px; }
+    .odds-divider { grid-column: 1 / -1; height: 0.5px; background: var(--border); margin: 2px 0; }
+    .odds-market-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 5px; padding: 10px 4px 3px; }
+    .odds-market-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); }
 
     /* BOOK HEADERS */
-    .book-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text-hint); text-align: center; padding: 6px 4px 2px; }
+    .book-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2px; color: var(--text-hint); text-align: center; padding: 6px 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* BET TYPE TOOLTIP */
+    .bet-type-help { width: 14px; height: 14px; border-radius: 50%; background: var(--surface-2); border: 0.5px solid var(--border-mid); font-size: 9px; font-weight: 700; color: var(--text-hint); display: inline-flex; align-items: center; justify-content: center; cursor: default; position: relative; flex-shrink: 0; }
+    .bet-type-help:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: -8px; background: #1a1a1a; color: #fff; font-size: 11px; font-weight: 400; padding: 7px 11px; border-radius: 6px; width: 220px; z-index: 30; line-height: 1.5; font-family: 'Inter', sans-serif; white-space: normal; pointer-events: none; }
+    .bet-type-help:hover::before { content: ''; position: absolute; bottom: calc(100% + 2px); left: 2px; border: 5px solid transparent; border-top-color: #1a1a1a; pointer-events: none; }
+
+    /* ODDS LEGEND */
+    .odds-legend { display: flex; gap: 14px; padding: 6px 16px 4px; font-size: 10px; color: var(--text-hint); flex-wrap: wrap; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 3px; vertical-align: middle; }
+    .legend-green { background: var(--green); }
+    .legend-red { background: #f9ede9; border: 0.5px solid #e4b0a0; }
+    .legend-neutral { background: var(--surface-2); border: 0.5px solid var(--border-mid); }
+
+    /* MOBILE ODDS CARD LAYOUT */
+    .odds-mobile { display: none; padding: 0 16px 8px; }
+    .odds-mobile-section { margin-bottom: 4px; }
+    .odds-mobile-market { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); padding: 10px 0 6px; display: flex; align-items: center; gap: 5px; border-top: 0.5px solid var(--border); }
+    .odds-mobile-market:first-child { border-top: none; }
+    .odds-mobile-side-label { font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 4px 0 2px; }
+    .odds-mobile-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 0.5px solid var(--border); gap: 8px; }
+    .odds-mobile-row:last-child { border-bottom: none; }
+    .odds-mobile-book { font-size: 12px; font-weight: 600; color: var(--text); min-width: 96px; }
+    .odds-mobile-val { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); }
+    .odds-mobile-val.best { color: var(--green); font-weight: 700; }
+    .odds-mobile-val.worst { color: #b04020; }
+    .odds-mobile-bet-btn { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: var(--amber); color: #fff; text-decoration: none; white-space: nowrap; display: inline-block; }
+    @media (max-width: 640px) {
+      .odds-table-desktop { display: none; }
+      .odds-mobile { display: block; }
+      .odds-legend { padding: 6px 0 4px; }
+    }
 
     /* LOADING */
     .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; gap: 12px; }
@@ -442,7 +477,7 @@
   <script>
     const BOOKS = ['FanDuel','DraftKings','BetMGM','BetRivers','BetOnline.ag'];
     const BOOK_KEYS = ['fanduel','draftkings','betmgm','betrivers','betonlineag'];
-    const BOOK_SHORT = ['FD','DK','MGM','Rivers','BetOnline'];
+    const BOOK_SHORT = ['FanDuel','DraftKings','BetMGM','BetRivers','BetOnline'];
     const BOOK_URLS = {
       'fanduel': 'https://fanduel.com',
       'draftkings': 'https://draftkings.com',
@@ -653,7 +688,8 @@
     }
 
     // ── Capy's Picks ─────────────────────────────────────────────────────
-    function getPickConfidence(edge) {
+    function getPickConfidence(edge, edgeType) {
+      if (edgeType === 'moneyline') return { label: '📊 Best Available Line', cls: 'pick-conf-look' };
       if (edge > 6) return { label: '🔥 Strong Pick', cls: 'pick-conf-strong' };
       if (edge >= 3) return { label: '✅ Good Value', cls: 'pick-conf-good' };
       return { label: '👀 Worth a Look', cls: 'pick-conf-look' };
@@ -694,7 +730,7 @@
         const edge = edgeInfo.value;
         const bestBook = getBestBookForGame(game);
         if (!bestBook) return '';
-        const conf = getPickConfidence(edge);
+        const conf = getPickConfidence(edge, edgeInfo.type);
         const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
         const label = SPORT_LABELS[game.sport_key] || game.sport_key;
         const oddsStr = bestBook.price > 0 ? `+${bestBook.price}` : `${bestBook.price}`;
@@ -796,6 +832,15 @@
              </div>`
         : '';
 
+      const mktHeader = (title, tip) =>
+        `<div class="odds-market-header"><span class="odds-market-label">${title}</span><span class="bet-type-help" data-tip="${tip}">?</span></div>`;
+
+      const legend = `<div class="odds-legend">
+        <span><span class="legend-dot legend-green"></span>Best line</span>
+        <span><span class="legend-dot legend-red"></span>Worst line</span>
+        <span><span class="legend-dot legend-neutral"></span>All equal</span>
+      </div>`;
+
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}">
           <div class="game-header">
@@ -807,40 +852,117 @@
             </div>
           </div>
           ${edgeRow}
-          <div class="odds-table">
-            <div class="odds-grid odds-grid-6">
-              <div class="odds-col-header"></div>
-              ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
-              ${h2hRows}
-              <div class="odds-divider"></div>
-              ${spreadRows}
-              <div class="odds-divider"></div>
-              ${totalRows}
+          ${legend}
+          <div class="odds-table-desktop">
+            <div class="odds-table">
+              <div class="odds-grid odds-grid-6" style="padding:0 16px;">
+                <div class="odds-col-header"></div>
+                ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
+                ${mktHeader('Moneyline','Pick which team wins outright. Negative odds = favorite, positive odds = underdog.')}
+                ${h2hRows}
+                <div class="odds-divider"></div>
+                ${mktHeader('Spread','Bet on the margin of victory. The favorite must win by more than the spread.')}
+                ${spreadRows}
+                <div class="odds-divider"></div>
+                ${mktHeader('Total','Bet on the combined score of both teams going over or under a set number.')}
+                ${totalRows}
+              </div>
             </div>
+          </div>
+          <div class="odds-mobile">
+            ${buildMobileOdds(game, books, isFirst)}
           </div>
         </div>`;
     }
 
-    function buildOddsRows(game, books, market, isFirst) {
-      const labels = {
-        h2h: [game.away_team?.split(' ').pop() + ' ML', game.home_team?.split(' ').pop() + ' ML'],
-        spreads: [game.away_team?.split(' ').pop() + ' spread', game.home_team?.split(' ').pop() + ' spread'],
-        totals: ['Over', 'Under']
-      };
-      const rows = labels[market];
-      if (!rows) return '';
+    const MARKET_TIPS = {
+      h2h: 'Pick which team wins outright. Negative odds = favorite, positive odds = underdog.',
+      spreads: 'Bet on the margin of victory. The favorite must win by more than the spread.',
+      totals: 'Bet on the combined score of both teams going over or under a set number.'
+    };
+    const MARKET_NAMES = { h2h: 'Moneyline', spreads: 'Spread', totals: 'Total (O/U)' };
 
-      return rows.map((label, ri) => {
-        const side = ri === 0 ? (market === 'totals' ? 'Over' : game.away_team) : (market === 'totals' ? 'Under' : game.home_team);
+    function buildMobileOdds(game, books, isFirst) {
+      return ['h2h','spreads','totals'].map(market => {
+        const sides = market === 'totals' ? ['Over','Under'] : [game.away_team, game.home_team];
+        const rows = sides.map((side, ri) => {
+          const vals = books.map((book, i) => {
+            if (!book) return null;
+            const mkt = book.markets?.find(m => m.key === market);
+            const outcome = mkt?.outcomes?.find(o => o.name === side);
+            if (!outcome) return null;
+            let val;
+            if (market === 'spreads') val = `${outcome.point >= 0 ? '+' : ''}${outcome.point}`;
+            else if (market === 'totals') val = `${ri === 0 ? 'o' : 'u'}${outcome.point}`;
+            else val = outcome.price >= 0 ? `+${outcome.price}` : `${outcome.price}`;
+            return { val, num: parseFloat(val.replace(/[ou+]/g,'')), idx: i };
+          });
+          const validNums = vals.filter(Boolean).map(v => v.num);
+          const best = validNums.length ? Math.max(...validNums) : null;
+          const worst = validNums.length ? Math.min(...validNums) : null;
+          const hasVariance = best !== null && best !== worst && validNums.length > 1;
+          const sideLabel = market === 'h2h' ? side.split(' ').pop() + ' to win'
+            : market === 'spreads' ? side.split(' ').pop() + ' (spread)'
+            : side;
+          const bookRows = vals.map(v => {
+            if (!v) return '';
+            const isBest = hasVariance && v.num === best;
+            const isWorst = hasVariance && v.num === worst;
+            const isLocked = !isFirst && !userEmail && v.idx > 2;
+            const betBtn = isBest && market === 'h2h' && BOOK_URLS[BOOK_KEYS[v.idx]]
+              ? `<a href="${BOOK_URLS[BOOK_KEYS[v.idx]]}" target="_blank" rel="noopener" class="odds-mobile-bet-btn" onclick="event.stopPropagation()">Bet →</a>`
+              : '';
+            return `<div class="odds-mobile-row">
+              <div class="odds-mobile-book">${BOOKS[v.idx]}</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="odds-mobile-val ${isBest ? 'best' : isWorst ? 'worst' : ''}">${isLocked ? '••••' : v.val}</span>
+                ${betBtn}
+              </div>
+            </div>`;
+          }).join('');
+          return `<div class="odds-mobile-side-label">${sideLabel}</div>${bookRows}`;
+        }).join('');
+        return `<div class="odds-mobile-section">
+          <div class="odds-mobile-market">${MARKET_NAMES[market]}<span class="bet-type-help" data-tip="${MARKET_TIPS[market]}">?</span></div>
+          ${rows}
+        </div>`;
+      }).join('');
+    }
+
+    function buildOddsRows(game, books, market, isFirst) {
+      const sides = market === 'totals' ? ['Over','Under'] : [game.away_team, game.home_team];
+      if (!sides[0]) return '';
+
+      return sides.map((side, ri) => {
         const vals = books.map(book => {
           if (!book) return null;
           const mkt = book.markets?.find(m => m.key === market);
           const outcome = mkt?.outcomes?.find(o => o.name === side);
           if (!outcome) return null;
-          if (market === 'spreads') return `${outcome.point > 0 ? '+' : ''}${outcome.point}`;
+          if (market === 'spreads') return `${outcome.point >= 0 ? '+' : ''}${outcome.point}`;
           if (market === 'totals') return `${ri === 0 ? 'o' : 'u'}${outcome.point}`;
-          return outcome.price > 0 ? `+${outcome.price}` : `${outcome.price}`;
+          return outcome.price >= 0 ? `+${outcome.price}` : `${outcome.price}`;
         });
+
+        // Get first available point value to use in the row label
+        let firstPoint = null;
+        for (const book of books) {
+          if (!book) continue;
+          const mkt = book.markets?.find(m => m.key === market);
+          const outcome = mkt?.outcomes?.find(o => o.name === side);
+          if (outcome?.point != null) { firstPoint = outcome.point; break; }
+        }
+
+        const teamShort = side.split(' ').pop();
+        let label;
+        if (market === 'h2h') {
+          label = `${teamShort} to win`;
+        } else if (market === 'spreads') {
+          const pt = firstPoint != null ? (firstPoint >= 0 ? `+${firstPoint}` : `${firstPoint}`) : '';
+          label = `${teamShort} ${pt} (spread)`;
+        } else {
+          label = firstPoint != null ? `${side} ${firstPoint} pts` : side;
+        }
 
         const numVals = vals.map(v => v ? parseFloat(v.replace(/[ou+]/g,'')) : null);
         const validNums = numVals.filter(v => v !== null);
@@ -849,26 +971,21 @@
         const allEqual = best !== null && best === worst && validNums.length > 1;
         const hasVariance = !allEqual && validNums.length > 1;
         const bestCount = hasVariance ? validNums.filter(v => v === best).length : 0;
+        const altClass = ri % 2 === 1 ? 'row-alt' : '';
 
         const cells = vals.map((v, i) => {
           if (!v) return `<div class="odds-cell odds-cell-empty" title="This book doesn't offer odds on this game">—</div>`;
           const num = numVals[i];
           const isLocked = !isFirst && !userEmail && i > 2;
-
           let cellClass = '';
           if (hasVariance) {
-            if (num === best) {
-              cellClass = bestCount === 1 ? 'best' : 'tied-best';
-            } else if (num === worst) {
-              cellClass = 'worst';
-            }
+            if (num === best) cellClass = bestCount === 1 ? 'best' : 'tied-best';
+            else if (num === worst) cellClass = 'worst';
           }
-
-          // Bet now link only on the uniquely best cell in h2h rows
           const betNow = (cellClass === 'best' && market === 'h2h' && BOOK_KEYS[i])
-            ? `<a href="${BOOK_URLS[BOOK_KEYS[i]] || '#'}" target="_blank" rel="noopener" class="bet-now-link" style="display:block;margin-top:3px;" onclick="event.stopPropagation()">Bet →</a>`
+            ? `<a href="${BOOK_URLS[BOOK_KEYS[i]] || '#'}" target="_blank" rel="noopener" class="bet-now-link" style="display:block;margin-top:3px;text-align:center;" onclick="event.stopPropagation()">Bet →</a>`
             : '';
-          return `<div class="odds-cell ${cellClass} ${isLocked ? 'locked' : ''}"
+          return `<div class="odds-cell ${cellClass} ${altClass} ${isLocked ? 'locked' : ''}"
             onclick="${isLocked ? 'showGate()' : ''}">${v}${betNow}</div>`;
         });
 
@@ -876,7 +993,7 @@
           ? `<div style="grid-column:1/-1;font-size:10px;color:var(--text-hint);text-align:center;padding:1px 0 3px;letter-spacing:0.2px;">All books equal</div>`
           : '';
 
-        return `<div class="odds-row-label" style="font-size:11px;">${label}</div>${cells.join('')}${allEqualNote}`;
+        return `<div class="odds-row-label ${altClass}">${label}</div>${cells.join('')}${allEqualNote}`;
       }).join('');
     }
 
