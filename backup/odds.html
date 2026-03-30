@@ -141,54 +141,10 @@
     /* FOOTER */
     .dash-footer { text-align: center; padding: 1.5rem; font-size: 11px; color: var(--text-hint); margin-top: 1rem; }
 
-    /* SKELETON */
-    .skeleton-card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
-    .skeleton-header { padding: 12px 16px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .skeleton-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
-    .skeleton-line { background: linear-gradient(90deg, #ededeb 25%, #f5f4f1 50%, #ededeb 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 4px; height: 14px; }
-    .skeleton-line.short { width: 40%; }
-    .skeleton-line.medium { width: 65%; }
-    .skeleton-line.full { width: 100%; }
-    .skeleton-line.tall { height: 22px; }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-    /* METHODOLOGY BANNER */
-    .method-banner { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .method-banner-icon { font-size: 15px; flex-shrink: 0; }
-    .method-banner-text { font-size: 12px; color: var(--text-muted); flex: 1; min-width: 200px; }
-    .method-banner-text strong { color: var(--text); }
-
-    /* EDGE BADGE */
-    .edge-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--green-light); color: var(--green-dark); }
-    .edge-badge.top { background: var(--green); color: #fff; }
-    .top-edge-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--green); color: #fff; }
-
-    /* BET NOW LINK */
-    .bet-now-link { font-size: 10px; font-weight: 700; color: var(--green-dark); background: var(--green-light); padding: 2px 8px; border-radius: 4px; text-decoration: none; white-space: nowrap; }
-    .bet-now-link:hover { background: var(--green); color: #fff; }
-
-    /* LIVE COUNTER */
-    .live-counter { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-hint); }
-
-    /* SORT TOGGLE */
-    .sort-toggle { display: flex; gap: 5px; }
-    .sort-toggle-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
-    .sort-toggle-btn.active { background: var(--amber); color: #fff; border-color: var(--amber); }
-    .sort-toggle-btn:hover:not(.active) { border-color: var(--amber); color: var(--amber); }
-
-    /* ERROR STATE */
-    .error-state { background: var(--surface); border-radius: var(--radius); border: 1.5px solid var(--red-light); padding: 2rem; text-align: center; }
-    .error-icon { font-size: 36px; display: block; margin-bottom: 8px; }
-    .error-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
-    .error-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1rem; }
-    .retry-btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 20px; border-radius: 6px; border: none; background: var(--amber); color: #fff; cursor: pointer; }
-
     @media (max-width: 600px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .nav-inner { padding: 0.75rem 1rem; }
       .main { padding: 1rem; }
-      .odds-grid { min-width: 400px; }
-      .game-card { border-radius: var(--radius-sm); }
     }
   </style>
 </head>
@@ -322,18 +278,7 @@
           </div>
         </div>
       </div>
-      <div class="filter-meta" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
-        <span><span class="live-dot"></span>Auto-refreshes every 5 min &nbsp;·&nbsp; <span class="live-counter" id="live-counter">Updated just now</span></span>
-        <div class="sort-toggle">
-          <button class="sort-toggle-btn active" onclick="setSortMode('edge', this)">Sort: Best edge</button>
-          <button class="sort-toggle-btn" onclick="setSortMode('time', this)">Sort: Time</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="method-banner">
-      <span class="method-banner-icon">📐</span>
-      <span class="method-banner-text"><strong>How edge is calculated:</strong> Edge = difference between the best available moneyline and the market average across all books. Positive edge means you're getting better-than-market value. Bigger edge = more opportunity.</span>
+      <div class="filter-meta"><span class="live-dot"></span>Auto-refreshes every 5 min</div>
     </div>
 
     <div class="games" id="games-container">
@@ -346,10 +291,10 @@
     <div class="affiliate-bar">
       <div class="aff-text"><strong>Ready to bet?</strong> Open an account at the book with the best line and claim your signup bonus.</div>
       <div class="aff-links">
-        <a href="https://draftkings.com" target="_blank" class="aff-btn">DraftKings</a>
-        <a href="https://fanduel.com" target="_blank" class="aff-btn">FanDuel</a>
-        <a href="https://betmgm.com" target="_blank" class="aff-btn">BetMGM</a>
-        <a href="https://caesars.com/sportsbook-and-casino" target="_blank" class="aff-btn">Caesars</a>
+        <a href="YOUR_DRAFTKINGS_AFFILIATE_LINK" target="_blank" class="aff-btn">DraftKings</a>
+        <a href="YOUR_FANDUEL_AFFILIATE_LINK" target="_blank" class="aff-btn">FanDuel</a>
+        <a href="YOUR_BETMGM_AFFILIATE_LINK" target="_blank" class="aff-btn">BetMGM</a>
+        <a href="YOUR_CAESARS_AFFILIATE_LINK" target="_blank" class="aff-btn">Caesars</a>
       </div>
     </div>
 
@@ -384,13 +329,6 @@
     const BOOKS = ['FanDuel','DraftKings','BetMGM','BetRivers','BetOnline.ag'];
     const BOOK_KEYS = ['fanduel','draftkings','betmgm','betrivers','betonlineag'];
     const BOOK_SHORT = ['FD','DK','MGM','Rivers','BetOnline'];
-    const BOOK_URLS = {
-      'fanduel': 'https://fanduel.com',
-      'draftkings': 'https://draftkings.com',
-      'betmgm': 'https://betmgm.com',
-      'betrivers': 'https://betrivers.com',
-      'betonlineag': 'https://betonline.ag',
-    };
     const ALL_SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
     const SPORT_LABELS = {
       americanfootball_nfl:'NFL', americanfootball_ncaaf:'NCAAF', americanfootball_ufl:'UFL',
@@ -414,56 +352,6 @@
     let oddsCache = {};
     let userEmail = localStorage.getItem('capy_email') || null;
     let gateShown = false;
-    let sortMode = 'edge';
-    let lastUpdatedTime = null;
-
-    // ── Live counter ──────────────────────────────────────────────────
-    function startLiveCounter() {
-      setInterval(() => {
-        if (!lastUpdatedTime) return;
-        const secs = Math.floor((Date.now() - lastUpdatedTime) / 1000);
-        const el = document.getElementById('live-counter');
-        if (!el) return;
-        if (secs < 10) el.textContent = 'Updated just now';
-        else if (secs < 60) el.textContent = `Updated ${secs}s ago`;
-        else el.textContent = `Updated ${Math.floor(secs / 60)}m ago`;
-      }, 5000);
-    }
-
-    // ── Skeleton loading ──────────────────────────────────────────────
-    function showSkeleton() {
-      const container = document.getElementById('games-container');
-      const cards = Array.from({length: 4}, () => `
-        <div class="skeleton-card">
-          <div class="skeleton-header">
-            <div class="skeleton-line medium tall"></div>
-            <div class="skeleton-line short" style="height:18px;width:80px;"></div>
-          </div>
-          <div class="skeleton-body">
-            <div class="skeleton-line full"></div>
-            <div class="skeleton-line full"></div>
-            <div class="skeleton-line medium"></div>
-            <div class="skeleton-line full"></div>
-          </div>
-        </div>`).join('');
-      container.innerHTML = cards;
-    }
-
-    // ── Edge calculation ──────────────────────────────────────────────
-    function calcEdge(game) {
-      const books = BOOK_KEYS.map(k =>
-        game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
-        game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)))
-      );
-      const side = game.home_team;
-      const prices = books.map(book => {
-        const h2h = book?.markets?.find(m => m.key === 'h2h');
-        const outcome = h2h?.outcomes?.find(o => o.name === side);
-        return outcome ? outcome.price : null;
-      }).filter(p => p !== null);
-      if (prices.length < 2) return 0;
-      return Math.max(...prices) - Math.min(...prices);
-    }
 
     async function fetchForSport(key) {
       if (oddsCache[key]) return oddsCache[key];
@@ -474,30 +362,24 @@
     }
 
     async function loadSport(sport) {
-      showSkeleton();
+      const container = document.getElementById('games-container');
+      container.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Fetching odds...</div></div>`;
       try {
         const results = sport === 'all'
           ? await Promise.all(ALL_SPORTS.map(s => fetchForSport(s)))
           : [await fetchForSport(sport)];
         allGames = results.flat();
-        lastUpdatedTime = Date.now();
         renderGames();
         updateStats();
         updateClock();
       } catch(e) {
-        showError();
+        showFallback();
       }
     }
 
     function updateStats() {
       document.getElementById('stat-games').textContent = allGames.length || '—';
-      if (allGames.length) {
-        const edges = allGames.map(calcEdge);
-        const maxEdge = Math.max(...edges);
-        document.getElementById('stat-edge').textContent = maxEdge > 0 ? `+${maxEdge}` : '—';
-      } else {
-        document.getElementById('stat-edge').textContent = '—';
-      }
+      document.getElementById('stat-edge').textContent = '—';
     }
 
     function updateClock() {
@@ -505,26 +387,11 @@
       document.getElementById('stat-time').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
     }
 
-    function setSortMode(mode, el) {
-      sortMode = mode;
-      document.querySelectorAll('.sort-toggle-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-      renderGames();
-    }
-
     function filterSport(sport, el) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       currentSport = sport;
-      oddsCache = {};
       loadSport(sport);
-    }
-
-    function getSortedGames() {
-      if (sortMode === 'edge') {
-        return [...allGames].sort((a, b) => calcEdge(b) - calcEdge(a));
-      }
-      return [...allGames].sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
     }
 
     function renderGames() {
@@ -538,8 +405,7 @@
           </div>`;
         return;
       }
-      const sorted = getSortedGames();
-      container.innerHTML = sorted.map((game, idx) => buildGameCard(game, idx)).join('');
+      container.innerHTML = allGames.map((game, idx) => buildGameCard(game, idx)).join('');
     }
 
     function buildGameCard(game, idx) {
@@ -549,22 +415,13 @@
       const tagClass = 'tag-' + tagKey;
       const label = SPORT_LABELS[sport] || sport;
       const time = new Date(game.commence_time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
-      const edge = calcEdge(game);
-      const isTopEdge = idx < 3 && edge > 0;
       const isFirst = idx === 0;
 
-      const books = BOOK_KEYS.map(k =>
-        game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
-        game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)))
-      );
+      const books = BOOK_KEYS.map(k => game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) || game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5))));
 
       const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
       const spreadRows = buildOddsRows(game, books, 'spreads', isFirst);
       const totalRows = buildOddsRows(game, books, 'totals', isFirst);
-
-      const edgeBadge = edge > 0
-        ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge' : ''} +${edge} edge</span>`
-        : '';
 
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}">
@@ -573,7 +430,7 @@
             <div class="game-tags">
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
-              ${edgeBadge}
+              ${isFirst ? '<span class="value-badge">Best value</span>' : ''}
             </div>
           </div>
           <div class="odds-table">
@@ -591,6 +448,7 @@
     }
 
     function buildOddsRows(game, books, market, isFirst) {
+      const outcomes = ['away', 'home', 'over', 'under'];
       const labels = {
         h2h: [game.away_team?.split(' ').pop() + ' ML', game.home_team?.split(' ').pop() + ' ML'],
         spreads: [game.away_team?.split(' ').pop() + ' spread', game.home_team?.split(' ').pop() + ' spread'],
@@ -613,9 +471,8 @@
 
         const numVals = vals.map(v => v ? parseFloat(v.replace(/[ou+]/g,'')) : null);
         const validNums = numVals.filter(v => v !== null);
-        const best = validNums.length ? Math.max(...validNums) : null;
+        const best = validNums.length ? (market === 'h2h' || market === 'totals' ? Math.max(...validNums) : Math.max(...validNums)) : null;
         const worst = validNums.length ? Math.min(...validNums) : null;
-        const bestIdx = best !== null ? numVals.indexOf(best) : -1;
 
         const cells = vals.map((v, i) => {
           if (!v) return `<div class="odds-cell" style="color:var(--text-hint);">—</div>`;
@@ -623,25 +480,20 @@
           const isBest = num === best;
           const isWorst = num === worst && num !== best;
           const isLocked = !isFirst && !userEmail && i > 2;
-          // Add bet now link on the best cell in h2h rows
-          const betNow = (isBest && market === 'h2h' && i === bestIdx && BOOK_KEYS[i])
-            ? `<a href="${BOOK_URLS[BOOK_KEYS[i]] || '#'}" target="_blank" rel="noopener" class="bet-now-link" style="display:block;margin-top:3px;" onclick="event.stopPropagation()">Bet →</a>`
-            : '';
-          return `<div class="odds-cell ${isBest ? 'best' : ''} ${isWorst ? 'worst' : ''} ${isLocked ? 'locked' : ''}"
-            onclick="${isLocked ? 'showGate()' : ''}">${v}${betNow}</div>`;
+          return `<div class="odds-cell ${isBest ? 'best' : ''} ${isWorst ? 'worst' : ''} ${isLocked ? 'locked' : ''}" 
+            onclick="${isLocked ? 'showGate()' : ''}">${v}</div>`;
         });
 
         return `<div class="odds-row-label" style="font-size:11px;">${label}</div>${cells.join('')}`;
       }).join('');
     }
 
-    function showError() {
+    function showFallback() {
       document.getElementById('games-container').innerHTML = `
-        <div class="error-state">
-          <span class="error-icon">🦫</span>
-          <div class="error-title">Couldn't load odds</div>
-          <div class="error-sub">Something went wrong fetching live data. Check your connection and try again.</div>
-          <button class="retry-btn" onclick="oddsCache={}; loadSport(currentSport)">Retry</button>
+        <div class="empty">
+          <span class="empty-icon">🦫</span>
+          <div class="empty-title">Odds loading soon</div>
+          <div class="empty-sub">We're fetching live data. Refresh in a moment.</div>
         </div>`;
     }
 
@@ -678,7 +530,6 @@
       if (!userEmail) showGate();
     }, 45000);
 
-    startLiveCounter();
     loadSport('basketball_nba');
     setInterval(() => { oddsCache = {}; loadSport(currentSport); }, 300000);
   </script>
