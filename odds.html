@@ -53,12 +53,20 @@
     .stat-value.green { color: var(--green); }
     .stat-value.amber { color: var(--amber); }
 
-    /* FILTERS */
-    .filters { display: flex; align-items: center; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
-    .filter-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    /* FILTER BAR */
+    .filter-wrap { margin-bottom: 1.25rem; }
+    .filter-bar { display: flex; align-items: flex-start; gap: 0; overflow-x: auto; padding-bottom: 6px; }
+    .filter-bar::-webkit-scrollbar { height: 3px; }
+    .filter-bar::-webkit-scrollbar-track { background: transparent; }
+    .filter-bar::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; padding-right: 14px; border-right: 0.5px solid var(--border-mid); margin-right: 14px; flex-shrink: 0; }
+    .filter-group:last-child { border-right: none; padding-right: 0; margin-right: 0; }
+    .filter-group-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); white-space: nowrap; }
+    .filter-group-btns { display: flex; gap: 5px; }
+    .filter-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 11px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
     .filter-btn:hover { border-color: var(--amber); color: var(--amber); }
     .filter-btn.active { background: var(--amber); color: #fff; border-color: var(--amber); }
-    .filter-right { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-hint); font-family: 'DM Mono', monospace; }
+    .filter-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-hint); font-family: 'DM Mono', monospace; margin-top: 8px; }
 
     /* GAME CARDS */
     .games { display: flex; flex-direction: column; gap: 10px; }
@@ -75,6 +83,7 @@
     .tag-nfl { background: #FAECE7; color: #993C1D; }
     .tag-mlb { background: #EAF3DE; color: #3B6D11; }
     .tag-nhl { background: #EEEDFE; color: #534AB7; }
+    .tag-other { background: var(--amber-light); color: var(--amber-dark); }
     .value-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--green-light); color: var(--green-dark); }
 
     /* ODDS TABLE */
@@ -177,13 +186,99 @@
       </div>
     </div>
 
-    <div class="filters">
-      <button class="filter-btn active" onclick="filterSport('all', this)">All sports</button>
-      <button class="filter-btn" onclick="filterSport('basketball_nba', this)">NBA</button>
-      <button class="filter-btn" onclick="filterSport('americanfootball_nfl', this)">NFL</button>
-      <button class="filter-btn" onclick="filterSport('baseball_mlb', this)">MLB</button>
-      <button class="filter-btn" onclick="filterSport('icehockey_nhl', this)">NHL</button>
-      <div class="filter-right"><span class="live-dot"></span>Auto-refreshes every 5 min</div>
+    <div class="filter-wrap">
+      <div class="filter-bar">
+        <div class="filter-group">
+          <div class="filter-group-label">&nbsp;</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('all', this)">All</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">American Football</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('americanfootball_nfl', this)">NFL</button>
+            <button class="filter-btn" onclick="filterSport('americanfootball_ncaaf', this)">NCAAF</button>
+            <button class="filter-btn" onclick="filterSport('americanfootball_ufl', this)">UFL</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Basketball</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn active" onclick="filterSport('basketball_nba', this)">NBA</button>
+            <button class="filter-btn" onclick="filterSport('basketball_ncaab', this)">NCAAB</button>
+            <button class="filter-btn" onclick="filterSport('basketball_wncaab', this)">WNCAAB</button>
+            <button class="filter-btn" onclick="filterSport('basketball_euroleague', this)">Euroleague</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Baseball</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('baseball_mlb', this)">MLB</button>
+            <button class="filter-btn" onclick="filterSport('baseball_ncaa', this)">NCAA Baseball</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Ice Hockey</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('icehockey_nhl', this)">NHL</button>
+            <button class="filter-btn" onclick="filterSport('icehockey_ahl', this)">AHL</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Soccer</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('soccer_epl', this)">EPL</button>
+            <button class="filter-btn" onclick="filterSport('soccer_uefa_champs_league', this)">UCL</button>
+            <button class="filter-btn" onclick="filterSport('soccer_spain_la_liga', this)">La Liga</button>
+            <button class="filter-btn" onclick="filterSport('soccer_germany_bundesliga', this)">Bundesliga</button>
+            <button class="filter-btn" onclick="filterSport('soccer_italy_serie_a', this)">Serie A</button>
+            <button class="filter-btn" onclick="filterSport('soccer_france_ligue_one', this)">Ligue 1</button>
+            <button class="filter-btn" onclick="filterSport('soccer_usa_mls', this)">MLS</button>
+            <button class="filter-btn" onclick="filterSport('soccer_fifa_world_cup', this)">World Cup</button>
+            <button class="filter-btn" onclick="filterSport('soccer_mexico_ligamx', this)">Liga MX</button>
+            <button class="filter-btn" onclick="filterSport('soccer_conmebol_copa_libertadores', this)">Copa Lib.</button>
+            <button class="filter-btn" onclick="filterSport('soccer_netherlands_eredivisie', this)">Eredivisie</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Combat</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('mma_mixed_martial_arts', this)">MMA</button>
+            <button class="filter-btn" onclick="filterSport('boxing_boxing', this)">Boxing</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Cricket</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('cricket_ipl', this)">IPL</button>
+            <button class="filter-btn" onclick="filterSport('cricket_psl', this)">PSL</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Rugby</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('rugbyleague_nrl', this)">NRL</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Golf</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('golf_masters_tournament_winner', this)">Masters</button>
+            <button class="filter-btn" onclick="filterSport('golf_pga_championship_winner', this)">PGA Champ.</button>
+            <button class="filter-btn" onclick="filterSport('golf_us_open_winner', this)">US Open</button>
+            <button class="filter-btn" onclick="filterSport('golf_the_open_championship_winner', this)">The Open</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Other</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('aussierules_afl', this)">AFL</button>
+            <button class="filter-btn" onclick="filterSport('lacrosse_ncaa', this)">NCAA Lacrosse</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-meta"><span class="live-dot"></span>Auto-refreshes every 5 min</div>
     </div>
 
     <div class="games" id="games-container">
@@ -234,20 +329,46 @@
     const BOOKS = ['FanDuel','DraftKings','BetMGM','BetRivers','BetOnline.ag'];
     const BOOK_KEYS = ['fanduel','draftkings','betmgm','betrivers','betonlineag'];
     const BOOK_SHORT = ['FD','DK','MGM','Rivers','BetOnline'];
-    const SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
-    const SPORT_LABELS = { basketball_nba:'NBA', americanfootball_nfl:'NFL', baseball_mlb:'MLB', icehockey_nhl:'NHL' };
+    const ALL_SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
+    const SPORT_LABELS = {
+      americanfootball_nfl:'NFL', americanfootball_ncaaf:'NCAAF', americanfootball_ufl:'UFL',
+      basketball_nba:'NBA', basketball_ncaab:'NCAAB', basketball_wncaab:'WNCAAB', basketball_euroleague:'Euroleague',
+      baseball_mlb:'MLB', baseball_ncaa:'NCAA Baseball',
+      icehockey_nhl:'NHL', icehockey_ahl:'AHL',
+      soccer_epl:'EPL', soccer_uefa_champs_league:'Champions League', soccer_spain_la_liga:'La Liga',
+      soccer_germany_bundesliga:'Bundesliga', soccer_italy_serie_a:'Serie A', soccer_france_ligue_one:'Ligue 1',
+      soccer_usa_mls:'MLS', soccer_fifa_world_cup:'FIFA World Cup', soccer_mexico_ligamx:'Liga MX',
+      soccer_conmebol_copa_libertadores:'Copa Libertadores', soccer_netherlands_eredivisie:'Eredivisie',
+      mma_mixed_martial_arts:'MMA', boxing_boxing:'Boxing',
+      cricket_ipl:'IPL', cricket_psl:'PSL',
+      rugbyleague_nrl:'NRL',
+      golf_masters_tournament_winner:'Masters', golf_pga_championship_winner:'PGA Championship',
+      golf_us_open_winner:'US Open', golf_the_open_championship_winner:'The Open',
+      aussierules_afl:'AFL', lacrosse_ncaa:'NCAA Lacrosse',
+    };
 
     let allGames = [];
-    let currentSport = 'all';
+    let currentSport = 'basketball_nba';
+    let oddsCache = {};
     let userEmail = localStorage.getItem('capy_email') || null;
     let gateShown = false;
 
-    async function fetchOdds() {
+    async function fetchForSport(key) {
+      if (oddsCache[key]) return oddsCache[key];
+      const data = await fetch(`/api/odds?sport=${key}`).then(r => r.json()).catch(() => []);
+      const games = Array.isArray(data) ? data.filter(g => g && g.bookmakers?.length) : [];
+      oddsCache[key] = games;
+      return games;
+    }
+
+    async function loadSport(sport) {
+      const container = document.getElementById('games-container');
+      container.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Fetching odds...</div></div>`;
       try {
-        const results = await Promise.all(
-          SPORTS.map(s => fetch(`/api/odds?sport=${s}`).then(r => r.json()).catch(() => []))
-        );
-        allGames = results.flat().filter(g => g && g.bookmakers && g.bookmakers.length);
+        const results = sport === 'all'
+          ? await Promise.all(ALL_SPORTS.map(s => fetchForSport(s)))
+          : [await fetchForSport(sport)];
+        allGames = results.flat();
         renderGames();
         updateStats();
         updateClock();
@@ -270,14 +391,12 @@
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       currentSport = sport;
-      renderGames();
+      loadSport(sport);
     }
 
     function renderGames() {
       const container = document.getElementById('games-container');
-      const filtered = currentSport === 'all' ? allGames : allGames.filter(g => g.sport_key === currentSport);
-
-      if (!filtered.length) {
+      if (!allGames.length) {
         container.innerHTML = `
           <div class="empty">
             <span class="empty-icon">🦫</span>
@@ -286,19 +405,18 @@
           </div>`;
         return;
       }
-
-      container.innerHTML = filtered.map((game, idx) => buildGameCard(game, idx)).join('');
+      container.innerHTML = allGames.map((game, idx) => buildGameCard(game, idx)).join('');
     }
 
     function buildGameCard(game, idx) {
       const gameUrl = `/game?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
       const sport = game.sport_key;
-      const tagClass = 'tag-' + (SPORT_LABELS[sport] || 'nba').toLowerCase();
+      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
+      const tagClass = 'tag-' + tagKey;
       const label = SPORT_LABELS[sport] || sport;
       const time = new Date(game.commence_time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
       const isFirst = idx === 0;
 
-      if (idx === 0) console.log('Available books:', game.bookmakers?.map(b => b.key + ' / ' + b.title));
       const books = BOOK_KEYS.map(k => game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) || game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5))));
 
       const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
@@ -412,8 +530,8 @@
       if (!userEmail) showGate();
     }, 45000);
 
-    fetchOdds();
-    setInterval(fetchOdds, 300000);
+    loadSport('basketball_nba');
+    setInterval(() => { oddsCache = {}; loadSport(currentSport); }, 300000);
   </script>
 
 </body>

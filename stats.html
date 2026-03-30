@@ -223,48 +223,86 @@
       <div class="sidebar-section-title">Sport</div>
       <div class="sport-selector">
         <div>
-          <div class="sport-cat-label">Pro Sports</div>
+          <div class="sport-cat-label">American Football</div>
           <div class="sport-tabs-grid">
-            <button class="sport-tab active" onclick="selectSport('basketball_nba', this)"><span class="sport-emoji">🏀</span>NBA</button>
             <button class="sport-tab" onclick="selectSport('americanfootball_nfl', this)"><span class="sport-emoji">🏈</span>NFL</button>
-            <button class="sport-tab" onclick="selectSport('baseball_mlb', this)"><span class="sport-emoji">⚾</span>MLB</button>
-            <button class="sport-tab" onclick="selectSport('icehockey_nhl', this)"><span class="sport-emoji">🏒</span>NHL</button>
+            <button class="sport-tab" onclick="showComingSoon('NCAAF', this)"><span class="sport-emoji">🏈</span>NCAAF</button>
+            <button class="sport-tab" onclick="showComingSoon('UFL', this)"><span class="sport-emoji">🏈</span>UFL</button>
           </div>
         </div>
         <div>
-          <div class="sport-cat-label">College</div>
+          <div class="sport-cat-label">Basketball</div>
           <div class="sport-tabs-grid">
+            <button class="sport-tab active" onclick="selectSport('basketball_nba', this)"><span class="sport-emoji">🏀</span>NBA</button>
             <button class="sport-tab" onclick="showComingSoon('NCAAB', this)"><span class="sport-emoji">🏀</span>NCAAB</button>
-            <button class="sport-tab" onclick="showComingSoon('NCAAF', this)"><span class="sport-emoji">🏈</span>NCAAF</button>
+            <button class="sport-tab" onclick="showComingSoon('WNCAAB', this)"><span class="sport-emoji">🏀</span>WNCAAB</button>
+            <button class="sport-tab" onclick="showComingSoon('Euroleague', this)"><span class="sport-emoji">🏀</span>Euroleague</button>
+          </div>
+        </div>
+        <div>
+          <div class="sport-cat-label">Baseball</div>
+          <div class="sport-tabs-grid">
+            <button class="sport-tab" onclick="selectSport('baseball_mlb', this)"><span class="sport-emoji">⚾</span>MLB</button>
+            <button class="sport-tab" onclick="showComingSoon('NCAA Baseball', this)"><span class="sport-emoji">⚾</span>NCAA Baseball</button>
+          </div>
+        </div>
+        <div>
+          <div class="sport-cat-label">Ice Hockey</div>
+          <div class="sport-tabs-grid">
+            <button class="sport-tab" onclick="selectSport('icehockey_nhl', this)"><span class="sport-emoji">🏒</span>NHL</button>
+            <button class="sport-tab" onclick="showComingSoon('AHL', this)"><span class="sport-emoji">🏒</span>AHL</button>
           </div>
         </div>
         <div>
           <div class="sport-cat-label">Soccer</div>
-          <div class="sport-tabs-wrap">
+          <div class="sport-tabs-grid">
             <button class="sport-tab" onclick="showComingSoon('EPL', this)"><span class="sport-emoji">⚽</span>EPL</button>
             <button class="sport-tab" onclick="showComingSoon('Champions League', this)"><span class="sport-emoji">⚽</span>UCL</button>
             <button class="sport-tab" onclick="showComingSoon('La Liga', this)"><span class="sport-emoji">⚽</span>La Liga</button>
             <button class="sport-tab" onclick="showComingSoon('Bundesliga', this)"><span class="sport-emoji">⚽</span>Bundesliga</button>
             <button class="sport-tab" onclick="showComingSoon('Serie A', this)"><span class="sport-emoji">⚽</span>Serie A</button>
+            <button class="sport-tab" onclick="showComingSoon('Ligue 1', this)"><span class="sport-emoji">⚽</span>Ligue 1</button>
             <button class="sport-tab" onclick="showComingSoon('MLS', this)"><span class="sport-emoji">⚽</span>MLS</button>
+            <button class="sport-tab" onclick="showComingSoon('FIFA World Cup', this)"><span class="sport-emoji">⚽</span>World Cup</button>
+            <button class="sport-tab" onclick="showComingSoon('Liga MX', this)"><span class="sport-emoji">⚽</span>Liga MX</button>
+            <button class="sport-tab" onclick="showComingSoon('Copa Libertadores', this)"><span class="sport-emoji">⚽</span>Copa Lib.</button>
+            <button class="sport-tab" onclick="showComingSoon('Eredivisie', this)"><span class="sport-emoji">⚽</span>Eredivisie</button>
+          </div>
+        </div>
+        <div>
+          <div class="sport-cat-label">Combat</div>
+          <div class="sport-tabs-grid">
+            <button class="sport-tab" onclick="showComingSoon('MMA', this)"><span class="sport-emoji">🥊</span>MMA</button>
+            <button class="sport-tab" onclick="showComingSoon('Boxing', this)"><span class="sport-emoji">🥊</span>Boxing</button>
+          </div>
+        </div>
+        <div>
+          <div class="sport-cat-label">Cricket</div>
+          <div class="sport-tabs-grid">
+            <button class="sport-tab" onclick="showComingSoon('IPL', this)"><span class="sport-emoji">🏏</span>IPL</button>
+            <button class="sport-tab" onclick="showComingSoon('PSL', this)"><span class="sport-emoji">🏏</span>PSL</button>
+          </div>
+        </div>
+        <div>
+          <div class="sport-cat-label">Rugby</div>
+          <div class="sport-tabs-grid">
+            <button class="sport-tab" onclick="showComingSoon('NRL', this)"><span class="sport-emoji">🏉</span>NRL</button>
+          </div>
+        </div>
+        <div>
+          <div class="sport-cat-label">Golf</div>
+          <div class="sport-tabs-grid">
+            <button class="sport-tab" onclick="showComingSoon('Masters', this)"><span class="sport-emoji">⛳</span>Masters</button>
+            <button class="sport-tab" onclick="showComingSoon('PGA Championship', this)"><span class="sport-emoji">⛳</span>PGA Champ.</button>
+            <button class="sport-tab" onclick="showComingSoon('US Open Golf', this)"><span class="sport-emoji">⛳</span>US Open</button>
+            <button class="sport-tab" onclick="showComingSoon('The Open Championship', this)"><span class="sport-emoji">⛳</span>The Open</button>
           </div>
         </div>
         <div>
           <div class="sport-cat-label">Other</div>
-          <div class="sport-tabs-wrap">
-            <button class="sport-tab" onclick="showComingSoon('MMA', this)"><span class="sport-emoji">🥊</span>MMA</button>
-            <button class="sport-tab" onclick="showComingSoon('F1', this)"><span class="sport-emoji">🏎️</span>F1</button>
-            <button class="sport-tab" onclick="showComingSoon('PGA', this)"><span class="sport-emoji">⛳</span>PGA</button>
-            <button class="sport-tab" onclick="showComingSoon('Tennis', this)"><span class="sport-emoji">🎾</span>Tennis</button>
-          </div>
-        </div>
-        <div>
-          <div class="sport-cat-label">Esports</div>
-          <div class="sport-tabs-wrap">
-            <button class="sport-tab" onclick="showComingSoon('CS2', this)"><span class="sport-emoji">🎮</span>CS2</button>
-            <button class="sport-tab" onclick="showComingSoon('LoL', this)"><span class="sport-emoji">🎮</span>LoL</button>
-            <button class="sport-tab" onclick="showComingSoon('Dota 2', this)"><span class="sport-emoji">🎮</span>Dota 2</button>
-            <button class="sport-tab" onclick="showComingSoon('Valorant', this)"><span class="sport-emoji">🎮</span>Valorant</button>
+          <div class="sport-tabs-grid">
+            <button class="sport-tab" onclick="showComingSoon('AFL', this)"><span class="sport-emoji">🏉</span>AFL</button>
+            <button class="sport-tab" onclick="showComingSoon('NCAA Lacrosse', this)"><span class="sport-emoji">🥍</span>NCAA Lacrosse</button>
           </div>
         </div>
       </div>
