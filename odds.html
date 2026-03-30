@@ -214,10 +214,10 @@
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
     /* METHODOLOGY BANNER */
-    .method-banner { background: linear-gradient(135deg, #eaf8f2, #f0faf5); border: 1.5px solid var(--green-light); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-    .method-banner-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
-    .method-banner-text { font-size: 13px; color: var(--green-dark); flex: 1; min-width: 200px; line-height: 1.55; }
-    .method-banner-text strong { color: var(--green-dark); font-size: 14px; display: block; margin-bottom: 2px; }
+    .method-banner { background: linear-gradient(135deg, #eaf8f2, #f0faf5); border: 1.5px solid var(--green-light); border-radius: var(--radius-sm); padding: 10px 18px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px; }
+    .method-banner-icon { font-size: 18px; flex-shrink: 0; line-height: 1; }
+    .method-banner-text { font-size: 12px; color: var(--green-dark); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .method-banner-text strong { color: var(--green-dark); font-size: 12px; display: inline; font-weight: 700; }
 
     /* CAPY'S PICKS */
     .picks-section { margin-bottom: 1.5rem; }
@@ -472,8 +472,7 @@
     <div class="method-banner">
       <span class="method-banner-icon">🦫</span>
       <div class="method-banner-text">
-        <strong>What is edge?</strong>
-        <strong style="font-size:12px;font-weight:600;display:inline;">Spreads:</strong> edge = the difference in points between the best and worst available line — +0.5 pts can flip a cover. &nbsp;<strong style="font-size:12px;font-weight:600;">Moneylines:</strong> edge = the gap in odds across books — a bigger gap means one book is pricing the outcome very differently. Either way: green = best value, red = worst.
+        🟢 Best line &nbsp;🔴 Worst line &nbsp;·&nbsp; <strong>Spread edge</strong> = pts difference between best and worst book &nbsp;·&nbsp; <strong>Moneyline edge</strong> = odds gap across books
       </div>
     </div>
 
