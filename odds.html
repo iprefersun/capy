@@ -33,7 +33,7 @@
 
     /* NAV */
     nav { background: #fff; border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
-    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1400px; margin: 0 auto; }
     .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
     .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
     .nav-right { display: flex; align-items: center; gap: 10px; }
@@ -43,7 +43,16 @@
     @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 
     /* LAYOUT */
-    .main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+    .main { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+
+    /* TWO-COLUMN LAYOUT */
+    .page-columns { display: grid; grid-template-columns: 1fr 360px; grid-template-areas: "main sidebar"; gap: 20px; align-items: start; }
+    .col-main { grid-area: main; min-width: 0; }
+    .col-sidebar { grid-area: sidebar; position: sticky; top: 70px; }
+    @media (max-width: 1200px) {
+      .page-columns { grid-template-columns: 1fr; grid-template-areas: "sidebar" "main"; }
+      .col-sidebar { position: static; }
+    }
 
     /* STATS ROW */
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
@@ -74,8 +83,20 @@
     .game-card:hover { border-color: var(--amber); box-shadow: 0 4px 18px rgba(0,0,0,0.10); transform: translateY(-2px); }
     .game-card.best-value { border-color: var(--green); border-width: 1.5px; }
 
+    /* GRID VIEW */
+    .games.grid-view { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .game-card.grid-card { cursor: default; }
+    .game-card.grid-card .game-header { padding: 10px 14px; }
+    .game-card.grid-card .game-teams { font-size: 13px; }
+    .game-card.grid-card .game-edge-row { padding: 6px 14px; }
+    .game-card.grid-card .game-edge-big { font-size: 17px; }
+    .game-card.grid-card .odds-legend { padding: 4px 14px 2px; }
+    .grid-expand-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 8px 14px; text-align: center; cursor: pointer; transition: background 0.15s; }
+    .grid-expand-btn:hover { background: var(--amber); color: #fff; }
+    @media (max-width: 900px) { .games.grid-view { grid-template-columns: 1fr; } }
+
     .game-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; gap: 8px; }
-    .game-teams { font-size: 15px; font-weight: 600; color: var(--text); }
+    .game-teams { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.1px; }
     .game-time { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-hint); }
     .game-tags { display: flex; align-items: center; gap: 6px; }
     .sport-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.3px; }
@@ -94,9 +115,9 @@
     .odds-row-label { font-size: 11px; font-weight: 600; color: var(--text); display: flex; align-items: center; padding: 9px 4px; }
     .odds-cell { background: var(--surface-2); border-radius: 6px; padding: 9px 12px 9px 4px; text-align: right; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.12s; border: 1px solid transparent; }
     .odds-cell:hover { border-color: var(--amber); }
-    .odds-cell.best { background: var(--green); color: #fff; border-color: var(--green-dark); }
-    .odds-cell.tied-best { background: var(--green-light); color: var(--green-dark); border-color: #b8dfc7; }
-    .odds-cell.worst { background: #f9ede9; color: #b04020; }
+    .odds-cell.best { background: var(--green); color: #fff; border-color: var(--green-dark); font-size: inherit; font-weight: inherit; }
+    .odds-cell.tied-best { background: var(--green-light); color: var(--green-dark); border-color: #b8dfc7; font-size: inherit; font-weight: inherit; }
+    .odds-cell.worst { background: #f9ede9; color: #b04020; font-size: inherit; font-weight: inherit; }
     .odds-cell.row-alt:not(.best):not(.worst):not(.tied-best):not(.odds-cell-empty) { background: rgba(0,0,0,0.022); }
     .odds-row-label.row-alt { background: rgba(0,0,0,0.015); border-radius: 4px; }
     .odds-cell.locked { filter: blur(4px); cursor: pointer; user-select: none; }
@@ -248,6 +269,12 @@
     .sort-toggle-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
     .sort-toggle-btn.active { background: var(--amber); color: #fff; border-color: var(--amber); }
     .sort-toggle-btn:hover:not(.active) { border-color: var(--amber); color: var(--amber); }
+
+    /* VIEW TOGGLE */
+    .view-toggle { display: flex; gap: 4px; }
+    .view-toggle-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 4px; }
+    .view-toggle-btn.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+    .view-toggle-btn:hover:not(.active) { border-color: var(--amber); color: var(--amber); }
 
     /* ERROR STATE */
     .error-state { background: var(--surface); border-radius: var(--radius); border: 1.5px solid var(--red-light); padding: 2rem; text-align: center; }
@@ -405,36 +432,52 @@
       </div>
       <div class="filter-meta" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <span><span class="live-dot"></span>Auto-refreshes every 5 min &nbsp;·&nbsp; <span class="live-counter" id="live-counter">Updated just now</span></span>
-        <div class="sort-toggle">
-          <button class="sort-toggle-btn active" onclick="setSortMode('edge', this)">Sort: Best edge</button>
-          <button class="sort-toggle-btn" onclick="setSortMode('time', this)">Sort: Time</button>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="sort-toggle">
+            <button class="sort-toggle-btn active" onclick="setSortMode('edge', this)">Sort: Best edge</button>
+            <button class="sort-toggle-btn" onclick="setSortMode('time', this)">Sort: Time</button>
+          </div>
+          <div class="view-toggle" id="view-toggle">
+            <button class="view-toggle-btn" id="btn-list" onclick="setViewMode('list')" title="List view">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="1" width="14" height="2" rx="1" fill="currentColor"/><rect x="0" y="6" width="14" height="2" rx="1" fill="currentColor"/><rect x="0" y="11" width="14" height="2" rx="1" fill="currentColor"/></svg>
+              List
+            </button>
+            <button class="view-toggle-btn" id="btn-grid" onclick="setViewMode('grid')" title="Grid view">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="6" rx="1" fill="currentColor"/><rect x="8" y="0" width="6" height="6" rx="1" fill="currentColor"/><rect x="0" y="8" width="6" height="6" rx="1" fill="currentColor"/><rect x="8" y="8" width="6" height="6" rx="1" fill="currentColor"/></svg>
+              Grid
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- CAPY'S PICKS -->
-    <div class="picks-section" id="picks-section" style="display:none;">
-      <div class="picks-header">
-        <div>
-          <div class="picks-title">🦫 Capy's Picks — Today's Best Lines</div>
-          <div class="picks-sub">We scanned 5 books and found these edges. Updated every 60 seconds.</div>
+    <div class="page-columns">
+      <div class="col-main">
+        <div class="method-banner">
+          <span class="method-banner-icon">🦫</span>
+          <div class="method-banner-text">
+            <strong>What is edge?</strong>
+            <strong style="font-size:12px;font-weight:600;display:inline;">Spreads:</strong> edge = the difference in points between the best and worst available line — +0.5 pts can flip a cover. &nbsp;<strong style="font-size:12px;font-weight:600;">Moneylines:</strong> edge = the gap in odds across books — a bigger gap means one book is pricing the outcome very differently. Either way: green = best value, red = worst.
+          </div>
+        </div>
+        <div class="games" id="games-container">
+          <div class="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Fetching live odds across all books...</div>
+          </div>
         </div>
       </div>
-      <div class="picks-scroll" id="picks-container"></div>
-    </div>
-
-    <div class="method-banner">
-      <span class="method-banner-icon">🦫</span>
-      <div class="method-banner-text">
-        <strong>What is edge?</strong>
-        <strong style="font-size:12px;font-weight:600;display:inline;">Spreads:</strong> edge = the difference in points between the best and worst available line — +0.5 pts can flip a cover. &nbsp;<strong style="font-size:12px;font-weight:600;">Moneylines:</strong> edge = the gap in odds across books — a bigger gap means one book is pricing the outcome very differently. Either way: green = best value, red = worst.
-      </div>
-    </div>
-
-    <div class="games" id="games-container">
-      <div class="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">Fetching live odds across all books...</div>
+      <div class="col-sidebar">
+        <!-- CAPY'S PICKS -->
+        <div class="picks-section" id="picks-section" style="display:none;">
+          <div class="picks-header">
+            <div>
+              <div class="picks-title">🦫 Capy's Picks — Today's Best Lines</div>
+              <div class="picks-sub">We scanned 5 books and found these edges. Updated every 60 seconds.</div>
+            </div>
+          </div>
+          <div class="picks-scroll" id="picks-container"></div>
+        </div>
       </div>
     </div>
 
@@ -523,6 +566,10 @@
     let oddsCache = {};
     let userEmail = localStorage.getItem('capy_email') || null;
     let gateShown = false;
+    let viewMode = (() => {
+      if (window.innerWidth < 768) return 'list';
+      return localStorage.getItem('capy_view') || 'grid';
+    })();
     let sortMode = 'edge';
     let lastUpdatedTime = null;
 
@@ -681,10 +728,122 @@
             <div class="empty-title">No games right now</div>
             <div class="empty-sub">Check back closer to game time — we update every 5 minutes.</div>
           </div>`;
+        container.className = 'games';
         return;
       }
       const sorted = getSortedGames();
-      container.innerHTML = sorted.map((game, idx) => buildGameCard(game, idx)).join('');
+      if (viewMode === 'grid') {
+        container.className = 'games grid-view';
+        container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
+      } else {
+        container.className = 'games';
+        container.innerHTML = sorted.map((game, idx) => buildGameCard(game, idx)).join('');
+      }
+      updateViewToggleUI();
+    }
+
+    function setViewMode(mode) {
+      if (window.innerWidth < 768) mode = 'list';
+      viewMode = mode;
+      localStorage.setItem('capy_view', mode);
+      renderGames();
+    }
+
+    function updateViewToggleUI() {
+      document.getElementById('btn-list')?.classList.toggle('active', viewMode === 'list');
+      document.getElementById('btn-grid')?.classList.toggle('active', viewMode === 'grid');
+    }
+
+    const expandedCards = new Set();
+
+    function expandCard(gameId) {
+      expandedCards.add(gameId);
+      // Re-render in grid mode — expanded cards use full buildGameCard
+      const sorted = getSortedGames();
+      const container = document.getElementById('games-container');
+      container.innerHTML = sorted.map((game, idx) => {
+        if (expandedCards.has(game.id)) return buildGameCard(game, idx);
+        return buildGridCard(game, idx);
+      }).join('');
+    }
+
+    function buildGridCard(game, idx) {
+      const gameUrl = `/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
+      const sport = game.sport_key;
+      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
+      const tagClass = 'tag-' + tagKey;
+      const label = SPORT_LABELS[sport] || sport;
+      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
+      const time = new Date(game.commence_time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+      const edgeInfo = calcEdgeInfo(game);
+      const edge = edgeInfo.value;
+      const isFirst = idx === 0;
+      const isTopEdge = idx < 3 && edge > 0;
+
+      const edgeBadge = edge > 0
+        ? edgeInfo.type === 'spread'
+          ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge ' : ''}+${edge} pts</span>`
+          : `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 ' : ''}Best ML</span>`
+        : '';
+
+      const edgeRowText = edgeInfo.type === 'spread'
+        ? `Spread edge: +${edge} pts best vs worst`
+        : edgeInfo.type === 'moneyline'
+          ? `Best ML: ${edgeInfo.bestLine} vs ${edgeInfo.worstLine}`
+          : '';
+
+      const edgeRow = edge > 0
+        ? edgeInfo.type === 'spread'
+          ? `<div class="game-edge-row"><div class="game-edge-big">+${edge} pts</div><div class="game-edge-text">${edgeRowText}</div></div>`
+          : `<div class="game-edge-row"><div class="game-edge-text" style="font-size:12px;">${edgeRowText}</div></div>`
+        : '';
+
+      const books = BOOK_KEYS.map(k =>
+        game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
+        game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)))
+      );
+
+      const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
+      const spreadRows = buildOddsRows(game, books, 'spreads', isFirst);
+
+      const legend = `<div class="odds-legend">
+        <span><span class="legend-dot legend-green"></span>Best</span>
+        <span><span class="legend-dot legend-red"></span>Worst</span>
+      </div>`;
+
+      const mktHeader = (title) =>
+        `<div class="odds-market-header"><span class="odds-market-label">${title}</span></div>`;
+
+      return `
+        <div class="game-card grid-card ${isFirst ? 'best-value' : ''}">
+          <div class="game-header">
+            <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${sportEmoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;font-size:12px;">@</span> ${game.home_team}</div>
+            <div class="game-tags">
+              <span class="sport-tag ${tagClass}">${label}</span>
+              <span class="game-time">${time}</span>
+              ${edgeBadge}
+            </div>
+          </div>
+          ${edgeRow}
+          ${legend}
+          <div class="odds-table-desktop">
+            <div class="odds-table">
+              <div class="odds-grid odds-grid-6" style="padding:0 14px;">
+                <div class="odds-col-header"></div>
+                ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
+                ${mktHeader('Moneyline')}
+                ${h2hRows}
+                <div class="odds-divider"></div>
+                ${mktHeader('Spread')}
+                ${spreadRows}
+              </div>
+            </div>
+          </div>
+          <div class="odds-mobile">
+            ${buildMobileOdds(game, books, isFirst)}
+          </div>
+          <button class="grid-expand-btn" onclick="expandCard('${game.id}')">Show totals + full view →</button>
+        </div>`;
     }
 
     // ── Capy's Picks ─────────────────────────────────────────────────────
@@ -1043,6 +1202,9 @@
     startLiveCounter();
     loadSport('basketball_nba');
     setInterval(() => { oddsCache = {}; loadSport(currentSport); }, 300000);
+
+    // Init view toggle UI on page load
+    updateViewToggleUI();
   </script>
 
 </body>
