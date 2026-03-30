@@ -627,61 +627,12 @@
 
     .footer-copy { font-size: 11px; color: var(--text-hint); }
 
-    /* HERO PREVIEW WIDGET */
-    .hero-preview { background: var(--surface); border: 1.5px solid var(--border-mid); border-radius: var(--radius); padding: 1rem 1.25rem; max-width: 420px; margin: 1.5rem auto 0; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-    .preview-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-    .preview-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
-    .preview-game { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
-    .preview-table { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
-    .preview-book-row { display: flex; align-items: center; gap: 8px; }
-    .preview-book { font-size: 11px; color: var(--text-hint); width: 80px; flex-shrink: 0; font-weight: 500; }
-    .preview-cell { font-family: 'DM Mono', monospace; font-size: 12px; padding: 4px 10px; border-radius: 5px; background: var(--surface-2); color: var(--text); font-weight: 500; flex: 1; text-align: center; }
-    .preview-best { background: var(--green); color: #fff; font-weight: 700; }
-    .preview-worst { background: #f9ede9; color: #b04020; }
-    .preview-avg { background: var(--surface-2); }
-    .preview-edge { font-size: 11px; font-weight: 600; color: var(--green-dark); background: var(--green-light); padding: 5px 10px; border-radius: 5px; }
-
-    /* STATS BANNER */
-    .stats-banner { background: var(--text); border-radius: var(--radius); padding: 2rem 2.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2rem; }
-    .stats-banner-item { text-align: center; }
-    .stats-banner-num { font-family: 'Fraunces', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 900; color: var(--amber-mid); line-height: 1; }
-    .stats-banner-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); margin-top: 4px; }
-    .stats-banner-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
-    .stats-banner .placeholder-flag { font-size: 9px; color: rgba(255,200,0,0.7); display: block; margin-top: 2px; }
-
-    /* PRO CARD GLOW */
-    .pricing-card.featured { border: 2px solid var(--amber); box-shadow: 0 0 0 4px var(--amber-light), 0 8px 30px rgba(186,117,23,0.18); }
-    .pricing-card.featured:hover { transform: translateY(-3px); box-shadow: 0 0 0 4px var(--amber-light), 0 14px 40px rgba(186,117,23,0.22); }
-
-    /* FEATURE CARD ENHANCEMENTS */
-    .feature-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
-    .feature-card::before { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; border-radius: 50%; opacity: 0.06; pointer-events: none; }
-    .feature-card.fc-radar::before { background: var(--amber); }
-    .feature-card.fc-odds::before { background: var(--green); }
-    .feature-card.fc-injury::before { background: #e74c3c; }
-    .feature-card.fc-alerts::before { background: #f39c12; }
-    .feature-card.fc-clv::before { background: #9b59b6; }
-    .feature-card.fc-stats::before { background: #3498db; }
-    .feature-card:hover { border-color: var(--amber); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-    .feature-who { font-size: 11px; color: var(--text-hint); font-style: italic; margin-top: 6px; line-height: 1.45; }
-
-    /* SCROLL FADE-IN ANIMATION */
-    .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
-    .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-    /* COUNT-UP */
-    .count-up { display: inline-block; }
-
     /* RESPONSIVE */
-    @media (max-width: 700px) {
-      .stats-banner { grid-template-columns: repeat(2, 1fr); padding: 1.5rem 1.25rem; }
-    }
     @media (max-width: 600px) {
       .nav-links .nav-link:not(.nav-link-odds):not(.nav-link-stats) { display: none; }
       .hero { padding: 3rem 0 2rem; }
       .hero-capy { font-size: 60px; }
       .tagline-block { gap: 1.5rem; }
-      .stats-banner { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -711,7 +662,7 @@
       </div>
       <span class="hero-capy">🦫</span>
       <h1>Lines move.<br><em>Capy</em> doesn't.</h1>
-      <p class="hero-sub">We watch DraftKings, FanDuel, BetMGM, Caesars and PointsBet every 60 seconds — and tell you exactly where the best line is before it moves.</p>
+      <p class="hero-sub">We scan 5 books every 60 seconds so you always know where the best line is — before it moves.</p>
       <div class="hero-cta">
         <a href="#signup" class="btn-hero">Start for free</a>
         <a href="/odds" class="btn-hero-out">See today's best lines</a>
@@ -719,33 +670,6 @@
       <div class="hero-proof">
         <span class="stars">★★★★★</span>
         <span>2,400+ bettors on the waitlist &nbsp;·&nbsp; Updated every 60 seconds</span>
-      </div>
-
-      <!-- LIVE PREVIEW WIDGET -->
-      <div class="hero-preview">
-        <div class="preview-label">
-          <span class="preview-dot"></span>
-          Live example
-        </div>
-        <div class="preview-game">🏀 Lakers <span style="color:var(--text-hint);font-weight:400;font-size:13px;">vs</span> Celtics</div>
-        <div class="preview-table">
-          <div class="preview-book-row">
-            <span class="preview-book">FanDuel</span>
-            <span class="preview-cell preview-best">LAL -3.5</span>
-            <span class="preview-cell preview-avg">BOS +3</span>
-          </div>
-          <div class="preview-book-row">
-            <span class="preview-book">DraftKings</span>
-            <span class="preview-cell">LAL -4</span>
-            <span class="preview-cell">BOS +4</span>
-          </div>
-          <div class="preview-book-row">
-            <span class="preview-book">BetMGM</span>
-            <span class="preview-cell preview-worst">LAL -4.5</span>
-            <span class="preview-cell">BOS +4.5</span>
-          </div>
-        </div>
-        <div class="preview-edge">🔥 +1 pt edge on FanDuel — take the better number</div>
       </div>
     </div>
   </div>
@@ -773,41 +697,35 @@
       <div class="section-title">Every edge. Zero stress.</div>
       <div class="section-sub">The tools serious bettors use, wrapped in the vibe of the chillest animal alive.</div>
       <div class="features-grid">
-        <div class="feature-card fc-radar fade-in">
-          <div class="feature-icon">🎯</div>
-          <div class="feature-title">Best bet radar</div>
-          <div class="feature-desc">AI-ranked value plays updated every minute. Know where the edge is before tip-off.</div>
-          <div class="feature-who">Perfect for bettors who just want to be told the best bet — no research required.</div>
-        </div>
-        <div class="feature-card fc-odds fade-in">
+        <div class="feature-card">
           <div class="feature-icon">📊</div>
           <div class="feature-title">Live odds comparison</div>
           <div class="feature-desc">Spreads, moneylines, totals across 5 books side by side. Best line highlighted instantly.</div>
-          <div class="feature-who">Great for anyone who wants to stop leaving money on the table by betting the wrong book.</div>
         </div>
-        <div class="feature-card fc-injury fade-in">
-          <div class="feature-icon">🏥</div>
-          <div class="feature-title">Injury reports</div>
-          <div class="feature-desc">Real-time injury status for every player across all major sports. Never bet blind again.</div>
-          <div class="feature-who">Essential for casual bettors who don't have time to monitor team news before tip-off.</div>
-        </div>
-        <div class="feature-card fc-alerts fade-in">
+        <div class="feature-card">
           <div class="feature-icon">⚡</div>
           <div class="feature-title">Line movement alerts</div>
           <div class="feature-desc">Get notified the moment a line moves. Catch sharp action before the window closes.</div>
-          <div class="feature-who">Perfect for bettors who want to catch line movement early and act before the market corrects.</div>
         </div>
-        <div class="feature-card fc-clv fade-in">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-title">Best bet radar</div>
+          <div class="feature-desc">AI-ranked value plays updated every minute. Know where the edge is before tip-off.</div>
+        </div>
+        <div class="feature-card">
           <div class="feature-icon">📈</div>
           <div class="feature-title">CLV tracking</div>
           <div class="feature-desc">See how your bets close versus the opening line. Prove you have a real edge over time.</div>
-          <div class="feature-who">For serious bettors who want proof — not just feels — that their process is working.</div>
         </div>
-        <div class="feature-card fc-stats fade-in">
+        <div class="feature-card">
+          <div class="feature-icon">🏥</div>
+          <div class="feature-title">Injury reports</div>
+          <div class="feature-desc">Real-time injury status for every player across all major sports. Never bet blind again.</div>
+        </div>
+        <div class="feature-card">
           <div class="feature-icon">🏆</div>
           <div class="feature-title">Team & player stats</div>
           <div class="feature-desc">Full standings, rosters, and player props in one place. Research and bet without switching tabs.</div>
-          <div class="feature-who">Ideal for bettors who do their homework before every game and hate juggling 6 tabs.</div>
         </div>
       </div>
     </section>
@@ -828,7 +746,6 @@
     <section id="pricing">
       <div class="section-label">Pricing</div>
       <div class="section-title">Simple, honest pricing</div>
-      <p style="font-size:14px;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.65;">Not sure which plan? Most bettors start free and upgrade when they want Capy to just tell them the best bet.</p>
       <div style="background:var(--amber-light);border:2px solid var(--amber);border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:1.5rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
         <span style="font-size:28px;">🦫</span>
         <div style="flex:1;min-width:200px;">
@@ -887,26 +804,21 @@
     <section>
       <div class="section-label">By the numbers</div>
       <div class="section-title">The edge adds up fast</div>
-      <div class="stats-banner fade-in">
-        <div class="stats-banner-item">
-          <div class="stats-banner-num"><span class="count-up" data-target="2400" data-suffix="+">2,400+</span></div>
-          <div class="stats-banner-label">bettors on the waitlist</div>
-          <div class="stats-banner-sub">and growing every day</div>
+      <div class="t-grid" style="margin-top:1.75rem;">
+        <div class="t-card" style="text-align:center;">
+          <div style="font-family:'Fraunces',serif;font-size:42px;font-weight:900;color:var(--amber);line-height:1;">2,400+</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:6px;">bettors on the waitlist</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">and growing every day</div>
         </div>
-        <div class="stats-banner-item">
-          <div class="stats-banner-num">60s</div>
-          <div class="stats-banner-label">line refresh interval</div>
-          <div class="stats-banner-sub">catch movement before it closes</div>
+        <div class="t-card" style="text-align:center;">
+          <div style="font-family:'Fraunces',serif;font-size:42px;font-weight:900;color:var(--green);line-height:1;">60s</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:6px;">line refresh interval</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">catch movement before it closes</div>
         </div>
-        <div class="stats-banner-item">
-          <div class="stats-banner-num">5</div>
-          <div class="stats-banner-label">books tracked simultaneously</div>
-          <div class="stats-banner-sub">DK, FD, MGM, Caesars + more</div>
-        </div>
-        <div class="stats-banner-item">
-          <div class="stats-banner-num">+3.2<span style="font-size:0.5em;">pts</span></div>
-          <div class="stats-banner-label">avg edge found per game</div>
-          <span class="placeholder-flag">⚠ placeholder — verify before launch</span>
+        <div class="t-card" style="text-align:center;">
+          <div style="font-family:'Fraunces',serif;font-size:42px;font-weight:900;color:var(--text);line-height:1;">5</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:6px;">books tracked simultaneously</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">DraftKings, FanDuel, BetMGM, Caesars + more</div>
         </div>
       </div>
     </section>
@@ -1043,50 +955,6 @@
         }
       });
     });
-
-    // ── Scroll fade-in ────────────────────────────────────────────────
-    const fadeEls = document.querySelectorAll('.fade-in');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          // Stagger sibling cards
-          const siblings = entry.target.parentElement?.querySelectorAll('.fade-in');
-          let delay = 0;
-          if (siblings) {
-            siblings.forEach((s, idx) => { if (s === entry.target) delay = idx * 80; });
-          }
-          setTimeout(() => entry.target.classList.add('visible'), delay);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    fadeEls.forEach(el => observer.observe(el));
-
-    // ── Count-up animation ─────────────────────────────────────────────
-    function countUp(el) {
-      const target = parseInt(el.dataset.target, 10);
-      const suffix = el.dataset.suffix || '';
-      const duration = 1200;
-      const step = 16;
-      const steps = duration / step;
-      let current = 0;
-      const increment = target / steps;
-      const timer = setInterval(() => {
-        current = Math.min(current + increment, target);
-        el.textContent = Math.floor(current).toLocaleString() + suffix;
-        if (current >= target) clearInterval(timer);
-      }, step);
-    }
-
-    const countObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.querySelectorAll('.count-up').forEach(countUp);
-          countObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-    document.querySelectorAll('.stats-banner').forEach(el => countObserver.observe(el));
   </script>
 
 </body>

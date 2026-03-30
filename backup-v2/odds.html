@@ -70,8 +70,8 @@
 
     /* GAME CARDS */
     .games { display: flex; flex-direction: column; gap: 10px; }
-    .game-card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s; }
-    .game-card:hover { border-color: var(--amber); box-shadow: 0 4px 18px rgba(0,0,0,0.10); transform: translateY(-2px); }
+    .game-card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; transition: border-color 0.15s; }
+    .game-card:hover { border-color: var(--border-mid); }
     .game-card.best-value { border-color: var(--green); border-width: 1.5px; }
 
     .game-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; gap: 8px; }
@@ -94,8 +94,8 @@
     .odds-row-label { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; padding: 6px 4px; }
     .odds-cell { background: var(--surface-2); border-radius: 6px; padding: 6px 4px; text-align: center; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.12s; border: 1px solid transparent; }
     .odds-cell:hover { border-color: var(--amber); }
-    .odds-cell.best { background: var(--green); color: #fff; font-weight: 700; border-color: var(--green-dark); }
-    .odds-cell.worst { background: #f9ede9; color: #b04020; font-weight: 400; }
+    .odds-cell.best { background: var(--green-light); color: var(--green-dark); font-weight: 700; }
+    .odds-cell.worst { color: var(--text-hint); }
     .odds-cell.locked { filter: blur(4px); cursor: pointer; user-select: none; }
     .odds-divider { grid-column: 1 / -1; height: 0.5px; background: var(--border); margin: 4px 0; }
 
@@ -153,47 +153,15 @@
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
     /* METHODOLOGY BANNER */
-    .method-banner { background: linear-gradient(135deg, #eaf8f2, #f0faf5); border: 1.5px solid var(--green-light); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-    .method-banner-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
-    .method-banner-text { font-size: 13px; color: var(--green-dark); flex: 1; min-width: 200px; line-height: 1.55; }
-    .method-banner-text strong { color: var(--green-dark); font-size: 14px; display: block; margin-bottom: 2px; }
-
-    /* CAPY'S PICKS */
-    .picks-section { margin-bottom: 1.5rem; }
-    .picks-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
-    .picks-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); }
-    .picks-sub { font-size: 12px; color: var(--text-muted); }
-    .picks-scroll { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .pick-card { background: var(--surface); border-radius: var(--radius); border: 1.5px solid var(--border); padding: 1.25rem; display: flex; flex-direction: column; gap: 10px; position: relative; transition: box-shadow 0.18s, transform 0.18s; }
-    .pick-card:hover { box-shadow: 0 6px 22px rgba(0,0,0,0.11); transform: translateY(-2px); }
-    .pick-card.locked-card { filter: none; }
-    .pick-card.locked-card .pick-body { filter: blur(5px); user-select: none; pointer-events: none; }
-    .pick-game { font-size: 13px; font-weight: 700; color: var(--text); }
-    .pick-rec { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
-    .pick-confidence { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; display: inline-block; }
-    .pick-conf-strong { background: var(--green); color: #fff; }
-    .pick-conf-good { background: var(--green-light); color: var(--green-dark); }
-    .pick-conf-look { background: var(--amber-light); color: var(--amber-dark); }
-    .pick-edge-num { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; color: var(--green); line-height: 1; }
-    .pick-edge-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); }
-    .pick-reason { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
-    .pick-bet-btn { display: block; background: var(--amber); color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 16px; border-radius: 8px; text-decoration: none; text-align: center; transition: opacity 0.15s; margin-top: auto; }
-    .pick-bet-btn:hover { opacity: 0.88; }
-    .pick-lock-overlay { position: absolute; inset: 0; border-radius: var(--radius); background: rgba(255,255,255,0.7); backdrop-filter: blur(1px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 1rem; }
-    .pick-lock-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 900; color: var(--text); }
-    .pick-lock-sub { font-size: 12px; color: var(--text-muted); }
-    .pick-lock-btn { background: var(--amber); color: #fff; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; padding: 8px 18px; border-radius: 6px; text-decoration: none; margin-top: 4px; display: inline-block; }
-
-    @media (max-width: 700px) {
-      .picks-scroll { grid-template-columns: none; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
-      .picks-scroll::-webkit-scrollbar { height: 3px; }
-      .pick-card { min-width: 82vw; scroll-snap-align: start; }
-    }
+    .method-banner { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .method-banner-icon { font-size: 15px; flex-shrink: 0; }
+    .method-banner-text { font-size: 12px; color: var(--text-muted); flex: 1; min-width: 200px; }
+    .method-banner-text strong { color: var(--text); }
 
     /* EDGE BADGE */
     .edge-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--green-light); color: var(--green-dark); }
-    .top-edge-badge { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 4px; background: linear-gradient(90deg, #1D9E75, #27c492, #1D9E75); background-size: 200% 100%; color: #fff; animation: edge-pulse 2s ease-in-out infinite; }
-    @keyframes edge-pulse { 0%,100% { background-position: 0% 50%; box-shadow: 0 0 0 0 rgba(29,158,117,0.4); } 50% { background-position: 100% 50%; box-shadow: 0 0 0 4px rgba(29,158,117,0); } }
+    .edge-badge.top { background: var(--green); color: #fff; }
+    .top-edge-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--green); color: #fff; }
 
     /* BET NOW LINK */
     .bet-now-link { font-size: 10px; font-weight: 700; color: var(--green-dark); background: var(--green-light); padding: 2px 8px; border-radius: 4px; text-decoration: none; white-space: nowrap; }
@@ -215,20 +183,12 @@
     .error-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1rem; }
     .retry-btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 20px; border-radius: 6px; border: none; background: var(--amber); color: #fff; cursor: pointer; }
 
-    /* EDGE SCORE PROMINENT ON CARD */
-    .game-edge-row { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: linear-gradient(90deg, rgba(29,158,117,0.07), transparent); border-top: 0.5px solid rgba(29,158,117,0.15); }
-    .game-edge-big { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; color: var(--green); line-height: 1; }
-    .game-edge-text { font-size: 11px; color: var(--green-dark); font-weight: 600; }
-    .game-edge-row.no-edge { display: none; }
-
     @media (max-width: 600px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .nav-inner { padding: 0.75rem 1rem; }
       .main { padding: 1rem; }
       .odds-grid { min-width: 400px; }
       .game-card { border-radius: var(--radius-sm); }
-      .game-card:hover { transform: none; }
-      .pick-bet-btn { width: 100%; }
     }
   </style>
 </head>
@@ -371,20 +331,9 @@
       </div>
     </div>
 
-    <!-- CAPY'S PICKS -->
-    <div class="picks-section" id="picks-section" style="display:none;">
-      <div class="picks-header">
-        <div>
-          <div class="picks-title">🦫 Capy's Picks — Today's Best Lines</div>
-          <div class="picks-sub">We scanned 5 books and found these edges. Updated every 60 seconds.</div>
-        </div>
-      </div>
-      <div class="picks-scroll" id="picks-container"></div>
-    </div>
-
     <div class="method-banner">
-      <span class="method-banner-icon">🦫</span>
-      <span class="method-banner-text"><strong>What is edge?</strong> Edge = the gap between the best available line and the worst across all 5 books. A bigger edge means one book is pricing this game very differently — and that's your opportunity. Green = best value. Red = worst value.</span>
+      <span class="method-banner-icon">📐</span>
+      <span class="method-banner-text"><strong>How edge is calculated:</strong> Edge = difference between the best available moneyline and the market average across all books. Positive edge means you're getting better-than-market value. Bigger edge = more opportunity.</span>
     </div>
 
     <div class="games" id="games-container">
@@ -443,21 +392,6 @@
       'betonlineag': 'https://betonline.ag',
     };
     const ALL_SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
-    const SPORT_EMOJIS = {
-      basketball_nba:'🏀', basketball_ncaab:'🏀', basketball_wncaab:'🏀', basketball_euroleague:'🏀',
-      americanfootball_nfl:'🏈', americanfootball_ncaaf:'🏈', americanfootball_ufl:'🏈',
-      baseball_mlb:'⚾', baseball_ncaa:'⚾',
-      icehockey_nhl:'🏒', icehockey_ahl:'🏒',
-      soccer_epl:'⚽', soccer_uefa_champs_league:'⚽', soccer_spain_la_liga:'⚽',
-      soccer_germany_bundesliga:'⚽', soccer_italy_serie_a:'⚽', soccer_france_ligue_one:'⚽',
-      soccer_usa_mls:'⚽', soccer_fifa_world_cup:'⚽', soccer_mexico_ligamx:'⚽',
-      mma_mixed_martial_arts:'🥊', boxing_boxing:'🥊',
-      cricket_ipl:'🏏', cricket_psl:'🏏',
-      rugbyleague_nrl:'🏉', aussierules_afl:'🏉',
-      golf_masters_tournament_winner:'⛳', golf_pga_championship_winner:'⛳',
-      golf_us_open_winner:'⛳', golf_the_open_championship_winner:'⛳',
-      lacrosse_ncaa:'🥍',
-    };
     const SPORT_LABELS = {
       americanfootball_nfl:'NFL', americanfootball_ncaaf:'NCAAF', americanfootball_ufl:'UFL',
       basketball_nba:'NBA', basketball_ncaab:'NCAAB', basketball_wncaab:'WNCAAB', basketball_euroleague:'Euroleague',
@@ -595,7 +529,6 @@
 
     function renderGames() {
       const container = document.getElementById('games-container');
-      renderPicks();
       if (!allGames.length) {
         container.innerHTML = `
           <div class="empty">
@@ -609,88 +542,12 @@
       container.innerHTML = sorted.map((game, idx) => buildGameCard(game, idx)).join('');
     }
 
-    // ── Capy's Picks ─────────────────────────────────────────────────────
-    function getPickConfidence(edge) {
-      if (edge > 6) return { label: '🔥 Strong Pick', cls: 'pick-conf-strong' };
-      if (edge >= 3) return { label: '✅ Good Value', cls: 'pick-conf-good' };
-      return { label: '👀 Worth a Look', cls: 'pick-conf-look' };
-    }
-
-    function getBestBookForGame(game) {
-      // Returns { bookKey, bookName, bookUrl, price, side } for the best h2h line
-      let best = null;
-      BOOK_KEYS.forEach((k, i) => {
-        const book = game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
-                     game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)));
-        if (!book) return;
-        const h2h = book.markets?.find(m => m.key === 'h2h');
-        if (!h2h) return;
-        h2h.outcomes?.forEach(outcome => {
-          if (!best || outcome.price > best.price) {
-            best = { bookKey: k, bookName: BOOKS[i], bookUrl: BOOK_URLS[k] || '#', price: outcome.price, side: outcome.name };
-          }
-        });
-      });
-      return best;
-    }
-
-    function renderPicks() {
-      const section = document.getElementById('picks-section');
-      const container = document.getElementById('picks-container');
-      if (!allGames.length) { section.style.display = 'none'; return; }
-
-      const sorted = [...allGames].sort((a, b) => calcEdge(b) - calcEdge(a));
-      const top3 = sorted.slice(0, 3);
-      if (!top3.length) { section.style.display = 'none'; return; }
-
-      section.style.display = 'block';
-      container.innerHTML = top3.map((game, idx) => {
-        const edge = calcEdge(game);
-        const bestBook = getBestBookForGame(game);
-        if (!bestBook) return '';
-        const conf = getPickConfidence(edge);
-        const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
-        const label = SPORT_LABELS[game.sport_key] || game.sport_key;
-        const oddsStr = bestBook.price > 0 ? `+${bestBook.price}` : `${bestBook.price}`;
-        const recText = `Take ${bestBook.side} ${oddsStr} at ${bestBook.bookName}`;
-        const reason = `${bestBook.bookName} is offering the best number on this game by ${edge} points — that's a meaningful edge worth acting on.`;
-        const isLocked = !userEmail && idx > 0;
-
-        return `
-          <div class="pick-card${isLocked ? ' locked-card' : ''}">
-            <div class="pick-body">
-              <div class="pick-game">${sportEmoji} ${game.away_team} vs ${game.home_team}</div>
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
-                <div>
-                  <div class="pick-rec">${recText}</div>
-                  <span class="pick-confidence ${conf.cls}" style="margin-top:6px;">${conf.label}</span>
-                </div>
-                <div style="text-align:right;flex-shrink:0;">
-                  <div class="pick-edge-num">+${edge}</div>
-                  <div class="pick-edge-label">edge</div>
-                </div>
-              </div>
-              <div class="pick-reason">${reason}</div>
-            </div>
-            ${isLocked ? `
-              <div class="pick-lock-overlay">
-                <span style="font-size:28px;">🔒</span>
-                <div class="pick-lock-title">Pro Pick</div>
-                <div class="pick-lock-sub">Unlock all 3 picks with Pro</div>
-                <a href="/#pricing" class="pick-lock-btn">Unlock — $7/mo</a>
-              </div>` : `
-            <a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>`}
-          </div>`;
-      }).join('');
-    }
-
     function buildGameCard(game, idx) {
       const gameUrl = `/game?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
       const sport = game.sport_key;
       const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
       const tagClass = 'tag-' + tagKey;
       const label = SPORT_LABELS[sport] || sport;
-      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
       const time = new Date(game.commence_time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
       const edge = calcEdge(game);
       const isTopEdge = idx < 3 && edge > 0;
@@ -706,27 +563,19 @@
       const totalRows = buildOddsRows(game, books, 'totals', isFirst);
 
       const edgeBadge = edge > 0
-        ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge' : ''} +${edge}</span>`
-        : '';
-
-      const edgeRow = edge > 0
-        ? `<div class="game-edge-row">
-            <div class="game-edge-big">+${edge}</div>
-            <div class="game-edge-text">pt edge — best line is ${edge} points better than worst available</div>
-           </div>`
+        ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge' : ''} +${edge} edge</span>`
         : '';
 
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}">
           <div class="game-header">
-            <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${sportEmoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team} <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:6px;">View breakdown →</span></div>
+            <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team} <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:6px;">View breakdown →</span></div>
             <div class="game-tags">
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
               ${edgeBadge}
             </div>
           </div>
-          ${edgeRow}
           <div class="odds-table">
             <div class="odds-grid odds-grid-6">
               <div class="odds-col-header"></div>
