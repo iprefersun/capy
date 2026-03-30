@@ -76,10 +76,18 @@
     .game-card.best-value { border-color: var(--green); border-width: 1.5px; }
 
     /* GRID VIEW */
-    .games.grid-view { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    @media (max-width: 1400px) { .games.grid-view { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 1000px) { .games.grid-view { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 700px)  { .games.grid-view { grid-template-columns: 1fr; } }
+    /* 2-column grid */
+    .games.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (max-width: 700px) { .games.grid-2 { grid-template-columns: 1fr; } }
+    /* 4-column grid */
+    .games.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    @media (max-width: 1400px) { .games.grid-4 { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 1000px) { .games.grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 700px)  { .games.grid-4 { grid-template-columns: 1fr; } }
+    /* 2-col card: larger odds text, more padding, full book names already in BOOK_SHORT */
+    .games.grid-2 .game-card.grid-card .odds-cell { font-size: 14px; padding: 10px 14px 10px 4px; }
+    .games.grid-2 .game-card.grid-card .game-header { padding: 12px 18px; }
+    .games.grid-2 .game-card.grid-card .odds-grid-6 { padding: 0 18px !important; }
     .game-card.grid-card { cursor: default; display: flex; flex-direction: column; }
     .game-card.grid-card .game-header { padding: 10px 14px; }
     .game-card.grid-card .game-teams { font-size: 13px; }
@@ -437,9 +445,13 @@
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="1" width="14" height="2" rx="1" fill="currentColor"/><rect x="0" y="6" width="14" height="2" rx="1" fill="currentColor"/><rect x="0" y="11" width="14" height="2" rx="1" fill="currentColor"/></svg>
               List
             </button>
-            <button class="view-toggle-btn" id="btn-grid" onclick="setViewMode('grid')" title="Grid view">
+            <button class="view-toggle-btn" id="btn-grid2" onclick="setViewMode('grid2')" title="2-column grid">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="14" rx="1" fill="currentColor"/><rect x="8" y="0" width="6" height="14" rx="1" fill="currentColor"/></svg>
+              2 Grid
+            </button>
+            <button class="view-toggle-btn" id="btn-grid4" onclick="setViewMode('grid4')" title="4-column grid">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="6" rx="1" fill="currentColor"/><rect x="8" y="0" width="6" height="6" rx="1" fill="currentColor"/><rect x="0" y="8" width="6" height="6" rx="1" fill="currentColor"/><rect x="8" y="8" width="6" height="6" rx="1" fill="currentColor"/></svg>
-              Grid
+              4 Grid
             </button>
           </div>
         </div>
@@ -559,7 +571,7 @@
     let gateShown = false;
     let viewMode = (() => {
       if (window.innerWidth < 768) return 'list';
-      return localStorage.getItem('capy_view') || 'grid';
+      return localStorage.getItem('capy_view') || 'grid2';
     })();
     let sortMode = 'edge';
     let lastUpdatedTime = null;
@@ -723,8 +735,11 @@
         return;
       }
       const sorted = getSortedGames();
-      if (viewMode === 'grid') {
-        container.className = 'games grid-view';
+      if (viewMode === 'grid2') {
+        container.className = 'games grid-2';
+        container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
+      } else if (viewMode === 'grid4') {
+        container.className = 'games grid-4';
         container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
       } else {
         container.className = 'games';
@@ -742,7 +757,8 @@
 
     function updateViewToggleUI() {
       document.getElementById('btn-list')?.classList.toggle('active', viewMode === 'list');
-      document.getElementById('btn-grid')?.classList.toggle('active', viewMode === 'grid');
+      document.getElementById('btn-grid2')?.classList.toggle('active', viewMode === 'grid2');
+      document.getElementById('btn-grid4')?.classList.toggle('active', viewMode === 'grid4');
     }
 
     const expandedCards = new Set();
