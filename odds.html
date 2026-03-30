@@ -701,10 +701,10 @@
         const recText = `Take ${bestBook.side} ${oddsStr} at ${bestBook.bookName}`;
         const edgeTypeLabel = edgeInfo.type === 'spread'
           ? `Spread edge: +${edge} pts`
-          : `Moneyline edge: ${edgeInfo.bestLine} vs ${edgeInfo.worstLine}`;
+          : `Best ML Available`;
         const reason = edgeInfo.type === 'spread'
           ? `${bestBook.bookName} has this spread ${edge} pts better than the worst available line — that's real money on the table.`
-          : `${bestBook.bookName} is pricing this moneyline ${Math.abs(bestBook.price - (edgeInfo.value || 0))} points better than other books — bet where the number is best.`;
+          : `${bestBook.bookName} has the best moneyline on this game — ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books.`;
         const isLocked = !hasAccess && idx > 0;
 
         // Always show game header. Only blur the rec/odds/button on locked cards.
@@ -725,8 +725,7 @@
                   <div class="pick-rec">${recText}</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0;">
-                  <div class="pick-edge-num">+${edge}</div>
-                  <div class="pick-edge-label">${edgeInfo.type === 'spread' ? 'pts' : 'ML'}</div>
+                  ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts</div>` : ''}
                 </div>
               </div>
               <div class="pick-reason">${reason}</div>
@@ -775,20 +774,26 @@
       const totalRows = buildOddsRows(game, books, 'totals', isFirst);
 
       const edgeBadge = edge > 0
-        ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge' : ''} +${edge}</span>`
+        ? edgeInfo.type === 'spread'
+          ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge ' : ''}+${edge} pts</span>`
+          : `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 ' : ''}Best ML</span>`
         : '';
 
       const edgeRowText = edgeInfo.type === 'spread'
         ? `Spread edge: best line is ${edge} pts better than worst available`
         : edgeInfo.type === 'moneyline'
-          ? `Moneyline edge: ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} worst — bet the better number`
+          ? `Best moneyline: ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books — bet the better number`
           : '';
 
       const edgeRow = edge > 0
-        ? `<div class="game-edge-row">
-            <div class="game-edge-big">+${edge}</div>
-            <div class="game-edge-text">${edgeRowText}</div>
-           </div>`
+        ? edgeInfo.type === 'spread'
+          ? `<div class="game-edge-row">
+              <div class="game-edge-big">+${edge} pts</div>
+              <div class="game-edge-text">${edgeRowText}</div>
+             </div>`
+          : `<div class="game-edge-row">
+              <div class="game-edge-text" style="font-size:12px;">${edgeRowText}</div>
+             </div>`
         : '';
 
       return `
