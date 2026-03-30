@@ -163,6 +163,28 @@
       .odds-legend { padding: 6px 0 4px; }
     }
 
+    /* MOBILE CARD COLLAPSE */
+    .mobile-best-line { display: none; }
+    .mobile-toggle-btn { display: none; }
+    .pick-mobile-toggle-btn { display: none; }
+
+    @media (max-width: 700px) {
+      /* Collapsed body wrapper */
+      .mobile-expand-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+      .mobile-expand-body.open { max-height: 3000px; }
+      /* Best line summary strip */
+      .mobile-best-line { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 8px; font-size: 12px; gap: 6px; }
+      .mobile-best-line-val { font-family: 'DM Mono', monospace; font-weight: 700; color: var(--green); }
+      .mobile-best-line-book { color: var(--text-hint); font-size: 11px; }
+      /* Toggle button */
+      .mobile-toggle-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--amber-dark); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 10px; text-align: center; cursor: pointer; transition: background 0.15s; }
+      [data-theme="dark"] .mobile-toggle-btn { color: var(--amber-dark); }
+      /* Picks cards */
+      .pick-mobile-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+      .pick-mobile-body.open { max-height: 600px; }
+      .pick-mobile-toggle-btn { display: block; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--text-hint); background: none; border: none; padding: 4px 0 0; cursor: pointer; text-align: left; }
+    }
+
     /* LOADING */
     .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; gap: 12px; }
     .spinner { width: 32px; height: 32px; border: 3px solid var(--amber-light); border-top-color: var(--amber); border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -865,8 +887,13 @@
       const mktHeader = (title) =>
         `<div class="odds-market-header"><span class="odds-market-label">${title}</span></div>`;
 
+      const bestBook = getBestBookForGame(game);
+      const bestLineSummary = bestBook
+        ? `<span class="mobile-best-line-val">${bestBook.price > 0 ? '+' : ''}${bestBook.price}</span><span class="mobile-best-line-book">${bestBook.side.split(' ').pop()} · ${bestBook.bookName}</span>`
+        : '';
+
       return `
-        <div class="game-card grid-card ${isFirst ? 'best-value' : ''}">
+        <div class="game-card grid-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
           <div class="game-header">
             <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${sportEmoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;font-size:12px;">@</span> ${game.home_team}</div>
             <div class="game-tags">
@@ -875,24 +902,28 @@
               ${edgeBadge}
             </div>
           </div>
-          ${edgeRow}
-          ${legend}
-          <div class="odds-table-desktop">
-            <div class="odds-table">
-              <div class="odds-grid odds-grid-6" style="padding:0 14px;">
-                <div class="odds-col-header"></div>
-                ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
-                ${mktHeader('Moneyline')}
-                ${h2hRows}
-                <div class="odds-divider"></div>
-                ${mktHeader('Spread')}
-                ${spreadRows}
+          ${bestLineSummary ? `<div class="mobile-best-line">${bestLineSummary}</div>` : ''}
+          <div class="mobile-expand-body" id="mob-body-${game.id}">
+            ${edgeRow}
+            ${legend}
+            <div class="odds-table-desktop">
+              <div class="odds-table">
+                <div class="odds-grid odds-grid-6" style="padding:0 14px;">
+                  <div class="odds-col-header"></div>
+                  ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
+                  ${mktHeader('Moneyline')}
+                  ${h2hRows}
+                  <div class="odds-divider"></div>
+                  ${mktHeader('Spread')}
+                  ${spreadRows}
+                </div>
               </div>
             </div>
+            <div class="odds-mobile">
+              ${buildMobileOdds(game, books, isFirst)}
+            </div>
           </div>
-          <div class="odds-mobile">
-            ${buildMobileOdds(game, books, isFirst)}
-          </div>
+          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show odds ▼</button>
           <button class="grid-expand-btn" onclick="expandCard('${game.id}')">Show totals + full view →</button>
         </div>`;
     }
@@ -964,20 +995,23 @@
                 <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${edgeTypeLabel}</span>
               </div>
             </div>
-            <!-- Blurred section for locked cards -->
-            <div class="pick-body${isLocked ? ' pick-body-blurred' : ''}">
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
-                <div>
-                  <div class="pick-rec">${recText}</div>
+            <button class="pick-mobile-toggle-btn" id="pick-btn-${game.id}" onclick="togglePickCard('${game.id}')">Show details ▼</button>
+            <!-- Blurred section for locked cards; collapsed on mobile by default -->
+            <div class="pick-mobile-body" id="pick-mob-${game.id}">
+              <div class="pick-body${isLocked ? ' pick-body-blurred' : ''}">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
+                  <div>
+                    <div class="pick-rec">${recText}</div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts</div>` : ''}
+                  </div>
                 </div>
-                <div style="text-align:right;flex-shrink:0;">
-                  ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts</div>` : ''}
-                </div>
+                <div class="pick-reason">${reason}</div>
+                ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
               </div>
-              <div class="pick-reason">${reason}</div>
-              ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
+              ${isLocked ? '<div class="pick-lock-badge">🔒 Pro Pick</div>' : ''}
             </div>
-            ${isLocked ? '<div class="pick-lock-badge">🔒 Pro Pick</div>' : ''}
           </div>`;
       }).join('');
 
@@ -1051,8 +1085,13 @@
         <span><span class="legend-dot legend-neutral"></span>All equal</span>
       </div>`;
 
+      const bestBook = getBestBookForGame(game);
+      const bestLineSummary = bestBook
+        ? `<span class="mobile-best-line-val">${bestBook.price > 0 ? '+' : ''}${bestBook.price}</span><span class="mobile-best-line-book">${bestBook.side.split(' ').pop()} · ${bestBook.bookName}</span>`
+        : '';
+
       return `
-        <div class="game-card ${isFirst ? 'best-value' : ''}">
+        <div class="game-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
           <div class="game-header">
             <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${sportEmoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team} <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:6px;">View breakdown →</span></div>
             <div class="game-tags">
@@ -1061,27 +1100,31 @@
               ${edgeBadge}
             </div>
           </div>
-          ${edgeRow}
-          ${legend}
-          <div class="odds-table-desktop">
-            <div class="odds-table">
-              <div class="odds-grid odds-grid-6" style="padding:0 16px;">
-                <div class="odds-col-header"></div>
-                ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
-                ${mktHeader('Moneyline','Pick which team wins outright. Negative odds = favorite, positive odds = underdog.')}
-                ${h2hRows}
-                <div class="odds-divider"></div>
-                ${mktHeader('Spread','Bet on the margin of victory. The favorite must win by more than the spread.')}
-                ${spreadRows}
-                <div class="odds-divider"></div>
-                ${mktHeader('Total','Bet on the combined score of both teams going over or under a set number.')}
-                ${totalRows}
+          ${bestLineSummary ? `<div class="mobile-best-line">${bestLineSummary}</div>` : ''}
+          <div class="mobile-expand-body" id="mob-body-${game.id}">
+            ${edgeRow}
+            ${legend}
+            <div class="odds-table-desktop">
+              <div class="odds-table">
+                <div class="odds-grid odds-grid-6" style="padding:0 16px;">
+                  <div class="odds-col-header"></div>
+                  ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
+                  ${mktHeader('Moneyline','Pick which team wins outright. Negative odds = favorite, positive odds = underdog.')}
+                  ${h2hRows}
+                  <div class="odds-divider"></div>
+                  ${mktHeader('Spread','Bet on the margin of victory. The favorite must win by more than the spread.')}
+                  ${spreadRows}
+                  <div class="odds-divider"></div>
+                  ${mktHeader('Total','Bet on the combined score of both teams going over or under a set number.')}
+                  ${totalRows}
+                </div>
               </div>
             </div>
+            <div class="odds-mobile">
+              ${buildMobileOdds(game, books, isFirst)}
+            </div>
           </div>
-          <div class="odds-mobile">
-            ${buildMobileOdds(game, books, isFirst)}
-          </div>
+          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show odds ▼</button>
         </div>`;
     }
 
@@ -1256,6 +1299,46 @@
 
     // Init view toggle UI on page load
     updateViewToggleUI();
+
+    // ── Mobile card collapse ─────────────────────────────────────────────
+    function toggleMobileCard(gameId) {
+      if (window.innerWidth >= 700) return;
+      const body = document.getElementById('mob-body-' + gameId);
+      const btn = document.getElementById('mob-btn-' + gameId);
+      if (!body) return;
+      const isOpen = body.classList.contains('open');
+      // Collapse all other cards
+      document.querySelectorAll('.mobile-expand-body.open').forEach(el => {
+        el.classList.remove('open');
+        const id = el.id.replace('mob-body-', '');
+        const b = document.getElementById('mob-btn-' + id);
+        if (b) b.textContent = 'Show odds ▼';
+      });
+      // Open this one if it was closed
+      if (!isOpen) {
+        body.classList.add('open');
+        if (btn) btn.textContent = 'Hide ▲';
+      }
+    }
+
+    function togglePickCard(gameId) {
+      if (window.innerWidth >= 700) return;
+      const body = document.getElementById('pick-mob-' + gameId);
+      const btn = document.getElementById('pick-btn-' + gameId);
+      if (!body) return;
+      const isOpen = body.classList.contains('open');
+      // Collapse all other pick cards
+      document.querySelectorAll('.pick-mobile-body.open').forEach(el => {
+        el.classList.remove('open');
+        const id = el.id.replace('pick-mob-', '');
+        const b = document.getElementById('pick-btn-' + id);
+        if (b) b.textContent = 'Show details ▼';
+      });
+      if (!isOpen) {
+        body.classList.add('open');
+        if (btn) btn.textContent = 'Hide ▲';
+      }
+    }
 
     // ── Theme toggle ─────────────────────────────────────────────────────
     function toggleTheme() {
