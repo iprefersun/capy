@@ -1,3 +1,4 @@
+// odds api updated
 export default async function handler(req, res) {
   const API_KEY = process.env.ODDS_API_KEY;
   const sport = req.query.sport || 'basketball_nba';
