@@ -753,7 +753,7 @@
     }
 
     function buildGameCard(game, idx) {
-      const gameUrl = `/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
+      const gameUrl = `/game?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
       const sport = game.sport_key;
       const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
       const tagClass = 'tag-' + tagKey;
