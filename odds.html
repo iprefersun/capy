@@ -45,14 +45,6 @@
     /* LAYOUT */
     .main { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
 
-    /* TWO-COLUMN LAYOUT */
-    .page-columns { display: grid; grid-template-columns: 1fr 360px; grid-template-areas: "main sidebar"; gap: 20px; align-items: start; }
-    .col-main { grid-area: main; min-width: 0; }
-    .col-sidebar { grid-area: sidebar; position: sticky; top: 70px; }
-    @media (max-width: 1200px) {
-      .page-columns { grid-template-columns: 1fr; grid-template-areas: "sidebar" "main"; }
-      .col-sidebar { position: static; }
-    }
 
     /* STATS ROW */
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
@@ -84,7 +76,10 @@
     .game-card.best-value { border-color: var(--green); border-width: 1.5px; }
 
     /* GRID VIEW */
-    .games.grid-view { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .games.grid-view { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    @media (max-width: 1400px) { .games.grid-view { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 1000px) { .games.grid-view { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 700px)  { .games.grid-view { grid-template-columns: 1fr; } }
     .game-card.grid-card { cursor: default; }
     .game-card.grid-card .game-header { padding: 10px 14px; }
     .game-card.grid-card .game-teams { font-size: 13px; }
@@ -93,7 +88,6 @@
     .game-card.grid-card .odds-legend { padding: 4px 14px 2px; }
     .grid-expand-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 8px 14px; text-align: center; cursor: pointer; transition: background 0.15s; }
     .grid-expand-btn:hover { background: var(--amber); color: #fff; }
-    @media (max-width: 900px) { .games.grid-view { grid-template-columns: 1fr; } }
 
     .game-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; gap: 8px; }
     .game-teams { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.1px; }
@@ -451,33 +445,29 @@
       </div>
     </div>
 
-    <div class="page-columns">
-      <div class="col-main">
-        <div class="method-banner">
-          <span class="method-banner-icon">🦫</span>
-          <div class="method-banner-text">
-            <strong>What is edge?</strong>
-            <strong style="font-size:12px;font-weight:600;display:inline;">Spreads:</strong> edge = the difference in points between the best and worst available line — +0.5 pts can flip a cover. &nbsp;<strong style="font-size:12px;font-weight:600;">Moneylines:</strong> edge = the gap in odds across books — a bigger gap means one book is pricing the outcome very differently. Either way: green = best value, red = worst.
-          </div>
-        </div>
-        <div class="games" id="games-container">
-          <div class="loading">
-            <div class="spinner"></div>
-            <div class="loading-text">Fetching live odds across all books...</div>
-          </div>
+    <!-- CAPY'S PICKS -->
+    <div class="picks-section" id="picks-section" style="display:none;">
+      <div class="picks-header">
+        <div>
+          <div class="picks-title">🦫 Capy's Picks — Today's Best Lines</div>
+          <div class="picks-sub">We scanned 5 books and found these edges. Updated every 60 seconds.</div>
         </div>
       </div>
-      <div class="col-sidebar">
-        <!-- CAPY'S PICKS -->
-        <div class="picks-section" id="picks-section" style="display:none;">
-          <div class="picks-header">
-            <div>
-              <div class="picks-title">🦫 Capy's Picks — Today's Best Lines</div>
-              <div class="picks-sub">We scanned 5 books and found these edges. Updated every 60 seconds.</div>
-            </div>
-          </div>
-          <div class="picks-scroll" id="picks-container"></div>
-        </div>
+      <div class="picks-scroll" id="picks-container"></div>
+    </div>
+
+    <div class="method-banner">
+      <span class="method-banner-icon">🦫</span>
+      <div class="method-banner-text">
+        <strong>What is edge?</strong>
+        <strong style="font-size:12px;font-weight:600;display:inline;">Spreads:</strong> edge = the difference in points between the best and worst available line — +0.5 pts can flip a cover. &nbsp;<strong style="font-size:12px;font-weight:600;">Moneylines:</strong> edge = the gap in odds across books — a bigger gap means one book is pricing the outcome very differently. Either way: green = best value, red = worst.
+      </div>
+    </div>
+
+    <div class="games" id="games-container">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Fetching live odds across all books...</div>
       </div>
     </div>
 
