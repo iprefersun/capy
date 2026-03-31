@@ -978,32 +978,21 @@
     const PROPS_CACHE_TTL = 5 * 60 * 1000; // 5 min
 
     async function fetchPropsData(eventId, sport) {
-      console.log('[Props] Fetching props for eventId:', eventId, '| sport:', sport);
       const cached = propsCache[eventId];
-      if (cached && Date.now() - cached.ts < PROPS_CACHE_TTL) {
-        console.log('[Props] Returning cached data for eventId:', eventId);
-        return cached.data;
-      }
-      const url = `/api/props?sport=${sport}&eventId=${eventId}`;
-      console.log('[Props] Calling URL:', url);
+      if (cached && Date.now() - cached.ts < PROPS_CACHE_TTL) return cached.data;
       try {
-        const res = await fetch(url);
+        const res = await fetch(`/api/props?sport=${sport}&eventId=${eventId}`);
         const data = await res.json();
-        console.log('[Props] Response status:', res.status, '| bookmakers:', data?.bookmakers?.length ?? 0, '| error:', data?.error ?? 'none');
-        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        if (!res.ok) throw new Error(data.error || 'API error');
         propsCache[eventId] = { data, ts: Date.now() };
         return data;
       } catch (e) {
-        console.error('[Props] Fetch failed for eventId:', eventId, '| error:', e.message);
         return null;
       }
     }
 
     function parsePropsData(apiData) {
-      if (!apiData?.bookmakers?.length) {
-        console.log('[Props] parsePropsData: no bookmakers in response');
-        return [];
-      }
+      if (!apiData?.bookmakers?.length) return [];
       const MARKET_LABELS = {
         player_points: 'Points', player_rebounds: 'Rebounds', player_assists: 'Assists',
         player_threes: '3-Pointers', player_blocks: 'Blocks', player_steals: 'Steals',
@@ -1016,33 +1005,36 @@
       apiData.bookmakers.forEach(book => {
         book.markets?.forEach(mkt => {
           const marketLabel = MARKET_LABELS[mkt.key] || mkt.key;
+          const grouped = {};
           mkt.outcomes?.forEach(o => {
-            // Odds API player prop outcomes: name = player name, description = "Over" | "Under"
-            const desc = (o.description || '').toLowerCase();
-            const isOver = desc === 'over';
-            const isUnder = desc === 'under';
-            if (!isOver && !isUnder) return; // skip if not Over/Under
-            const k = `${o.name}|${mkt.key}|${o.point}`;
-            if (!propMap[k]) propMap[k] = { player: o.name, market: marketLabel, marketKey: mkt.key, line: o.point, over: null, under: null, overBook: null, underBook: null };
-            if (isOver && (propMap[k].over === null || o.price > propMap[k].over)) {
-              propMap[k].over = o.price; propMap[k].overBook = book.title;
+            const key = `${o.name}|${mkt.key}|${o.point}`;
+            if (!grouped[key]) grouped[key] = { player: o.name, market: marketLabel, line: o.point, over: null, under: null, overBook: null, underBook: null };
+            if (o.description === 'Over' || o.name.includes('Over')) {
+              if (grouped[key].over === null || o.price > grouped[key].over) {
+                grouped[key].over = o.price; grouped[key].overBook = book.title;
+              }
+            } else if (o.description === 'Under' || o.name.includes('Under')) {
+              if (grouped[key].under === null || o.price > grouped[key].under) {
+                grouped[key].under = o.price; grouped[key].underBook = book.title;
+              }
             }
-            if (isUnder && (propMap[k].under === null || o.price > propMap[k].under)) {
-              propMap[k].under = o.price; propMap[k].underBook = book.title;
-            }
+          });
+          Object.values(grouped).forEach(p => {
+            const k = `${p.player}|${p.market}|${p.line}`;
+            if (!propMap[k]) { propMap[k] = p; return; }
+            const existing = propMap[k];
+            if (p.over !== null && (existing.over === null || p.over > existing.over)) { existing.over = p.over; existing.overBook = p.overBook; }
+            if (p.under !== null && (existing.under === null || p.under > existing.under)) { existing.under = p.under; existing.underBook = p.underBook; }
           });
         });
       });
-      const result = Object.values(propMap).filter(p => p.over !== null || p.under !== null);
-      console.log('[Props] parsePropsData: found', result.length, 'props across', apiData.bookmakers.length, 'books');
-      return result;
+      return Object.values(propMap).filter(p => p.over !== null || p.under !== null);
     }
 
     async function togglePropsPreview(gameId, sport) {
-      console.log('[Props] togglePropsPreview clicked | gameId:', gameId, '| sport:', sport);
       const panel = document.getElementById(`props-panel-${gameId}`);
       const btn = document.getElementById(`props-btn-${gameId}`);
-      if (!panel) { console.error('[Props] Panel element not found for gameId:', gameId); return; }
+      if (!panel) return;
 
       if (panel.style.display !== 'none') {
         panel.style.display = 'none';
@@ -1055,18 +1047,9 @@
       panel.innerHTML = '<div class="props-skeleton">Loading props...</div>';
 
       const game = allGames.find(g => g.id === gameId);
-      if (!game) {
-        console.error('[Props] Game not found in allGames for id:', gameId, '| allGames count:', allGames.length);
-        panel.innerHTML = '<div class="props-skeleton">Game not found — try refreshing the page.</div>';
-        return;
-      }
-      console.log('[Props] Found game:', game.away_team, '@', game.home_team, '| eventId:', game.id);
+      if (!game) { panel.innerHTML = '<div class="props-skeleton">Game not found.</div>'; return; }
 
       const data = await fetchPropsData(gameId, sport);
-      if (!data) {
-        panel.innerHTML = '<div class="props-skeleton">Failed to load props — check the console for details.</div>';
-        return;
-      }
       const props = parsePropsData(data);
 
       if (!props.length) {
