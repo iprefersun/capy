@@ -164,25 +164,23 @@
     }
 
     /* MOBILE CARD COLLAPSE */
-    .mobile-best-line { display: none; }
+    .mobile-snapshot { display: none; }
     .mobile-toggle-btn { display: none; }
-    .pick-mobile-toggle-btn { display: none; }
 
     @media (max-width: 700px) {
       /* Collapsed body wrapper */
       .mobile-expand-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
       .mobile-expand-body.open { max-height: 3000px; }
-      /* Best line summary strip */
-      .mobile-best-line { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 8px; font-size: 12px; gap: 6px; }
-      .mobile-best-line-val { font-family: 'DM Mono', monospace; font-weight: 700; color: var(--green); }
-      .mobile-best-line-book { color: var(--text-hint); font-size: 11px; }
+      /* Odds snapshot strip */
+      .mobile-snapshot { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 10px; gap: 8px; border-top: 0.5px solid var(--border); }
+      .mobile-snapshot-odds { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
+      .mobile-snapshot-team { font-size: 13px; font-weight: 600; color: var(--text); }
+      .mobile-snapshot-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--green); }
+      .mobile-snapshot-sep { color: var(--border-mid); font-size: 13px; font-weight: 400; padding: 0 2px; }
+      .mobile-snapshot-right { text-align: right; flex-shrink: 0; }
+      .mobile-snapshot-book { font-size: 11px; color: var(--text-hint); white-space: nowrap; }
       /* Toggle button */
       .mobile-toggle-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--amber-dark); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 10px; text-align: center; cursor: pointer; transition: background 0.15s; }
-      [data-theme="dark"] .mobile-toggle-btn { color: var(--amber-dark); }
-      /* Picks cards */
-      .pick-mobile-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
-      .pick-mobile-body.open { max-height: 600px; }
-      .pick-mobile-toggle-btn { display: block; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--text-hint); background: none; border: none; padding: 4px 0 0; cursor: pointer; text-align: left; }
     }
 
     /* LOADING */
@@ -887,10 +885,7 @@
       const mktHeader = (title) =>
         `<div class="odds-market-header"><span class="odds-market-label">${title}</span></div>`;
 
-      const bestBook = getBestBookForGame(game);
-      const bestLineSummary = bestBook
-        ? `<span class="mobile-best-line-val">${bestBook.price > 0 ? '+' : ''}${bestBook.price}</span><span class="mobile-best-line-book">${bestBook.side.split(' ').pop()} · ${bestBook.bookName}</span>`
-        : '';
+      const mobileSnapshot = buildMobileSnapshot(game, books);
 
       return `
         <div class="game-card grid-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
@@ -902,7 +897,7 @@
               ${edgeBadge}
             </div>
           </div>
-          ${bestLineSummary ? `<div class="mobile-best-line">${bestLineSummary}</div>` : ''}
+          ${mobileSnapshot}
           <div class="mobile-expand-body" id="mob-body-${game.id}">
             ${edgeRow}
             ${legend}
@@ -923,7 +918,7 @@
               ${buildMobileOdds(game, books, isFirst)}
             </div>
           </div>
-          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show odds ▼</button>
+          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show all books ▼</button>
           <button class="grid-expand-btn" onclick="expandCard('${game.id}')">Show totals + full view →</button>
         </div>`;
     }
@@ -995,23 +990,20 @@
                 <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${edgeTypeLabel}</span>
               </div>
             </div>
-            <button class="pick-mobile-toggle-btn" id="pick-btn-${game.id}" onclick="togglePickCard('${game.id}')">Show details ▼</button>
-            <!-- Blurred section for locked cards; collapsed on mobile by default -->
-            <div class="pick-mobile-body" id="pick-mob-${game.id}">
-              <div class="pick-body${isLocked ? ' pick-body-blurred' : ''}">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
-                  <div>
-                    <div class="pick-rec">${recText}</div>
-                  </div>
-                  <div style="text-align:right;flex-shrink:0;">
-                    ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts</div>` : ''}
-                  </div>
+            <!-- Blurred section for locked cards -->
+            <div class="pick-body${isLocked ? ' pick-body-blurred' : ''}">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
+                <div>
+                  <div class="pick-rec">${recText}</div>
                 </div>
-                <div class="pick-reason">${reason}</div>
-                ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
+                <div style="text-align:right;flex-shrink:0;">
+                  ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts</div>` : ''}
+                </div>
               </div>
-              ${isLocked ? '<div class="pick-lock-badge">🔒 Pro Pick</div>' : ''}
+              <div class="pick-reason">${reason}</div>
+              ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
             </div>
+            ${isLocked ? '<div class="pick-lock-badge">🔒 Pro Pick</div>' : ''}
           </div>`;
       }).join('');
 
@@ -1085,10 +1077,7 @@
         <span><span class="legend-dot legend-neutral"></span>All equal</span>
       </div>`;
 
-      const bestBook = getBestBookForGame(game);
-      const bestLineSummary = bestBook
-        ? `<span class="mobile-best-line-val">${bestBook.price > 0 ? '+' : ''}${bestBook.price}</span><span class="mobile-best-line-book">${bestBook.side.split(' ').pop()} · ${bestBook.bookName}</span>`
-        : '';
+      const mobileSnapshot = buildMobileSnapshot(game, books);
 
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
@@ -1100,7 +1089,7 @@
               ${edgeBadge}
             </div>
           </div>
-          ${bestLineSummary ? `<div class="mobile-best-line">${bestLineSummary}</div>` : ''}
+          ${mobileSnapshot}
           <div class="mobile-expand-body" id="mob-body-${game.id}">
             ${edgeRow}
             ${legend}
@@ -1124,8 +1113,46 @@
               ${buildMobileOdds(game, books, isFirst)}
             </div>
           </div>
-          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show odds ▼</button>
+          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show all books ▼</button>
         </div>`;
+    }
+
+    // ── Mobile odds snapshot (collapsed card summary) ───────────────────
+    function buildMobileSnapshot(game, books) {
+      let awayBest = null, homeBest = null, bestBookName = null, bestBookPrice = null;
+      books.forEach((book, i) => {
+        if (!book) return;
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        if (!h2h) return;
+        h2h.outcomes?.forEach(outcome => {
+          if (outcome.name === game.away_team && (awayBest === null || outcome.price > awayBest)) {
+            awayBest = outcome.price;
+          }
+          if (outcome.name === game.home_team && (homeBest === null || outcome.price > homeBest)) {
+            homeBest = outcome.price;
+          }
+          if (bestBookPrice === null || outcome.price > bestBookPrice) {
+            bestBookPrice = outcome.price;
+            bestBookName = BOOKS[i];
+          }
+        });
+      });
+      if (awayBest === null && homeBest === null) return '';
+      const awayShort = game.away_team.split(' ').pop();
+      const homeShort = game.home_team.split(' ').pop();
+      const fmt = p => p > 0 ? `+${p}` : `${p}`;
+      const awayStr = awayBest !== null ? fmt(awayBest) : '—';
+      const homeStr = homeBest !== null ? fmt(homeBest) : '—';
+      return `<div class="mobile-snapshot">
+        <div class="mobile-snapshot-odds">
+          <span class="mobile-snapshot-team">${awayShort}</span>
+          <span class="mobile-snapshot-val">${awayStr}</span>
+          <span class="mobile-snapshot-sep">·</span>
+          <span class="mobile-snapshot-team">${homeShort}</span>
+          <span class="mobile-snapshot-val">${homeStr}</span>
+        </div>
+        ${bestBookName ? `<div class="mobile-snapshot-right"><span class="mobile-snapshot-book">Best at ${bestBookName}</span></div>` : ''}
+      </div>`;
     }
 
     const MARKET_TIPS = {
@@ -1312,7 +1339,7 @@
         el.classList.remove('open');
         const id = el.id.replace('mob-body-', '');
         const b = document.getElementById('mob-btn-' + id);
-        if (b) b.textContent = 'Show odds ▼';
+        if (b) b.textContent = 'Show all books ▼';
       });
       // Open this one if it was closed
       if (!isOpen) {
