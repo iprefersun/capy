@@ -124,10 +124,30 @@
     .summary-leg-pick { font-size: 13px; font-weight: 700; color: var(--text); }
     .summary-leg-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
     .summary-leg-book { font-size: 11px; color: var(--text-hint); }
-    .ev-badge { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 10px; cursor: default; }
-    .ev-badge.pos { background: var(--green-light); color: var(--green-dark); }
-    .ev-badge.neg { background: var(--red-light); color: var(--red); }
-    .ev-badge[title] { cursor: help; }
+    .ev-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; cursor: help; white-space: nowrap; }
+    .ev-strong { background: var(--green-light); color: var(--green-dark); }
+    .ev-pos    { background: var(--green-light); color: var(--green); }
+    .ev-neutral{ background: var(--surface-2); color: var(--text-muted); }
+    .ev-neg    { background: var(--red-light); color: var(--red); }
+    .kelly-line { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .ev-warning { font-size: 11px; font-weight: 600; color: var(--red); background: var(--red-light); padding: 6px 10px; border-radius: 6px; margin-top: 6px; }
+    .combined-ev { font-size: 13px; font-weight: 700; margin-top: 6px; }
+    /* EV explanation section */
+    .ev-explainer { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); margin-top: 1rem; overflow: hidden; }
+    .ev-explainer-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); background: none; border: none; cursor: pointer; text-align: left; }
+    .ev-explainer-toggle:hover { background: var(--surface-2); }
+    .ev-explainer-body { padding: 0 18px 18px; display: none; }
+    .ev-explainer-body.open { display: block; }
+    .ev-scale { display: flex; height: 20px; border-radius: 6px; overflow: hidden; margin: 12px 0 4px; }
+    .ev-scale-pos { flex: 1; background: var(--green); }
+    .ev-scale-neg { flex: 1; background: var(--red-light); }
+    .ev-scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-hint); margin-bottom: 12px; }
+    .ev-faq { margin-top: 14px; }
+    .ev-faq-item { border-top: 0.5px solid var(--border); }
+    .ev-faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px 0; font-size: 13px; font-weight: 600; color: var(--text); background: none; border: none; cursor: pointer; text-align: left; }
+    .ev-faq-a { font-size: 13px; color: var(--text-muted); padding-bottom: 10px; line-height: 1.55; display: none; }
+    .ev-faq-a.open { display: block; }
+    .ev-disclaimer { font-size: 11px; color: var(--text-hint); font-style: italic; margin-top: 1rem; line-height: 1.5; }
     .summary-leg-right { text-align: right; flex-shrink: 0; }
     .summary-leg-odds { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--green); }
     .remove-leg-btn { font-size: 16px; color: var(--text-hint); background: none; border: none; cursor: pointer; padding: 0; line-height: 1; margin-top: 1px; }
@@ -265,6 +285,50 @@
 
     </div>
   </div>
+
+  <!-- EV EXPLAINER -->
+  <div class="ev-explainer" style="margin-top:1.5rem;">
+    <button class="ev-explainer-toggle" onclick="toggleEvExplainer(this)">
+      <span>What is Expected Value and why does it matter?</span>
+      <span class="ev-explainer-icon">▼</span>
+    </button>
+    <div class="ev-explainer-body">
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">Expected Value (EV) is the single most important concept in sports betting. It answers one question: is this bet mathematically profitable over the long run?</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">A bet is +EV when the odds you're getting are better than the true probability of the outcome. Sportsbooks build in a margin (called the 'vig' or 'juice') so most bets are actually -EV by default. Capy strips out the vig to find the true probability, then checks whether the best available line across all books beats it.</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">Example: If the true probability of the Lakers winning is 60%, but FanDuel is offering odds that imply only 55% — you're getting a better price than the market thinks is fair. That's +EV. Bet enough +EV spots and you'll be profitable long term.</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;">The Kelly Criterion takes this further — it tells you exactly how much of your bankroll to risk on each +EV bet to maximize long-term growth without going broke.</p>
+
+      <div style="margin-top:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">True probability vs. Implied probability from odds</div>
+        <div class="ev-scale">
+          <div class="ev-scale-pos" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">+EV (implied &lt; true)</div>
+          <div class="ev-scale-neg" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--red);">-EV (implied &gt; true)</div>
+        </div>
+        <div class="ev-scale-labels">
+          <span>You're getting better price than market</span>
+          <span>Market is pricing you out</span>
+        </div>
+      </div>
+
+      <div class="ev-faq">
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>Why do I need to remove the vig?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Books price both sides so they profit regardless of outcome. The vig inflates implied probabilities. Removing it reveals the true market price.</div>
+        </div>
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>What EV % should I look for?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Anything above +2% is strong. Even +1% adds up over hundreds of bets. Avoid -EV bets.</div>
+        </div>
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>Is Kelly Criterion safe to use?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Kelly maximizes long-term growth but can suggest large bets on high-confidence edges. Many bettors use Half-Kelly (half the suggested %) to be more conservative.</div>
+        </div>
+      </div>
+
+      <p class="ev-disclaimer">EV calculations are estimates based on market-implied probabilities. Past performance does not guarantee future results. Bet responsibly.</p>
+    </div>
+  </div>
+
 </div>
 
 <!-- MOBILE FIXED BAR -->
@@ -318,13 +382,30 @@
     if (!legs.length) return 1;
     return legs.reduce((acc, l) => acc * amToDecimal(l.odds), 1);
   }
-  function calcEV(selectedOdds, otherSideOdds) {
+  function amToImpliedProb(american) {
+    if (american > 0) return 100 / (american + 100);
+    return Math.abs(american) / (Math.abs(american) + 100);
+  }
+  // Returns { evPct, fairProb, kelly } for a leg (needs otherSideOdds for fair prob calc)
+  function calcLegEV(selectedOdds, otherSideOdds) {
     if (!otherSideOdds) return null;
-    const d1 = amToDecimal(selectedOdds);
-    const d2 = amToDecimal(otherSideOdds);
-    const total = 1/d1 + 1/d2;
-    const fairDecimal = total / (1/d1);
-    return d1 >= fairDecimal; // true = +EV
+    const imp1 = amToImpliedProb(selectedOdds);
+    const imp2 = amToImpliedProb(otherSideOdds);
+    const total = imp1 + imp2;
+    const fairProb = imp1 / total;
+    const decimal = amToDecimal(selectedOdds);
+    const evPct = parseFloat((((fairProb * (decimal - 1)) - (1 - fairProb)) * 100).toFixed(1));
+    const kellyRaw = (fairProb * (decimal - 1) - (1 - fairProb)) / (decimal - 1);
+    const kelly = parseFloat((Math.min(kellyRaw * 100, 25)).toFixed(1));
+    return { evPct, fairProb, kelly };
+  }
+  function classifyEV(evPct) {
+    const sign = evPct > 0 ? '+' : '';
+    const label = `${sign}${evPct.toFixed(1)}%`;
+    if (evPct > 3)  return { label, cls: 'ev-strong', emoji: '🔥', full: '🔥 Strong +EV' };
+    if (evPct >= 1) return { label, cls: 'ev-pos',    emoji: '✅', full: '✅ +EV' };
+    if (evPct >= -1)return { label, cls: 'ev-neutral', emoji: '➖', full: '➖ Neutral' };
+    return           { label, cls: 'ev-neg',    emoji: '⚠️', full: '⚠️ -EV' };
   }
 
   // ── Edge calc ──────────────────────────────────────────────────────────
@@ -608,15 +689,32 @@
     const avgEdge = suggested.reduce((a, l) => a + l.edge, 0) / suggested.length;
     const confLabel = avgEdge >= 4 ? '🔥 Strong Parlay' : '✅ Good Value Parlay';
 
+    // Compute combined EV for suggested parlay
+    let combinedEvPct = 0;
+    let hasAllEV = true;
     const legItems = suggested.map(l => {
       const oddsStr = fmtAm(l.odds);
       const sideShort = l.side.split(' ').pop();
+      const evData = l.otherSideOdds ? calcLegEV(l.odds, l.otherSideOdds) : null;
+      let evHtml = '', kellyHtml = '';
+      if (evData) {
+        const evInfo = classifyEV(evData.evPct);
+        evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg">${evInfo.emoji} ${evInfo.label}</span>`;
+        kellyHtml = evData.kelly > 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;">Kelly: ${evData.kelly}%</span>` : '';
+        const legEVDecimal = (evData.evPct / 100) + 1;
+        combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
+      } else { hasAllEV = false; }
       return `<div class="suggested-leg">
         <div class="suggested-leg-teams">${l.teamsLabel}</div>
         <div class="suggested-leg-pick">${sideShort} ML ${oddsStr}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">${evHtml}${kellyHtml}</div>
         <div class="suggested-leg-book">Best at ${l.bookName}</div>
       </div>`;
     }).join('');
+
+    const combinedEvDisplay = hasAllEV && suggested.length > 0
+      ? (() => { const e = classifyEV(combinedEvPct); return `<div style="font-size:12px;margin-top:8px;color:rgba(255,255,255,0.6);">Combined EV: <span class="${e.cls}" style="font-weight:700;">${e.emoji} ${e.label}</span></div>`; })()
+      : '';
 
     card.innerHTML = `
       <div class="suggested-label">🦫 Capy's Pick — Updated every 60 seconds</div>
@@ -625,6 +723,7 @@
       <div class="suggested-odds-block">
         <div class="suggested-odds-label">Combined odds</div>
         <div class="suggested-odds-num">${fmtAm(combinedAm)}</div>
+        ${combinedEvDisplay}
       </div>
       <div class="suggested-legs-list">${legItems}</div>
       <div class="suggested-btns">
@@ -660,6 +759,10 @@
       return;
     }
 
+    let combinedEvPct = 0;
+    let hasAllEV = true;
+    let combinedFairProb = 1;
+
     const legItems = parlayLegs.map(leg => {
       const sideShort = leg.side.split(' ').pop();
       const oddsStr = fmtAm(leg.odds);
@@ -667,13 +770,22 @@
       const pickStr = leg.market === 'spreads' ? `${sideShort}${spreadStr}` : `${sideShort} ML`;
       const teamsStr = `${leg.awayTeam.split(' ').pop()} @ ${leg.homeTeam.split(' ').pop()}`;
 
-      let evHtml = '';
+      let evHtml = '', kellyHtml = '', warnHtml = '';
       if (leg.market === 'h2h' && leg.otherSideOdds) {
-        const isPos = calcEV(leg.odds, leg.otherSideOdds);
-        const evLabel = isPos ? '+EV ✅' : '-EV ⚠️';
-        const evCls = isPos ? 'ev-badge pos' : 'ev-badge neg';
-        evHtml = `<span class="${evCls}" title="EV = Expected Value. +EV means this line is mathematically profitable long term based on the market's implied probability.">${evLabel}</span>`;
-      }
+        const evData = calcLegEV(leg.odds, leg.otherSideOdds);
+        if (evData) {
+          const evInfo = classifyEV(evData.evPct);
+          evHtml = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line is mathematically profitable long term.">${evInfo.emoji} ${evInfo.label}</span>`;
+          if (evData.kelly > 0) {
+            kellyHtml = `<div class="kelly-line">Kelly: ${evData.kelly}% of bankroll</div>`;
+          }
+          if (evData.evPct < -1) {
+            warnHtml = `<div class="ev-warning">⚠️ This leg has negative expected value — it reduces your overall edge</div>`;
+          }
+          combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
+          combinedFairProb *= evData.fairProb;
+        } else { hasAllEV = false; }
+      } else { hasAllEV = false; }
 
       return `<div class="summary-leg">
         <div class="summary-leg-left">
@@ -683,6 +795,8 @@
             <span class="summary-leg-book">${leg.bookName}</span>
             ${evHtml}
           </div>
+          ${kellyHtml}
+          ${warnHtml}
         </div>
         <div class="summary-leg-right">
           <div class="summary-leg-odds">${oddsStr}</div>
@@ -696,12 +810,28 @@
     const payout = (betAmount * combinedDecimal).toFixed(2);
     const profit = ((betAmount * combinedDecimal) - betAmount).toFixed(2);
 
+    // Combined EV and Kelly for the whole parlay
+    let combinedEvBlock = '';
+    if (hasAllEV && parlayLegs.length > 0) {
+      const evInfo = classifyEV(combinedEvPct);
+      const kellyRaw = (combinedFairProb * (combinedDecimal - 1) - (1 - combinedFairProb)) / (combinedDecimal - 1);
+      const parlayKelly = Math.min(parseFloat((kellyRaw * 100).toFixed(1)), 25);
+      const kellyMsg = parlayKelly > 0
+        ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Kelly suggests: ${parlayKelly}% of bankroll for this parlay</div>`
+        : `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">No edge — skip this bet</div>`;
+      combinedEvBlock = `
+        <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">Combined EV: <span class="ev-badge ${evInfo.cls}" style="font-size:11px;">${evInfo.emoji} ${evInfo.label}</span></div>
+        ${kellyMsg}
+        <div style="font-size:10px;color:var(--text-hint);margin-top:3px;font-style:italic;">Parlay EV compounds — each leg must be +EV for the parlay to be +EV overall</div>`;
+    }
+
     body.innerHTML = `
       <div class="summary-legs">${legItems}</div>
       <div class="combined-block">
         <div class="combined-label">Combined parlay odds</div>
         <div class="combined-odds">${fmtAm(combinedAm)}</div>
         <div class="combined-decimal">${combinedDecimal.toFixed(2)}x decimal</div>
+        ${combinedEvBlock}
       </div>
       <div class="payout-row">
         <span class="payout-label">Bet $</span>
@@ -758,6 +888,21 @@
     const icon = document.getElementById('theme-icon');
     if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
   })();
+
+  // ── EV Explainer toggles ──────────────────────────────────────────────
+  function toggleEvExplainer(btn) {
+    const body = btn.closest('.ev-explainer').querySelector('.ev-explainer-body');
+    const icon = btn.querySelector('.ev-explainer-icon');
+    const isOpen = body.classList.toggle('open');
+    if (icon) icon.textContent = isOpen ? '▲' : '▼';
+  }
+  function toggleFaq(btn) {
+    const item = btn.closest('.ev-faq-item');
+    const ans = item.querySelector('.ev-faq-a');
+    const icon = btn.querySelector('.faq-icon');
+    const isOpen = ans.classList.toggle('open');
+    if (icon) icon.textContent = isOpen ? '−' : '+';
+  }
 
   // ── Init ──────────────────────────────────────────────────────────────
   async function init() {

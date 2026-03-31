@@ -101,6 +101,28 @@
     .add-parlay-btn:hover { background: var(--green); color: #fff; }
     .add-parlay-btn.added { background: var(--green); color: #fff; }
     /* PARLAY TOAST */
+    /* EV BADGES */
+    .ev-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; white-space: nowrap; position: relative; }
+    .ev-strong { background: var(--green-light); color: var(--green-dark); }
+    .ev-pos    { background: var(--green-light); color: var(--green); }
+    .ev-neutral{ background: var(--surface-2);   color: var(--text-muted); }
+    .ev-neg    { background: var(--red-light);    color: var(--red); }
+    .ev-cell   { font-size: 9px; line-height: 1; margin-top: 3px; border-radius: 3px; padding: 1px 3px; display: inline-block; }
+    .ev-game-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .ev-game-item { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+    /* EV tooltip */
+    .ev-tip { display: inline-flex; align-items: center; justify-content: center; width: 13px; height: 13px; background: var(--border-mid); color: var(--text-hint); border-radius: 50%; font-size: 9px; font-weight: 700; cursor: help; position: relative; flex-shrink: 0; }
+    .ev-tip::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1a1d27; color: #eeedf0; font-size: 11px; font-weight: 400; padding: 7px 10px; border-radius: 7px; white-space: normal; width: 220px; line-height: 1.4; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 500; }
+    .ev-tip:hover::after { opacity: 1; }
+    /* +EV filter active state */
+    .filter-btn.ev-active { background: var(--green); color: #fff; border-color: var(--green); }
+    .filter-btn.ev-active:hover { background: var(--green); opacity: 0.88; }
+    /* picks EV number */
+    .pick-ev-num { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1; }
+    .pick-ev-label { font-size: 10px; color: var(--text-hint); margin-top: 2px; }
+    /* EV disclaimer */
+    .ev-disclaimer { font-size: 11px; color: var(--text-hint); font-style: italic; margin-top: 0.75rem; line-height: 1.5; }
+
     .parlay-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f1117; color: #eeedf0; font-size: 13px; font-weight: 600; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; gap: 10px; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
     .parlay-toast.show { opacity: 1; pointer-events: auto; }
     .parlay-toast a { color: #22c48a; text-decoration: none; font-weight: 700; }
@@ -415,7 +437,8 @@
         <div class="stat-value" id="stat-time" style="font-size:14px;">—</div>
       </div>
     </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:1rem;">⏱ Today's edges expire at game time. Check back tomorrow for new opportunities.</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:0.5rem;">⏱ Today's edges expire at game time. Check back tomorrow for new opportunities.</div>
+    <p class="ev-disclaimer">EV calculations are estimates based on market-implied probabilities. Past performance does not guarantee future results. Bet responsibly.</p>
 
     <div class="filter-wrap">
       <div class="filter-bar">
@@ -512,6 +535,7 @@
       <div class="filter-meta" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <span><span class="live-dot"></span>Auto-refreshes every 5 min &nbsp;·&nbsp; <span class="live-counter" id="live-counter">Updated just now</span></span>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <button id="btn-ev-filter" class="filter-btn" onclick="toggleEvFilter()" style="margin-right:6px;">Show +EV only</button>
           <div class="sort-toggle">
             <button class="sort-toggle-btn active" onclick="setSortMode('edge', this)">Sort: Best edge</button>
             <button class="sort-toggle-btn" onclick="setSortMode('time', this)">Sort: Time</button>
@@ -649,6 +673,7 @@
       return localStorage.getItem('capy_view') || 'grid2';
     })();
     let sortMode = 'edge';
+    let showEvOnly = false;
     let lastUpdatedTime = null;
 
     // ── Live counter ──────────────────────────────────────────────────
@@ -684,6 +709,59 @@
     }
 
     // ── Edge calculation ──────────────────────────────────────────────
+    // ── EV Calculations ──────────────────────────────────────────────────────
+    function amToImpliedProb(american) {
+      if (american > 0) return 100 / (american + 100);
+      return Math.abs(american) / (Math.abs(american) + 100);
+    }
+    function classifyEV(evPct) {
+      const sign = evPct > 0 ? '+' : '';
+      const label = `${sign}${evPct.toFixed(1)}%`;
+      if (evPct > 3)  return { label, cls: 'ev-strong', emoji: '🔥', full: `🔥 Strong +EV` };
+      if (evPct >= 1) return { label, cls: 'ev-pos',    emoji: '✅', full: `✅ +EV` };
+      if (evPct >= -1)return { label, cls: 'ev-neutral', emoji: '➖', full: `➖ Neutral` };
+      return           { label, cls: 'ev-neg',    emoji: '⚠️', full: `⚠️ -EV` };
+    }
+    function calcEVFromOdds(americanOdds, fairProb) {
+      const decimal = americanOdds > 0 ? americanOdds/100 + 1 : 100/Math.abs(americanOdds) + 1;
+      return parseFloat((((fairProb * (decimal - 1)) - (1 - fairProb)) * 100).toFixed(1));
+    }
+    function calcKellyPct(americanOdds, fairProb) {
+      const decimal = americanOdds > 0 ? americanOdds/100 + 1 : 100/Math.abs(americanOdds) + 1;
+      const kelly = (fairProb * (decimal - 1) - (1 - fairProb)) / (decimal - 1);
+      return Math.min(parseFloat((kelly * 100).toFixed(1)), 25);
+    }
+    // Returns { home, away } each: { ev, fairProb, bestOdds, bestBook } or null
+    function calcGameEV(game) {
+      let bestHome = null, bestAway = null;
+      BOOK_KEYS.forEach((k, i) => {
+        const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
+                     game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
+        if (!book) return;
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        h2h?.outcomes?.forEach(o => {
+          if (o.name === game.home_team && (bestHome === null || o.price > bestHome.price))
+            bestHome = { price: o.price, bookName: BOOKS[i] };
+          if (o.name === game.away_team && (bestAway === null || o.price > bestAway.price))
+            bestAway = { price: o.price, bookName: BOOKS[i] };
+        });
+      });
+      if (!bestHome || !bestAway) return null;
+      const impH = amToImpliedProb(bestHome.price);
+      const impA = amToImpliedProb(bestAway.price);
+      const total = impH + impA;
+      const fairH = impH / total, fairA = impA / total;
+      return {
+        home: { ev: calcEVFromOdds(bestHome.price, fairH), fairProb: fairH, bestOdds: bestHome.price, bestBook: bestHome.bookName },
+        away: { ev: calcEVFromOdds(bestAway.price, fairA), fairProb: fairA, bestOdds: bestAway.price, bestBook: bestAway.bookName },
+      };
+    }
+    // Returns true if the game has any positive EV line
+    function gameHasPositiveEV(game) {
+      const ev = calcGameEV(game);
+      return ev && (ev.home.ev > 0 || ev.away.ev > 0);
+    }
+
     // Returns raw numeric edge (used for sorting — always positive, bigger = better)
     function calcEdge(game) {
       return calcEdgeInfo(game).value;
@@ -790,10 +868,18 @@
     }
 
     function getSortedGames() {
-      if (sortMode === 'edge') {
-        return [...allGames].sort((a, b) => calcEdge(b) - calcEdge(a));
+      let games = showEvOnly ? allGames.filter(gameHasPositiveEV) : [...allGames];
+      if (sortMode === 'edge') return games.sort((a, b) => calcEdge(b) - calcEdge(a));
+      return games.sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
+    }
+    function toggleEvFilter() {
+      showEvOnly = !showEvOnly;
+      const btn = document.getElementById('btn-ev-filter');
+      if (btn) {
+        btn.classList.toggle('ev-active', showEvOnly);
+        btn.textContent = showEvOnly ? '✅ +EV Only (on)' : 'Show +EV only';
       }
-      return [...allGames].sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
+      renderGames();
     }
 
     function renderGames() {
@@ -900,6 +986,13 @@
 
       const parlayLegsGrid = loadParlayLegs();
       const alreadyInParlayGrid = parlayLegsGrid.some(l => l.gameId === game.id);
+      const gridGameEV = calcGameEV(game);
+      let gridEvBadge = '';
+      if (gridGameEV) {
+        const bestEV = gridGameEV.home.ev >= gridGameEV.away.ev ? gridGameEV.home : gridGameEV.away;
+        const evInfo = classifyEV(bestEV.ev);
+        gridEvBadge = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line beats the true probability.">${evInfo.emoji} ${evInfo.label}</span>`;
+      }
       return `
         <div class="game-card grid-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
           <div class="game-header">
@@ -908,6 +1001,7 @@
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
               ${edgeBadge}
+              ${gridEvBadge}
               <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlayGrid ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlayGrid ? '✓ Added' : '➕ Add to parlay'}</button>
             </div>
           </div>
@@ -938,11 +1032,10 @@
     }
 
     // ── Capy's Picks ─────────────────────────────────────────────────────
-    function getPickConfidence(edge, edgeType) {
-      if (edgeType === 'moneyline') return { label: '📊 Best Available Line', cls: 'pick-conf-look' };
-      if (edge > 6) return { label: '🔥 Strong Pick', cls: 'pick-conf-strong' };
-      if (edge >= 3) return { label: '✅ Good Value', cls: 'pick-conf-good' };
-      return { label: '👀 Worth a Look', cls: 'pick-conf-look' };
+    function getPickConfidence(evPct) {
+      if (evPct > 3)  return { label: '🔥 Strong Pick', cls: 'pick-conf-strong' };
+      if (evPct >= 1) return { label: '✅ Good Value',  cls: 'pick-conf-good' };
+      return                 { label: '📊 Best Available Line', cls: 'pick-conf-look' };
     }
 
     function getBestBookForGame(game) {
@@ -980,23 +1073,29 @@
         const edge = edgeInfo.value;
         const bestBook = getBestBookForGame(game);
         if (!bestBook) return '';
-        const conf = getPickConfidence(edge, edgeInfo.type);
+        const gameEVData = calcGameEV(game);
+        // Pick EV: use the side's EV that corresponds to the best pick
+        let pickEV = null;
+        if (gameEVData) {
+          pickEV = bestBook.side === game.home_team ? gameEVData.home.ev : gameEVData.away.ev;
+        }
+        const evPctForConf = pickEV !== null ? pickEV : (edgeInfo.type === 'spread' ? edge * 0.5 : 0);
+        const conf = getPickConfidence(evPctForConf);
         const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
         const label = SPORT_LABELS[game.sport_key] || game.sport_key;
         const oddsStr = bestBook.price > 0 ? `+${bestBook.price}` : `${bestBook.price}`;
         const recText = `Take ${bestBook.side} ${oddsStr} at ${bestBook.bookName}`;
-        const edgeTypeLabel = edgeInfo.type === 'spread'
-          ? `Spread edge: +${edge} pts`
-          : `Best ML Available`;
+        const edgeTypeLabel = edgeInfo.type === 'spread' ? `Spread edge: +${edge} pts` : `Best ML Available`;
         const reason = edgeInfo.type === 'spread'
           ? `${bestBook.bookName} has this spread ${edge} pts better than the worst available line — that's real money on the table.`
           : `${bestBook.bookName} has the best moneyline on this game — ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books.`;
         const isLocked = !hasAccess && idx > 0;
+        const evDisplay = pickEV !== null
+          ? (() => { const e = classifyEV(pickEV); return `<div class="pick-ev-num ${e.cls}" style="margin-bottom:2px;">${e.emoji} ${e.label}</div><div class="pick-ev-label">Expected Value</div>`; })()
+          : '';
 
-        // Always show game header. Only blur the rec/odds/button on locked cards.
         return `
           <div class="pick-card${isLocked ? ' locked-card' : ''}">
-            <!-- Always visible: game identity + edge score -->
             <div class="pick-game-header">
               <div class="pick-game">${sportEmoji} ${game.away_team} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">vs</span> ${game.home_team}</div>
               <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
@@ -1004,14 +1103,12 @@
                 <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${edgeTypeLabel}</span>
               </div>
             </div>
-            <!-- Blurred section for locked cards -->
             <div class="pick-body${isLocked ? ' pick-body-blurred' : ''}">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
-                <div>
-                  <div class="pick-rec">${recText}</div>
-                </div>
+                <div><div class="pick-rec">${recText}</div></div>
                 <div style="text-align:right;flex-shrink:0;">
-                  ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts</div>` : ''}
+                  ${evDisplay}
+                  ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts edge</div>` : ''}
                 </div>
               </div>
               <div class="pick-reason">${reason}</div>
@@ -1096,6 +1193,19 @@
 
       const parlayLegsNow = loadParlayLegs();
       const alreadyInParlay = parlayLegsNow.some(l => l.gameId === game.id);
+      const gameEV = calcGameEV(game);
+      const evTipText = 'EV = Expected Value. +EV means this line beats the true probability — mathematically profitable long term. Capy removes the bookmaker\'s margin to find this.';
+      let evRowHtml = '';
+      if (gameEV) {
+        const hEV = classifyEV(gameEV.home.ev);
+        const aEV = classifyEV(gameEV.away.ev);
+        const homeShort = game.home_team.split(' ').pop();
+        const awayShort = game.away_team.split(' ').pop();
+        evRowHtml = `<div class="ev-game-row">
+          <span class="ev-game-item"><span class="ev-badge ${hEV.cls}">${hEV.emoji} ${hEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${homeShort} ML at ${gameEV.home.bestBook}</span><span class="ev-tip" data-tip="${evTipText}">?</span></span>
+          <span class="ev-game-item"><span class="ev-badge ${aEV.cls}">${aEV.emoji} ${aEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${awayShort} ML at ${gameEV.away.bestBook}</span></span>
+        </div>`;
+      }
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
           <div class="game-header">
@@ -1106,6 +1216,7 @@
               ${edgeBadge}
               <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlay ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlay ? '✓ Added' : '➕ Add to parlay'}</button>
             </div>
+            ${evRowHtml}
           </div>
           ${mobileSnapshot}
           <div class="mobile-expand-body" id="mob-body-${game.id}">
@@ -1231,6 +1342,29 @@
       const sides = market === 'totals' ? ['Over','Under'] : [game.away_team, game.home_team];
       if (!sides[0]) return '';
 
+      // Pre-compute fair probs for EV (h2h only)
+      const fairProbs = {};
+      if (market === 'h2h') {
+        const bestPrices = {};
+        sides.forEach(side => {
+          bestPrices[side] = null;
+          books.forEach(book => {
+            if (!book) return;
+            const h2h = book.markets?.find(m => m.key === 'h2h');
+            const outcome = h2h?.outcomes?.find(o => o.name === side);
+            if (outcome?.price != null && (bestPrices[side] === null || outcome.price > bestPrices[side]))
+              bestPrices[side] = outcome.price;
+          });
+        });
+        if (bestPrices[sides[0]] !== null && bestPrices[sides[1]] !== null) {
+          const imp0 = amToImpliedProb(bestPrices[sides[0]]);
+          const imp1 = amToImpliedProb(bestPrices[sides[1]]);
+          const tot = imp0 + imp1;
+          fairProbs[sides[0]] = imp0 / tot;
+          fairProbs[sides[1]] = imp1 / tot;
+        }
+      }
+
       return sides.map((side, ri) => {
         const vals = books.map(book => {
           if (!book) return null;
@@ -1283,8 +1417,15 @@
           const betNow = (cellClass === 'best' && market === 'h2h' && BOOK_KEYS[i])
             ? `<a href="${BOOK_URLS[BOOK_KEYS[i]] || '#'}" target="_blank" rel="noopener" class="bet-now-link" style="display:block;margin-top:3px;text-align:center;" onclick="event.stopPropagation()">Bet →</a>`
             : '';
+          // EV indicator for moneyline cells only
+          let evCellHtml = '';
+          if (market === 'h2h' && !isLocked && fairProbs[side] != null) {
+            const cellEV = calcEVFromOdds(num, fairProbs[side]);
+            const evC = classifyEV(cellEV);
+            evCellHtml = `<span class="ev-badge ev-cell ${evC.cls}">${evC.label}</span>`;
+          }
           return `<div class="odds-cell ${cellClass} ${altClass} ${isLocked ? 'locked' : ''}"
-            onclick="${isLocked ? 'showGate()' : ''}">${v}${betNow}</div>`;
+            onclick="${isLocked ? 'showGate()' : ''}">${v}${betNow}${evCellHtml}</div>`;
         });
 
         const allEqualNote = allEqual
