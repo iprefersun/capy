@@ -352,6 +352,14 @@
       .pick-bet-btn { width: 100%; }
     }
 
+    /* ── PINNACLE ROW ────────────────────────────────────── */
+    .pinnacle-row { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--text-hint); padding: 3px 16px 6px; line-height: 1.4; }
+    /* ── CLV TEASER ──────────────────────────────────────── */
+    .clv-teaser { background: var(--surface-2); border: 1.5px dashed var(--border-mid); border-radius: var(--radius-sm); padding: 14px 18px; margin-top: 1rem; display: flex; align-items: center; gap: 12px; opacity: 0.8; }
+    .clv-teaser-icon { font-size: 22px; flex-shrink: 0; }
+    .clv-teaser-body { flex: 1; }
+    .clv-teaser-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; }
+    .clv-teaser-desc { font-size: 11px; color: var(--text-hint); line-height: 1.4; }
     /* ── PROPS PREVIEW ───────────────────────────────────── */
     .props-preview-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--amber-dark); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 7px 14px; text-align: center; cursor: pointer; transition: background 0.15s; }
     .props-preview-btn:hover { background: var(--amber); color: #fff; }
@@ -552,7 +560,8 @@
       <div class="filter-meta" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <span><span class="live-dot"></span>Auto-refreshes every 5 min &nbsp;·&nbsp; <span class="live-counter" id="live-counter">Updated just now</span></span>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <button id="btn-ev-filter" class="filter-btn" onclick="toggleEvFilter()" style="margin-right:6px;">Show +EV only</button>
+          <button id="btn-ev-filter" class="filter-btn" onclick="toggleEvFilter()" style="margin-right:4px;">Show +EV only</button>
+          <button id="btn-pinnacle-filter" class="filter-btn" onclick="togglePinnacleFilter()" style="margin-right:6px;">📍 +EV vs Pinnacle only</button>
           <div class="sort-toggle">
             <button class="sort-toggle-btn active" onclick="setSortMode('edge', this)">Sort: Best edge</button>
             <button class="sort-toggle-btn" onclick="setSortMode('time', this)">Sort: Time</button>
@@ -579,17 +588,17 @@
     <div class="picks-section" id="picks-section" style="display:none;">
       <div class="picks-header">
         <div>
-          <div class="picks-title">🦫 Capy's Picks — Today's Best Lines</div>
-          <div class="picks-sub">These edges won't last. Lines move fast — act before the window closes.</div>
+          <div class="picks-title">🦫 Capy's Picks — Market Inefficiencies vs Sharp Line</div>
+          <div class="picks-sub">Comparing all books against Pinnacle (sharp market) to find genuine pricing gaps.</div>
         </div>
       </div>
       <div class="picks-scroll" id="picks-container"></div>
     </div>
 
     <div class="method-banner">
-      <span class="method-banner-icon">🦫</span>
+      <span class="method-banner-icon">📍</span>
       <div class="method-banner-text">
-        🟢 Best line &nbsp;🔴 Worst line &nbsp;·&nbsp; <strong>Spread edge</strong> = pts difference between best and worst book &nbsp;·&nbsp; <strong>Moneyline edge</strong> = odds gap across books
+        <strong>Capy compares every major US book against Pinnacle — the sharpest market in the world.</strong> When a US book offers better odds than Pinnacle's fair price, that's a genuine edge. Green = beating the sharp line. Everything else = you're paying the house.
       </div>
     </div>
 
@@ -606,6 +615,14 @@
         <a href="https://record.betonlineaffiliates.ag/_otQU8R9fzqnYJMJFEJBL7mNd7ZgqdRLk/1/" target="_blank" class="aff-btn">BetOnline</a>
         <a href="https://record.sportsbettingaffiliates.ag/_otQU8R9fzqmh_7RUBh20pWNd7ZgqdRLk/1/" target="_blank" class="aff-btn">SportsBetting.ag</a>
         <a href="https://record.tigergamingaffiliates.com/_otQU8R9fzqklN6TbhFfl5GNd7ZgqdRLk/1/" target="_blank" class="aff-btn">TigerGaming</a>
+      </div>
+    </div>
+
+    <div class="clv-teaser">
+      <div class="clv-teaser-icon">📈</div>
+      <div class="clv-teaser-body">
+        <div class="clv-teaser-title">📊 Closing Line Value Tracker <span style="font-size:10px;font-weight:600;background:rgba(0,0,0,0.06);color:var(--text-hint);padding:2px 7px;border-radius:20px;margin-left:6px;">Coming soon</span></div>
+        <div class="clv-teaser-desc">CLV is how pros measure edge. If your picks consistently close better than where you bet, you're beating the market — even when individual bets lose. <a href="/#pricing" style="color:var(--amber);font-weight:600;text-decoration:none;">Available in Sharp tier →</a></div>
       </div>
     </div>
 
@@ -693,6 +710,7 @@
     })();
     let sortMode = 'edge';
     let showEvOnly = false;
+    let showPinnacleOnly = false;
     let lastUpdatedTime = null;
 
     // ── Live counter ──────────────────────────────────────────────────
@@ -838,6 +856,38 @@
         refSource: ref.source || 'Market',
       };
     }
+    // Convert fair probability to American odds
+    function fairProbToAm(prob) {
+      if (prob <= 0 || prob >= 1) return 0;
+      if (prob >= 0.5) return -Math.round((prob / (1 - prob)) * 100);
+      return Math.round(((1 - prob) / prob) * 100);
+    }
+
+    // Context-aware EV label for game cards (replaces raw "Top Edge" labels)
+    function getEVContextLabel(ev) {
+      if (!ev) return null;
+      const bestEV = Math.max(ev.home.ev, ev.away.ev);
+      if (bestEV > 2)  return { label: '🔥 +EV vs Pinnacle', cls: 'ev-strong' };
+      if (bestEV > 0.5) return { label: '✅ Edge vs Sharp Line', cls: 'ev-pos' };
+      if (bestEV >= 0)  return { label: '➖ Marginal Edge', cls: 'ev-neutral' };
+      return              { label: '📊 Best Available (Negative EV)', cls: 'ev-neg' };
+    }
+
+    // Build the "vs Pinnacle" comparison row for a game card
+    function buildPinnacleRow(game, ev) {
+      if (!ev) return '';
+      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
+      const isPinnacle = ev.refSource === 'Pinnacle';
+      const refLabel = isPinnacle ? 'Pinnacle fair' : 'Market fair';
+      const bestSide = ev.home.ev >= ev.away.ev ? ev.home : ev.away;
+      const fairAm = fairProbToAm(bestSide.fairProb);
+      const evSign = bestSide.ev >= 0 ? '+' : '';
+      const evColor = bestSide.ev > 0 ? 'var(--green)' : 'var(--text-hint)';
+      return `<div class="pinnacle-row" style="color:${evColor};">
+        ${bestSide.bestBook} ${fmtAm(bestSide.bestOdds)} vs ${refLabel} ${fmtAm(fairAm)} → ${evSign}${bestSide.ev.toFixed(1)}% EV
+      </div>`;
+    }
+
     // Returns true if the game has any positive EV line
     function gameHasPositiveEV(game) {
       const ev = calcGameEV(game);
@@ -960,7 +1010,12 @@
     }
 
     function getSortedGames() {
-      let games = showEvOnly ? allGames.filter(gameHasPositiveEV) : [...allGames];
+      let games = [...allGames];
+      if (showEvOnly) games = games.filter(gameHasPositiveEV);
+      if (showPinnacleOnly) games = games.filter(g => {
+        const ev = calcGameEV(g);
+        return ev && ev.refSource === 'Pinnacle' && (ev.home.ev > 0 || ev.away.ev > 0);
+      });
       if (sortMode === 'edge') return games.sort((a, b) => calcEdge(b) - calcEdge(a));
       return games.sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
     }
@@ -970,6 +1025,15 @@
       if (btn) {
         btn.classList.toggle('ev-active', showEvOnly);
         btn.textContent = showEvOnly ? '✅ +EV Only (on)' : 'Show +EV only';
+      }
+      renderGames();
+    }
+    function togglePinnacleFilter() {
+      showPinnacleOnly = !showPinnacleOnly;
+      const btn = document.getElementById('btn-pinnacle-filter');
+      if (btn) {
+        btn.classList.toggle('ev-active', showPinnacleOnly);
+        btn.textContent = showPinnacleOnly ? '📍 +EV vs Pinnacle (on)' : '📍 +EV vs Pinnacle only';
       }
       renderGames();
     }
@@ -1195,6 +1259,7 @@
       const parlayLegsGrid = loadParlayLegs();
       const alreadyInParlayGrid = parlayLegsGrid.some(l => l.gameId === game.id);
       const gridGameEV = calcGameEV(game);
+      const gridEVCtxLabel = getEVContextLabel(gridGameEV);
       let gridEvBadge = '';
       if (gridGameEV) {
         const bestEV = gridGameEV.home.ev >= gridGameEV.away.ev ? gridGameEV.home : gridGameEV.away;
@@ -1202,6 +1267,7 @@
         const refLbl = gridGameEV.refSource === 'Pinnacle' ? ' 📍' : '';
         gridEvBadge = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line beats the true probability.">${evInfo.emoji} ${evInfo.label}${refLbl}</span>`;
       }
+      const gridPinnacleRow = buildPinnacleRow(game, gridGameEV);
       const gridPropsBadge = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(sport)
         ? `<a href="${gameUrl}" class="props-grid-badge">🎯 Props →</a>` : '';
       return `
@@ -1211,11 +1277,12 @@
             <div class="game-tags">
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
-              ${edgeBadge}
+              ${gridEVCtxLabel ? `<span class="ev-badge ${gridEVCtxLabel.cls}">${gridEVCtxLabel.label}</span>` : edgeBadge}
               ${gridEvBadge}
               ${gridPropsBadge}
               <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlayGrid ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlayGrid ? '✓ Added' : '➕ Add to parlay'}</button>
             </div>
+            ${gridPinnacleRow}
           </div>
           ${mobileSnapshot}
           <div class="mobile-expand-body" id="mob-body-${game.id}">
@@ -1404,6 +1471,7 @@
       const alreadyInParlay = parlayLegsNow.some(l => l.gameId === game.id);
       const gameEV = calcGameEV(game);
       const evTipText = 'EV = Expected Value. +EV means this line beats the true probability — mathematically profitable long term. Capy removes the bookmaker\'s margin to find this.';
+      const evContextLabel = getEVContextLabel(gameEV);
       let evRowHtml = '';
       if (gameEV) {
         const hEV = classifyEV(gameEV.home.ev);
@@ -1417,6 +1485,7 @@
           <span style="font-size:10px;color:var(--text-hint);font-style:italic;">${refLabel}</span>
         </div>`;
       }
+      const pinnacleRow = buildPinnacleRow(game, gameEV);
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
           <div class="game-header">
@@ -1424,10 +1493,11 @@
             <div class="game-tags">
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
-              ${edgeBadge}
+              ${evContextLabel ? `<span class="ev-badge ${evContextLabel.cls}">${evContextLabel.label}</span>` : edgeBadge}
               <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlay ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlay ? '✓ Added' : '➕ Add to parlay'}</button>
             </div>
             ${evRowHtml}
+            ${pinnacleRow}
           </div>
           ${mobileSnapshot}
           <div class="mobile-expand-body" id="mob-body-${game.id}">

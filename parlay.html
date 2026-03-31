@@ -214,6 +214,51 @@
     .props-empty-msg { font-size: 13px; color: var(--text-hint); text-align: center; padding: 2rem; }
     .props-loading { font-size: 13px; color: var(--text-hint); padding: 1rem 0; }
 
+    /* HEDGE CALCULATOR */
+    .hedge-section { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .hedge-toggle { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; }
+    .hedge-toggle:hover { background: var(--surface-2); }
+    .hedge-toggle-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .hedge-toggle-sub { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+    .hedge-toggle-icon { font-size: 18px; transition: transform 0.2s; flex-shrink: 0; }
+    .hedge-toggle-icon.open { transform: rotate(180deg); }
+    .hedge-body { display: none; padding: 0 18px 18px; border-top: 0.5px solid var(--border); }
+    .hedge-body.open { display: block; }
+    .hedge-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .hedge-label { font-size: 12px; font-weight: 600; color: var(--text-muted); white-space: nowrap; min-width: 90px; }
+    .hedge-input { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; padding: 7px 12px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); width: 120px; background: var(--surface-2); color: var(--text); }
+    .hedge-input:focus { outline: none; border-color: var(--amber); }
+    .hedge-legs-list { margin-top: 14px; }
+    .hedge-leg-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+    .hedge-leg-item:last-child { border-bottom: none; }
+    .hedge-leg-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
+    .hedge-leg-label { font-size: 12px; color: var(--text); flex: 1; }
+    .hedge-leg-odds { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .hedge-slider-wrap { margin-top: 16px; }
+    .hedge-slider-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .hedge-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--green) 0%, var(--green) var(--pct, 100%), var(--border-mid) var(--pct, 100%)); outline: none; cursor: pointer; touch-action: manipulation; }
+    .hedge-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--green); cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .hedge-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--green); cursor: pointer; border: none; }
+    .hedge-results { margin-top: 16px; background: var(--surface-2); border-radius: var(--radius-sm); padding: 14px; }
+    .hedge-result-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 0.5px solid var(--border); }
+    .hedge-result-row:last-child { border-bottom: none; }
+    .hedge-result-label { font-size: 12px; color: var(--text-muted); }
+    .hedge-result-value { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text); }
+    .hedge-result-value.green { color: var(--green); }
+    .hedge-result-value.amber { color: var(--amber); }
+    .hedge-best-line { margin-top: 12px; padding: 10px 12px; background: var(--green-light); border-radius: var(--radius-sm); border: 0.5px solid var(--green); font-size: 12px; color: var(--green-dark); }
+    .hedge-disclaimer { font-size: 10px; color: var(--text-hint); margin-top: 10px; font-style: italic; }
+    .hedge-explainer { margin-top: 14px; border-top: 0.5px solid var(--border); padding-top: 12px; }
+    .hedge-explainer-toggle { font-size: 11px; font-weight: 600; color: var(--text-hint); cursor: pointer; background: none; border: none; padding: 0; text-decoration: underline; }
+    .hedge-explainer-body { display: none; font-size: 11px; color: var(--text-muted); line-height: 1.6; margin-top: 8px; }
+    .hedge-explainer-body.open { display: block; }
+    /* CLV TEASER */
+    .clv-teaser { background: var(--surface-2); border: 1.5px dashed var(--border-mid); border-radius: var(--radius-sm); padding: 14px 18px; display: flex; align-items: center; gap: 12px; opacity: 0.85; }
+    .clv-teaser-icon { font-size: 22px; flex-shrink: 0; }
+    .clv-teaser-body { flex: 1; }
+    .clv-teaser-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; }
+    .clv-teaser-desc { font-size: 11px; color: var(--text-hint); line-height: 1.4; }
+    .clv-teaser-link { font-size: 11px; font-weight: 600; color: var(--amber); text-decoration: none; }
     /* DARK MODE */
     body, nav, .selector-card, .summary-card, .leg-btn, .sport-tab, .payout-input,
     .combined-block { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
@@ -270,7 +315,7 @@
 
   <div class="parlay-page-header">
     <div class="parlay-page-title">🦫 Capy Parlay Builder</div>
-    <div class="parlay-page-sub">We find the edges. You build the parlay.</div>
+    <div class="parlay-page-sub">Build parlays from genuine market inefficiencies — not just good-looking lines.</div>
   </div>
 
   <div class="parlay-layout">
@@ -334,6 +379,67 @@
         <div class="summary-title">Your Custom Parlay</div>
         <div id="parlay-summary-body">
           <div class="summary-empty">Add games from the left to build your parlay 🦫</div>
+        </div>
+      </div>
+
+      <!-- HEDGE CALCULATOR -->
+      <div class="hedge-section">
+        <div class="hedge-toggle" onclick="toggleHedge(this)">
+          <div>
+            <div class="hedge-toggle-title">🛡️ Protect My Parlay</div>
+            <div class="hedge-toggle-sub">Already have a parlay running? Find the optimal hedge to lock profit or cut losses.</div>
+          </div>
+          <div class="hedge-toggle-icon">▼</div>
+        </div>
+        <div class="hedge-body" id="hedge-body">
+          <div class="hedge-row">
+            <span class="hedge-label">Original stake</span>
+            <input type="number" class="hedge-input" id="hedge-stake" placeholder="100" min="1" value="100" oninput="recalcHedge()" />
+          </div>
+          <div class="hedge-row">
+            <span class="hedge-label">Parlay odds</span>
+            <input type="number" class="hedge-input" id="hedge-odds" placeholder="+600" oninput="recalcHedge()" />
+            <span style="font-size:11px;color:var(--text-hint);">(American, e.g. +600)</span>
+          </div>
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-hint);margin-bottom:6px;">Mark legs as won ✓</div>
+            <div class="hedge-legs-list" id="hedge-legs-list">
+              <div style="font-size:12px;color:var(--text-hint);padding:8px 0;">Add legs to your parlay first, then come back here to hedge.</div>
+            </div>
+          </div>
+          <div class="hedge-slider-wrap">
+            <div class="hedge-slider-label">
+              <span>Protection level</span>
+              <span id="hedge-pct-display">100% (full guarantee)</span>
+            </div>
+            <input type="range" class="hedge-slider" id="hedge-slider" min="0" max="100" value="100" oninput="onHedgeSlider(this.value)" style="--pct:100%;" />
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-hint);margin-top:3px;"><span>No hedge (max upside)</span><span>Full guarantee</span></div>
+          </div>
+          <div class="hedge-results" id="hedge-results" style="display:none;">
+            <div class="hedge-result-row"><span class="hedge-result-label">Parlay payout if all win</span><span class="hedge-result-value" id="hr-payout">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Recommended hedge bet</span><span class="hedge-result-value amber" id="hr-hedge-bet">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Hedge odds (opposite side)</span><span class="hedge-result-value" id="hr-hedge-odds">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Guaranteed profit (if hedged)</span><span class="hedge-result-value green" id="hr-guaranteed">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Unhedged upside (no hedge)</span><span class="hedge-result-value" id="hr-unhedged">—</span></div>
+            <div class="hedge-best-line" id="hr-best-line" style="display:none;"></div>
+            <div class="hedge-disclaimer">⚠️ Hedge calculations are estimates. Always verify odds before placing. Lines move.</div>
+          </div>
+          <div class="hedge-explainer">
+            <button class="hedge-explainer-toggle" onclick="toggleHedgeExplainer(this)">How does hedging work? ▼</button>
+            <div class="hedge-explainer-body" id="hedge-explainer-body">
+              Hedging means betting on the opposite outcome of one or more of your parlay legs. Done correctly, it guarantees you profit regardless of the final result — at the cost of reducing your maximum payout. The key is timing: hedge too early and you sacrifice upside. Hedge at the right moment (when you have 1–2 legs left and the payout is large) and you can lock real money.
+              <br/><br/><strong>Formula:</strong> Hedge amount = Parlay payout ÷ Decimal odds of opposite side. Guaranteed profit = Payout − Hedge amount − Original stake.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLV TEASER -->
+      <div class="clv-teaser">
+        <div class="clv-teaser-icon">📈</div>
+        <div class="clv-teaser-body">
+          <div class="clv-teaser-title">📊 Closing Line Value Tracker <span style="font-size:10px;font-weight:600;background:var(--amber-light);color:var(--amber-dark);padding:2px 7px;border-radius:20px;margin-left:6px;">Coming soon</span></div>
+          <div class="clv-teaser-desc">CLV is how pros measure edge. If your picks consistently close better than where you bet, you're beating the market — even when individual bets lose. <a href="/#pricing" class="clv-teaser-link">Available in Sharp tier →</a></div>
         </div>
       </div>
 
@@ -742,8 +848,6 @@
 
     const combinedDecimal = suggested.reduce((acc, l) => acc * amToDecimal(l.odds), 1);
     const combinedAm = decimalToAm(combinedDecimal);
-    const avgEdge = suggested.reduce((a, l) => a + l.edge, 0) / suggested.length;
-    const confLabel = avgEdge >= 4 ? '🔥 Strong Parlay' : '✅ Good Value Parlay';
 
     // Compute combined EV for suggested parlay
     let combinedEvPct = 0;
@@ -762,7 +866,7 @@
       let evHtml = '', kellyHtml = '';
       if (evData) {
         const evInfo = classifyEV(evData.evPct);
-        evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg">${evInfo.emoji} ${evInfo.label}</span>`;
+        evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg vs Pinnacle sharp line">${evInfo.emoji} ${evInfo.label} vs Pinnacle</span>`;
         kellyHtml = evData.kelly > 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;">Kelly: ${evData.kelly}%</span>` : '';
         combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
       } else { hasAllEV = false; }
@@ -774,8 +878,13 @@
       </div>`;
     }).join('');
 
+    // Determine label based on combined EV (not avgEdge)
+    const confLabel = (hasAllEV && combinedEvPct > 0)
+      ? '🔥 Strong Parlay'
+      : '🎰 High Upside Parlay (Negative EV — entertainment play)';
+
     const combinedEvDisplay = hasAllEV && suggested.length > 0
-      ? (() => { const e = classifyEV(combinedEvPct); return `<div style="font-size:12px;margin-top:8px;color:rgba(255,255,255,0.6);">Combined EV: <span class="${e.cls}" style="font-weight:700;">${e.emoji} ${e.label}</span></div>`; })()
+      ? (() => { const e = classifyEV(combinedEvPct); return `<div style="font-size:12px;margin-top:8px;color:rgba(255,255,255,0.6);">Combined EV: <span class="${e.cls}" style="font-weight:700;">${e.emoji} ${e.label} vs Pinnacle</span></div>`; })()
       : '';
 
     card.innerHTML = `
@@ -883,7 +992,7 @@
         const evData = calcLegEV(leg.odds, leg.otherSideOdds);
         if (evData) {
           const evInfo = classifyEV(evData.evPct);
-          evHtml = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line is mathematically profitable long term.">${evInfo.emoji} ${evInfo.label}</span>`;
+          evHtml = `<span class="ev-badge ${evInfo.cls}" title="EV vs Pinnacle sharp line. +EV means this line beats the sharpest market price.">${evInfo.emoji} ${evInfo.label} vs Pinnacle</span>`;
           if (evData.kelly > 0) {
             kellyHtml = `<div class="kelly-line">Kelly: ${evData.kelly}% of bankroll</div>`;
           }
@@ -982,6 +1091,10 @@
     renderGameSelector();
     renderSummary();
     updateMobileBar();
+    // Refresh hedge legs if calculator is open
+    if (document.getElementById('hedge-body')?.classList.contains('open')) {
+      populateHedgeLegs(); recalcHedge();
+    }
   }
 
   // ── Dark mode ─────────────────────────────────────────────────────────
@@ -996,6 +1109,133 @@
     const icon = document.getElementById('theme-icon');
     if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
   })();
+
+  // ── Hedge Calculator ──────────────────────────────────────────────────
+  function toggleHedge(el) {
+    const body = document.getElementById('hedge-body');
+    const icon = el.querySelector('.hedge-toggle-icon');
+    const isOpen = body.classList.toggle('open');
+    icon.classList.toggle('open', isOpen);
+    if (isOpen) { populateHedgeLegs(); recalcHedge(); }
+  }
+
+  function populateHedgeLegs() {
+    const list = document.getElementById('hedge-legs-list');
+    if (!parlayLegs.length) {
+      list.innerHTML = '<div style="font-size:12px;color:var(--text-hint);padding:8px 0;">Add legs to your parlay first, then come back here to hedge.</div>';
+      return;
+    }
+    list.innerHTML = parlayLegs.map((leg, i) => {
+      const label = leg.isProp
+        ? (leg.propLabel || leg.player)
+        : `${leg.side.split(' ').pop()} ML — ${(leg.awayTeam || '').split(' ').pop()} @ ${(leg.homeTeam || '').split(' ').pop()}`;
+      return `<div class="hedge-leg-item">
+        <input type="checkbox" class="hedge-leg-check" id="hedge-leg-${i}" onchange="recalcHedge()" />
+        <label class="hedge-leg-label" for="hedge-leg-${i}">${label}</label>
+        <span class="hedge-leg-odds">${fmtAm(leg.odds)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function onHedgeSlider(val) {
+    const slider = document.getElementById('hedge-slider');
+    slider.style.setProperty('--pct', val + '%');
+    const pctDisplay = document.getElementById('hedge-pct-display');
+    pctDisplay.textContent = val == 100 ? '100% (full guarantee)' : val == 0 ? '0% (no hedge)' : `${val}%`;
+    recalcHedge();
+  }
+
+  function recalcHedge() {
+    const stake = parseFloat(document.getElementById('hedge-stake')?.value) || 0;
+    const parlayOddsInput = parseFloat(document.getElementById('hedge-odds')?.value) || 0;
+    const slider = document.getElementById('hedge-slider');
+    const protectionPct = slider ? parseFloat(slider.value) / 100 : 1;
+    const results = document.getElementById('hedge-results');
+
+    if (!stake || !parlayOddsInput) { if (results) results.style.display = 'none'; return; }
+
+    // Calculate remaining parlay odds: multiply all unfinished legs
+    let remainingDecimal = 1;
+    let remainingLegs = [];
+    let wonCount = 0;
+    parlayLegs.forEach((leg, i) => {
+      const cb = document.getElementById(`hedge-leg-${i}`);
+      if (cb && cb.checked) { wonCount++; return; } // already won
+      remainingDecimal *= amToDecimal(leg.odds);
+      remainingLegs.push(leg);
+    });
+
+    // If user entered manual parlay odds, use that for full payout calc
+    const parlayDecimal = amToDecimal(parlayOddsInput);
+    const parlayCurrent = wonCount > 0 ? remainingDecimal : parlayDecimal;
+    const potentialPayout = stake * (wonCount > 0 ? parlayCurrent : parlayDecimal);
+    const currentPayout = stake * parlayCurrent;
+
+    // Hedge on last remaining leg or overall opposite
+    // Find best opposite odds from parlayLegs remaining legs
+    let hedgeOddsAm = null;
+    let hedgeTeam = 'Opposite side';
+    let hedgeBook = '—';
+
+    if (remainingLegs.length === 1) {
+      const lastLeg = remainingLegs[0];
+      if (lastLeg.otherSideOdds) {
+        hedgeOddsAm = lastLeg.otherSideOdds;
+        // Find which team is opposite
+        const pickedTeam = lastLeg.side.split(' ').pop();
+        const homeShort = (lastLeg.homeTeam || '').split(' ').pop();
+        const awayShort = (lastLeg.awayTeam || '').split(' ').pop();
+        hedgeTeam = pickedTeam === homeShort ? awayShort : homeShort;
+      }
+    } else if (remainingLegs.length > 1) {
+      // Can only guarantee via last leg — show using combined remaining odds
+      hedgeOddsAm = decimalToAm(1 / (1 - 1 / remainingDecimal));
+    }
+
+    if (hedgeOddsAm === null) { if (results) results.style.display = 'none'; return; }
+
+    const hedgeDecimal = amToDecimal(hedgeOddsAm);
+    // Full hedge: hedge_amount = payout / hedgeDecimal
+    const fullHedgeAmount = currentPayout / hedgeDecimal;
+    // Scaled hedge by protection %
+    const hedgeAmount = fullHedgeAmount * protectionPct;
+    const guaranteedProfit = currentPayout - hedgeAmount * hedgeDecimal - stake;
+    const unhedgedProfit = potentialPayout - stake;
+
+    // Show results
+    results.style.display = 'block';
+    document.getElementById('hr-payout').textContent = `$${potentialPayout.toFixed(2)}`;
+    document.getElementById('hr-hedge-bet').textContent = `$${hedgeAmount.toFixed(2)} on ${hedgeTeam}`;
+    document.getElementById('hr-hedge-odds').textContent = fmtAm(hedgeOddsAm);
+    document.getElementById('hr-guaranteed').textContent = protectionPct > 0
+      ? `$${guaranteedProfit.toFixed(2)}` : 'No hedge placed';
+    document.getElementById('hr-unhedged').textContent = `$${unhedgedProfit.toFixed(2)} (if parlay hits)`;
+
+    // Guarantee label
+    const hrGuaranteed = document.getElementById('hr-guaranteed');
+    hrGuaranteed.classList.toggle('green', guaranteedProfit > 0);
+
+    // Best line hint
+    const bestLineEl = document.getElementById('hr-best-line');
+    if (hedgeOddsAm && hedgeTeam !== 'Opposite side') {
+      bestLineEl.style.display = 'block';
+      bestLineEl.innerHTML = `🔍 <strong>Best hedge line:</strong> ${hedgeTeam} ${fmtAm(hedgeOddsAm)} — check FanDuel/DraftKings for live odds`;
+    } else {
+      bestLineEl.style.display = 'none';
+    }
+
+    // Live mode callout
+    if (wonCount > 0 && remainingLegs.length === 1) {
+      hrGuaranteed.closest('.hedge-results').querySelector('.hedge-disclaimer').innerHTML =
+        `🔥 <strong>Lock profit now</strong> — hedge the final leg. ${wonCount} leg${wonCount > 1 ? 's' : ''} already won.<br/>⚠️ Hedge calculations are estimates. Always verify odds before placing. Lines move.`;
+    }
+  }
+
+  function toggleHedgeExplainer(btn) {
+    const body = document.getElementById('hedge-explainer-body');
+    const isOpen = body.classList.toggle('open');
+    btn.textContent = isOpen ? 'How does hedging work? ▲' : 'How does hedging work? ▼';
+  }
 
   // ── EV Explainer toggles ──────────────────────────────────────────────
   function toggleEvExplainer(btn) {
