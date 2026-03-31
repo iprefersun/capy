@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capy Dashboard — Live Odds</title>
+  <title>Today's Best Betting Edges | Capy</title>
   <meta name="description" content="Real-time odds comparison across every major sportsbook." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,7 +37,7 @@
     .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
     .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
     .nav-right { display: flex; align-items: center; gap: 10px; }
-    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; }
+    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
     .btn-small { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 6px; border: none; background: var(--amber); color: #fff; cursor: pointer; text-decoration: none; }
     .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; margin-right: 4px; }
     @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
@@ -378,7 +378,7 @@
       <div class="nav-right">
         <a href="/stats.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f3'" onmouseout="this.style.background='none'">Stats</a>
         <span style="font-size:12px;color:var(--text-muted);"><span class="live-dot"></span>Live odds</span>
-        <span class="nav-badge">Founding rate — $7/mo</span>
+        <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
         <a href="/#signup" class="btn-small">Go Pro</a>
         <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
       </div>
@@ -405,6 +405,7 @@
         <div class="stat-value" id="stat-time" style="font-size:14px;">—</div>
       </div>
     </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:1rem;">⏱ Today's edges expire at game time. Check back tomorrow for new opportunities.</div>
 
     <div class="filter-wrap">
       <div class="filter-bar">
@@ -528,7 +529,7 @@
       <div class="picks-header">
         <div>
           <div class="picks-title">🦫 Capy's Picks — Today's Best Lines</div>
-          <div class="picks-sub">We scanned 5 books and found these edges. Updated every 60 seconds.</div>
+          <div class="picks-sub">These edges won't last. Lines move fast — act before the window closes.</div>
         </div>
       </div>
       <div class="picks-scroll" id="picks-container"></div>
@@ -1004,14 +1005,15 @@
               ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
             </div>
             ${isLocked ? '<div class="pick-lock-badge">🔒 Pro Pick</div>' : ''}
+            ${!isLocked && idx === 0 ? '<div style="font-size:11px;font-weight:600;color:var(--green);margin-top:6px;">⚡ This edge is live now — lines move fast</div>' : ''}
           </div>`;
       }).join('');
 
       // Single unlock CTA below all cards (only when user is not Pro)
       const unlockBanner = !hasAccess ? `
         <div class="picks-unlock-banner">
-          <span>🔒 Unlock all picks + full Capy's Picks with Pro</span>
-          <a href="/#pricing" class="picks-unlock-btn">$7/mo →</a>
+          <span>🔒 You're missing 2 of today's best edges. Unlock with Pro — $7/mo → One better line pays for a year.</span>
+          <a href="/#pricing" class="picks-unlock-btn">Unlock Pro →</a>
         </div>` : '';
 
       container.innerHTML = cards;

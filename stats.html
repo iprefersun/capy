@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capy Stats — Team & Player Explorer</title>
+  <title>Team Stats & Injury Reports | Capy</title>
   <meta name="description" content="Browse team standings, player stats, props, and injury reports for NBA, NFL, MLB, and NHL." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,7 +37,7 @@
     .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
     .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
     .nav-right { display: flex; align-items: center; gap: 10px; }
-    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; }
+    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
     .btn-small { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 6px; border: none; background: var(--amber); color: #fff; cursor: pointer; text-decoration: none; }
     .nav-link { font-size: 13px; color: var(--text-muted); text-decoration: none; }
     .nav-link:hover { color: var(--text); }
@@ -288,7 +288,7 @@
     </a>
     <div class="nav-right">
       <a href="/odds" class="nav-link">← Live odds</a>
-      <span class="nav-badge">Founding rate — $7/mo</span>
+      <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
       <a href="/#signup" class="btn-small">Go Pro</a>
       <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
     </div>
