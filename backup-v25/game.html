@@ -104,33 +104,6 @@
     .status-questionable { background: var(--amber-light); color: var(--amber-dark); }
     .status-probable { background: var(--green-light); color: var(--green-dark); }
 
-    /* PLAYER PROPS */
-    .props-market-group { margin-bottom: 1rem; }
-    .props-market-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1.5px solid var(--border-mid); margin-bottom: 6px; cursor: pointer; user-select: none; }
-    .props-market-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
-    .props-market-toggle { font-size: 11px; color: var(--text-hint); }
-    .props-table { width: 100%; }
-    .props-th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-hint); padding: 4px 6px; text-align: left; }
-    .props-tr { border-bottom: 0.5px solid var(--border); }
-    .props-tr:last-child { border-bottom: none; }
-    .props-td { padding: 8px 6px; font-size: 12px; color: var(--text); vertical-align: middle; }
-    .props-player { font-weight: 600; }
-    .props-line { font-family: 'DM Mono', monospace; color: var(--text-muted); }
-    .props-odds-val { font-family: 'DM Mono', monospace; font-weight: 700; }
-    .props-odds-val.best-odds { color: var(--green-dark); background: var(--green-light); padding: 2px 6px; border-radius: 6px; }
-    .props-book-name { font-size: 10px; color: var(--text-hint); }
-    .ou-toggle { display: flex; border-radius: 6px; overflow: hidden; border: 0.5px solid var(--border-mid); }
-    .ou-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 8px; background: var(--surface-2); color: var(--text-muted); border: none; cursor: pointer; transition: background 0.12s; }
-    .ou-btn.active { background: var(--green); color: #fff; }
-    .add-prop-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; padding: 4px 10px; background: var(--amber-light); color: var(--amber-dark); border: none; border-radius: 6px; cursor: pointer; transition: background 0.12s; }
-    .add-prop-btn:hover { background: var(--amber); color: #fff; }
-    .add-prop-btn.added { background: var(--green-light); color: var(--green-dark); }
-    .props-empty { text-align: center; padding: 1.5rem; font-size: 13px; color: var(--text-hint); }
-    .props-skeleton-row { background: var(--surface-2); border-radius: 6px; height: 36px; margin-bottom: 6px; animation: pulse-sk 1.4s ease infinite; }
-    @keyframes pulse-sk { 0%,100%{opacity:1} 50%{opacity:0.45} }
-    .prop-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #0f1117; color: #eeedf0; font-size: 13px; font-weight: 600; padding: 10px 20px; border-radius: 8px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
-    .prop-toast.show { opacity: 1; }
-
     /* PRO GATE */
     .pro-gate { background: var(--surface-2); border-radius: var(--radius-sm); padding: 2rem; text-align: center; border: 1.5px dashed var(--border-mid); }
     .pro-gate-icon { font-size: 32px; margin-bottom: 10px; display: block; }
@@ -227,15 +200,12 @@
       fetchESPN()
     ]);
     render(oddsData, espnData);
-    loadProps();
   }
 
   async function fetchOdds() {
     try {
       const res = await fetch(`/api/odds?sport=${sport}`);
-      const data = await res.json();
-      // Handle both new { usOdds, pinnacleOdds } format and legacy array fallback
-      const games = Array.isArray(data.usOdds) ? data.usOdds : (Array.isArray(data) ? data : []);
+      const games = await res.json();
       return games.find(g => g.home_team === homeTeam && g.away_team === awayTeam) || null;
     } catch(e) { return null; }
   }
@@ -356,19 +326,6 @@
         </div>
         <div class="injury-list" id="injury-list">
           <div class="loading-text" style="font-size:12px;color:var(--text-hint);">Loading injury report...</div>
-        </div>
-      </div>
-
-      <div class="section" id="props-section">
-        <div class="section-header">
-          <div class="section-title">🎯 Player Props — Best Available Lines</div>
-          <span class="section-badge badge-free">Free</span>
-        </div>
-        <div id="props-container">
-          ${['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(sport) ? `
-            <div class="props-skeleton-row"></div>
-            <div class="props-skeleton-row"></div>
-            <div class="props-skeleton-row"></div>` : '<div class="props-empty">Props coming soon for this sport</div>'}
         </div>
       </div>
 
@@ -589,170 +546,6 @@
     const icon = document.getElementById('theme-icon');
     if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
   })();
-
-  // ── Player Props ──────────────────────────────────────────────────────
-  const PROPS_CACHE_TTL_GAME = 5 * 60 * 1000;
-  let propsCache = {};
-  let propSideState = {}; // keyed by propKey, value: 'over' | 'under'
-
-  const MARKET_LABELS = {
-    player_points: 'Points', player_rebounds: 'Rebounds', player_assists: 'Assists',
-    player_threes: '3-Pointers', player_blocks: 'Blocks', player_steals: 'Steals',
-    player_pass_tds: 'Pass TDs', player_pass_yards: 'Pass Yards', player_rush_yards: 'Rush Yards',
-    player_reception_yards: 'Rec Yards', player_receptions: 'Receptions',
-    player_hits: 'Hits', player_home_runs: 'Home Runs', player_rbis: 'RBIs',
-    player_strikeouts_thrown: 'Strikeouts', player_goals: 'Goals',
-  };
-
-  async function loadProps() {
-    if (!['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(sport)) return;
-    if (!gameId) { document.getElementById('props-container').innerHTML = '<div class="props-empty">Props not available — game ID missing.</div>'; return; }
-    try {
-      const cached = propsCache[gameId];
-      let data;
-      if (cached && Date.now() - cached.ts < PROPS_CACHE_TTL_GAME) {
-        data = cached.data;
-      } else {
-        const res = await fetch(`/api/props?sport=${sport}&eventId=${gameId}`);
-        data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'API error');
-        propsCache[gameId] = { data, ts: Date.now() };
-        const remaining = res.headers.get ? null : null; // handled server-side
-      }
-      renderProps(parsePropsData(data));
-    } catch (e) {
-      document.getElementById('props-container').innerHTML = '<div class="props-empty">Props not available for this game yet — check back closer to tip-off.</div>';
-    }
-  }
-
-  function parsePropsData(apiData) {
-    if (!apiData?.bookmakers?.length) return {};
-    const propMap = {};
-    apiData.bookmakers.forEach(book => {
-      book.markets?.forEach(mkt => {
-        const marketLabel = MARKET_LABELS[mkt.key] || mkt.key;
-        mkt.outcomes?.forEach(o => {
-          const isOver = (o.description || '').toLowerCase() === 'over';
-          const isUnder = (o.description || '').toLowerCase() === 'under';
-          if (!isOver && !isUnder) return;
-          const key = `${o.name}|${mkt.key}|${o.point}`;
-          if (!propMap[key]) propMap[key] = { player: o.name, market: marketLabel, marketKey: mkt.key, line: o.point, over: null, under: null, overBook: null, underBook: null };
-          if (isOver && (propMap[key].over === null || o.price > propMap[key].over)) { propMap[key].over = o.price; propMap[key].overBook = book.title; }
-          if (isUnder && (propMap[key].under === null || o.price > propMap[key].under)) { propMap[key].under = o.price; propMap[key].underBook = book.title; }
-        });
-      });
-    });
-    // Group by market
-    const grouped = {};
-    Object.values(propMap).filter(p => p.over !== null || p.under !== null).forEach(p => {
-      if (!grouped[p.market]) grouped[p.market] = [];
-      grouped[p.market].push(p);
-    });
-    return grouped;
-  }
-
-  function renderProps(grouped) {
-    const container = document.getElementById('props-container');
-    if (!container) return;
-    const markets = Object.keys(grouped);
-    if (!markets.length) {
-      container.innerHTML = '<div class="props-empty">Props not available for this game yet — check back closer to tip-off.</div>';
-      return;
-    }
-    const fmtOdds = o => o == null ? '—' : (o > 0 ? `+${o}` : `${o}`);
-    container.innerHTML = markets.map(mkt => {
-      const props = grouped[mkt].sort((a, b) => b.line - a.line);
-      return `<div class="props-market-group">
-        <div class="props-market-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none';this.querySelector('.props-market-toggle').textContent=this.nextElementSibling.style.display===''?'▼':'▶'">
-          <span class="props-market-label">${mkt}</span>
-          <span class="props-market-toggle">▼</span>
-        </div>
-        <div>
-          <table class="props-table">
-            <thead><tr>
-              <th class="props-th">Player</th>
-              <th class="props-th">Line</th>
-              <th class="props-th">Best Over</th>
-              <th class="props-th">Best Under</th>
-              <th class="props-th">Side</th>
-              <th class="props-th">Add</th>
-            </tr></thead>
-            <tbody>
-              ${props.map(p => {
-                const pk = `${p.player}|${p.marketKey}|${p.line}`;
-                const side = propSideState[pk] || 'over';
-                return `<tr class="props-tr">
-                  <td class="props-td props-player">${p.player}</td>
-                  <td class="props-td props-line">${p.line}</td>
-                  <td class="props-td"><span class="props-odds-val best-odds">${fmtOdds(p.over)}</span><br><span class="props-book-name">${p.overBook || ''}</span></td>
-                  <td class="props-td"><span class="props-odds-val">${fmtOdds(p.under)}</span><br><span class="props-book-name">${p.underBook || ''}</span></td>
-                  <td class="props-td"><div class="ou-toggle"><button class="ou-btn${side==='over'?' active':''}" onclick="setOUSide('${pk}','over',this)">O</button><button class="ou-btn${side==='under'?' active':''}" onclick="setOUSide('${pk}','under',this)">U</button></div></td>
-                  <td class="props-td"><button class="add-prop-btn" id="add-prop-${pk.replace(/[|.]/g,'-')}" onclick="addPropToParlay('${p.player}','${p.market}','${p.marketKey}',${p.line},${p.over},${p.under},'${p.overBook}','${p.underBook}','${pk}')">➕ Add</button></td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function setOUSide(pk, side, btn) {
-    propSideState[pk] = side;
-    const toggle = btn.closest('.ou-toggle');
-    toggle.querySelectorAll('.ou-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
-  function addPropToParlay(player, market, marketKey, line, overOdds, underOdds, overBook, underBook, pk) {
-    const side = propSideState[pk] || 'over';
-    const odds = side === 'over' ? overOdds : underOdds;
-    const bookName = side === 'over' ? overBook : underBook;
-    if (odds == null) { showPropToast('No odds available for that side.'); return; }
-
-    const propId = `${gameId}_prop_${pk}`;
-    const leg = {
-      gameId: propId,
-      isProp: true,
-      player, market, marketKey, line,
-      propSide: side,
-      side: player,
-      sideType: `prop_${side}`,
-      market: 'prop',
-      odds: parseInt(odds),
-      bookName: bookName || '—',
-      homeTeam, awayTeam,
-      sportKey: sport,
-      commenceTime,
-      otherSideOdds: null,
-      propLabel: `${player} — ${side === 'over' ? 'Over' : 'Under'} ${line} ${market}`,
-    };
-
-    try {
-      const legs = JSON.parse(localStorage.getItem('capy_parlay') || '[]');
-      const filtered = legs.filter(l => l.gameId !== propId);
-      if (filtered.length >= 10) { showPropToast('Maximum 10 legs per parlay.'); return; }
-      filtered.push(leg);
-      localStorage.setItem('capy_parlay', JSON.stringify(filtered));
-      const btnEl = document.getElementById(`add-prop-${pk.replace(/[|.]/g,'-')}`);
-      if (btnEl) { btnEl.textContent = '✓ Added'; btnEl.classList.add('added'); }
-      showPropToast(`Added ${player} ${market} to parlay → <a href="/parlay.html" style="color:var(--amber)">View parlay</a>`);
-    } catch(e) { showPropToast('Could not add to parlay.'); }
-  }
-
-  function showPropToast(html) {
-    let toast = document.getElementById('prop-toast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'prop-toast';
-      toast.className = 'prop-toast';
-      document.body.appendChild(toast);
-    }
-    toast.innerHTML = html;
-    toast.classList.add('show');
-    clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
-  }
 
   if (homeTeam && awayTeam) {
     loadGame();

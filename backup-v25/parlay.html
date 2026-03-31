@@ -183,37 +183,6 @@
     /* EMPTY / LOADING */
     .selector-empty { text-align: center; padding: 2rem; font-size: 14px; color: var(--text-muted); }
 
-    /* LEFT COLUMN TABS */
-    .left-tabs { display: flex; gap: 0; margin-bottom: 1rem; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border-mid); }
-    .left-tab { flex: 1; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 12px; background: var(--surface-2); color: var(--text-muted); border: none; cursor: pointer; transition: all 0.12s; text-align: center; }
-    .left-tab.active { background: var(--green); color: #fff; }
-    .left-tab:first-child { border-right: 1.5px solid var(--border-mid); }
-
-    /* PROPS TAB */
-    .props-tab-content { display: none; }
-    .props-tab-content.active { display: block; }
-    .games-tab-content { display: block; }
-    .games-tab-content.hidden { display: none; }
-    .props-search { width: 100%; padding: 8px 12px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 13px; background: var(--surface); color: var(--text); margin-bottom: 10px; }
-    .props-sport-tabs { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
-    .props-sport-tab { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
-    .props-sport-tab.active { background: var(--green); color: #fff; border-color: var(--green); }
-    .props-game-group { margin-bottom: 1rem; }
-    .props-game-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-hint); margin-bottom: 6px; padding: 4px 0; border-bottom: 0.5px solid var(--border); }
-    .prop-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .prop-card-info { flex: 1; min-width: 0; }
-    .prop-card-player { font-size: 13px; font-weight: 600; color: var(--text); }
-    .prop-card-type { font-size: 11px; color: var(--text-hint); }
-    .prop-card-line { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
-    .prop-card-odds { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
-    .prop-ou-toggle { display: flex; border-radius: 6px; overflow: hidden; border: 0.5px solid var(--border-mid); }
-    .prop-ou-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 9px; background: var(--surface-2); color: var(--text-muted); border: none; cursor: pointer; transition: background 0.12s; }
-    .prop-ou-btn.active { background: var(--green); color: #fff; }
-    .prop-add-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; padding: 5px 10px; background: var(--green-light); color: var(--green-dark); border: none; border-radius: 6px; cursor: pointer; transition: background 0.12s; white-space: nowrap; }
-    .prop-add-btn:hover { background: var(--green); color: #fff; }
-    .props-empty-msg { font-size: 13px; color: var(--text-hint); text-align: center; padding: 2rem; }
-    .props-loading { font-size: 13px; color: var(--text-hint); padding: 1rem 0; }
-
     /* DARK MODE */
     body, nav, .selector-card, .summary-card, .leg-btn, .sport-tab, .payout-input,
     .combined-block { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
@@ -277,47 +246,24 @@
 
     <!-- LEFT: GAME SELECTOR -->
     <div class="parlay-left">
-      <div class="left-tabs">
-        <button class="left-tab active" id="tab-games" onclick="switchTab('games')">🎮 Games</button>
-        <button class="left-tab" id="tab-props" onclick="switchTab('props')">🎯 Player Props</button>
+      <div class="section-label">Today's games</div>
+      <div class="sport-tabs" id="sport-tabs">
+        <button class="sport-tab active" onclick="filterSport('all')">All</button>
+        <button class="sport-tab" onclick="filterSport('basketball_nba')">🏀 NBA</button>
+        <button class="sport-tab" onclick="filterSport('americanfootball_nfl')">🏈 NFL</button>
+        <button class="sport-tab" onclick="filterSport('baseball_mlb')">⚾ MLB</button>
+        <button class="sport-tab" onclick="filterSport('icehockey_nhl')">🏒 NHL</button>
       </div>
-
-      <!-- GAMES TAB -->
-      <div class="games-tab-content" id="games-tab-content">
-        <div class="section-label">Today's games</div>
-        <div class="sport-tabs" id="sport-tabs">
-          <button class="sport-tab active" onclick="filterSport('all')">All</button>
-          <button class="sport-tab" onclick="filterSport('basketball_nba')">🏀 NBA</button>
-          <button class="sport-tab" onclick="filterSport('americanfootball_nfl')">🏈 NFL</button>
-          <button class="sport-tab" onclick="filterSport('baseball_mlb')">⚾ MLB</button>
-          <button class="sport-tab" onclick="filterSport('icehockey_nhl')">🏒 NHL</button>
-        </div>
-        <div class="left-header">
-          <span id="game-count-note" class="leg-count-note"></span>
-          <span class="leg-count-note" id="legs-count-note"></span>
-        </div>
-        <div id="game-selector">
-          <div class="skeleton-row"><div class="skeleton-line" style="width:60%"></div><div class="skeleton-line" style="width:40%"></div></div>
-          <div class="skeleton-row"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:35%"></div></div>
-          <div class="skeleton-row"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:45%"></div></div>
-        </div>
-      </div><!-- end games-tab-content -->
-
-      <!-- PROPS TAB -->
-      <div class="props-tab-content" id="props-tab-content">
-        <div class="props-sport-tabs" id="props-sport-tabs">
-          <button class="props-sport-tab active" onclick="filterPropsSport('basketball_nba',this)">🏀 NBA</button>
-          <button class="props-sport-tab" onclick="filterPropsSport('americanfootball_nfl',this)">🏈 NFL</button>
-          <button class="props-sport-tab" onclick="filterPropsSport('baseball_mlb',this)">⚾ MLB</button>
-          <button class="props-sport-tab" onclick="filterPropsSport('icehockey_nhl',this)">🏒 NHL</button>
-        </div>
-        <input type="text" class="props-search" id="props-search" placeholder="Search player name..." oninput="filterPropsSearch(this.value)" />
-        <div id="props-list">
-          <div class="props-loading">Loading props...</div>
-        </div>
-      </div><!-- end props-tab-content -->
-
-    </div><!-- end parlay-left -->
+      <div class="left-header">
+        <span id="game-count-note" class="leg-count-note"></span>
+        <span class="leg-count-note" id="legs-count-note"></span>
+      </div>
+      <div id="game-selector">
+        <div class="skeleton-row"><div class="skeleton-line" style="width:60%"></div><div class="skeleton-line" style="width:40%"></div></div>
+        <div class="skeleton-row"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:35%"></div></div>
+        <div class="skeleton-row"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:45%"></div></div>
+      </div>
+    </div>
 
     <!-- RIGHT: SUGGESTED + SUMMARY -->
     <div class="parlay-right">
@@ -580,11 +526,9 @@
     );
     const games = [];
     results.forEach((r, i) => {
-      if (r.status !== 'fulfilled') return;
-      const data = r.value;
-      // Handle both new { usOdds, pinnacleOdds } and legacy array format
-      const arr = Array.isArray(data.usOdds) ? data.usOdds : (Array.isArray(data) ? data : []);
-      arr.forEach(g => { if (!g.sport_key) g.sport_key = sports[i]; games.push(g); });
+      if (r.status === 'fulfilled' && Array.isArray(r.value)) {
+        r.value.forEach(g => { if (!g.sport_key) g.sport_key = sports[i]; games.push(g); });
+      }
     });
     return games;
   }
@@ -750,13 +694,6 @@
     let hasAllEV = true;
     const legItems = suggested.map(l => {
       const oddsStr = fmtAm(l.odds);
-      if (l.isProp) {
-        return `<div class="suggested-leg">
-          <div class="suggested-leg-teams">${l.teamsLabel || ''}</div>
-          <div class="suggested-leg-pick">🎯 ${l.propLabel}</div>
-          <div class="suggested-leg-book">Best at ${l.bookName}</div>
-        </div>`;
-      }
       const sideShort = l.side.split(' ').pop();
       const evData = l.otherSideOdds ? calcLegEV(l.odds, l.otherSideOdds) : null;
       let evHtml = '', kellyHtml = '';
@@ -764,6 +701,7 @@
         const evInfo = classifyEV(evData.evPct);
         evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg">${evInfo.emoji} ${evInfo.label}</span>`;
         kellyHtml = evData.kelly > 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;">Kelly: ${evData.kelly}%</span>` : '';
+        const legEVDecimal = (evData.evPct / 100) + 1;
         combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
       } else { hasAllEV = false; }
       return `<div class="suggested-leg">
@@ -812,37 +750,6 @@
     renderAll();
   }
 
-  // ── Load best prop for suggested parlay ────────────────────────────────
-  async function loadBestPropForSuggested(suggested) {
-    // Only for NBA, only add 1 prop leg max
-    const nbaGames = allGamesData.filter(g => g.sport_key === 'basketball_nba').slice(0, 3);
-    if (!nbaGames.length) return suggested;
-    for (const game of nbaGames) {
-      try {
-        const res = await fetch(`/api/props?sport=basketball_nba&eventId=${game.id}`);
-        if (!res.ok) continue;
-        const data = await res.json();
-        const props = parseParlayProps(data).filter(p => p.over !== null);
-        if (!props.length) continue;
-        // Pick best prop (highest over odds)
-        const best = props.sort((a, b) => b.over - a.over)[0];
-        const propLeg = {
-          gameId: `${game.id}_prop_best`,
-          isProp: true,
-          player: best.player, market: best.market, marketKey: best.marketKey, line: best.line,
-          propSide: 'over', side: best.player, sideType: 'prop_over', odds: parseInt(best.over),
-          bookName: best.overBook || '—', homeTeam: game.home_team, awayTeam: game.away_team,
-          sportKey: 'basketball_nba', commenceTime: game.commence_time, otherSideOdds: null,
-          propLabel: `${best.player} — Over ${best.line} ${best.market}`,
-          teamsLabel: `🏀 ${game.away_team} @ ${game.home_team}`,
-          edge: 0,
-        };
-        return [...suggested, propLeg];
-      } catch(e) { continue; }
-    }
-    return suggested;
-  }
-
   // ── Render custom parlay summary (right column bottom) ────────────────
   function renderSummary() {
     const body = document.getElementById('parlay-summary-body');
@@ -857,23 +764,8 @@
     let combinedFairProb = 1;
 
     const legItems = parlayLegs.map(leg => {
-      const oddsStr = fmtAm(leg.odds);
-      // Prop legs display differently
-      if (leg.isProp) {
-        const sportEmoji = SPORT_EMOJIS[leg.sportKey] || '🎯';
-        return `<div class="summary-leg">
-          <div class="summary-leg-left">
-            <div class="summary-leg-teams">${sportEmoji} ${leg.awayTeam?.split(' ').pop() || ''} @ ${leg.homeTeam?.split(' ').pop() || ''}</div>
-            <div class="summary-leg-pick">${leg.propLabel || leg.player}</div>
-            <div class="summary-leg-meta"><span class="summary-leg-book">${leg.bookName}</span></div>
-          </div>
-          <div class="summary-leg-right">
-            <div class="summary-leg-odds">${oddsStr}</div>
-            <button class="remove-leg-btn" onclick="removeLeg('${leg.gameId}')" title="Remove leg">×</button>
-          </div>
-        </div>`;
-      }
       const sideShort = leg.side.split(' ').pop();
+      const oddsStr = fmtAm(leg.odds);
       const spreadStr = leg.point != null ? ` (${leg.point >= 0 ? '+' : ''}${leg.point})` : '';
       const pickStr = leg.market === 'spreads' ? `${sideShort}${spreadStr}` : `${sideShort} ML`;
       const teamsStr = `${leg.awayTeam.split(' ').pop()} @ ${leg.homeTeam.split(' ').pop()}`;
@@ -1012,171 +904,6 @@
     if (icon) icon.textContent = isOpen ? '−' : '+';
   }
 
-  // ── Props Tab ──────────────────────────────────────────────────────────
-  let propsSport = 'basketball_nba';
-  let allPropsData = {}; // keyed by sport, value: { games: [{game, props}], ts }
-  let propsSideState = {}; // keyed by propKey
-  const PROPS_TTL = 5 * 60 * 1000;
-
-  const MARKET_LABELS_P = {
-    player_points: 'Points', player_rebounds: 'Rebounds', player_assists: 'Assists',
-    player_threes: '3-Pointers', player_blocks: 'Blocks', player_steals: 'Steals',
-    player_pass_tds: 'Pass TDs', player_pass_yards: 'Pass Yards', player_rush_yards: 'Rush Yards',
-    player_reception_yards: 'Rec Yards', player_receptions: 'Receptions',
-    player_hits: 'Hits', player_home_runs: 'Home Runs', player_rbis: 'RBIs',
-    player_strikeouts_thrown: 'Strikeouts', player_goals: 'Goals',
-  };
-
-  function switchTab(tab) {
-    const gamesContent = document.getElementById('games-tab-content');
-    const propsContent = document.getElementById('props-tab-content');
-    const gamesBtn = document.getElementById('tab-games');
-    const propsBtn = document.getElementById('tab-props');
-    if (tab === 'games') {
-      gamesContent.classList.remove('hidden');
-      propsContent.classList.remove('active');
-      gamesBtn.classList.add('active');
-      propsBtn.classList.remove('active');
-    } else {
-      gamesContent.classList.add('hidden');
-      propsContent.classList.add('active');
-      gamesBtn.classList.remove('active');
-      propsBtn.classList.add('active');
-      loadAllProps(propsSport);
-    }
-  }
-
-  function filterPropsSport(sport, btn) {
-    propsSport = sport;
-    document.querySelectorAll('.props-sport-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    loadAllProps(sport);
-  }
-
-  function filterPropsSearch(query) {
-    renderPropsTab(query.toLowerCase());
-  }
-
-  async function loadAllProps(sport) {
-    const cached = allPropsData[sport];
-    if (cached && Date.now() - cached.ts < PROPS_TTL) { renderPropsTab(); return; }
-
-    document.getElementById('props-list').innerHTML = '<div class="props-loading">Loading props...</div>';
-    const games = allGamesData.filter(g => g.sport_key === sport);
-    if (!games.length) {
-      document.getElementById('props-list').innerHTML = '<div class="props-empty-msg">No games available for this sport right now.</div>';
-      return;
-    }
-
-    const results = await Promise.allSettled(
-      games.map(g => fetch(`/api/props?sport=${sport}&eventId=${g.id}`).then(r => r.json()).then(data => ({ game: g, data })))
-    );
-
-    const gameProps = [];
-    results.forEach(r => {
-      if (r.status !== 'fulfilled') return;
-      const { game, data } = r.value;
-      const props = parseParlayProps(data);
-      if (props.length) gameProps.push({ game, props });
-    });
-
-    allPropsData[sport] = { games: gameProps, ts: Date.now() };
-    renderPropsTab();
-  }
-
-  function parseParlayProps(apiData) {
-    if (!apiData?.bookmakers?.length) return [];
-    const propMap = {};
-    apiData.bookmakers.forEach(book => {
-      book.markets?.forEach(mkt => {
-        const mktLabel = MARKET_LABELS_P[mkt.key] || mkt.key;
-        mkt.outcomes?.forEach(o => {
-          const isOver = (o.description || '').toLowerCase() === 'over';
-          const isUnder = (o.description || '').toLowerCase() === 'under';
-          if (!isOver && !isUnder) return;
-          const key = `${o.name}|${mkt.key}|${o.point}`;
-          if (!propMap[key]) propMap[key] = { player: o.name, market: mktLabel, marketKey: mkt.key, line: o.point, over: null, under: null, overBook: null, underBook: null };
-          if (isOver && (propMap[key].over === null || o.price > propMap[key].over)) { propMap[key].over = o.price; propMap[key].overBook = book.title; }
-          if (isUnder && (propMap[key].under === null || o.price > propMap[key].under)) { propMap[key].under = o.price; propMap[key].underBook = book.title; }
-        });
-      });
-    });
-    return Object.values(propMap).filter(p => p.over !== null || p.under !== null);
-  }
-
-  function renderPropsTab(searchQuery = '') {
-    const cached = allPropsData[propsSport];
-    const container = document.getElementById('props-list');
-    if (!cached?.games?.length) {
-      container.innerHTML = '<div class="props-empty-msg">No props available for this sport right now. Check back closer to game time.</div>';
-      return;
-    }
-    const fmtOdds = o => o == null ? '—' : (o > 0 ? `+${o}` : `${o}`);
-    const html = cached.games.map(({ game, props }) => {
-      const filtered = searchQuery ? props.filter(p => p.player.toLowerCase().includes(searchQuery)) : props;
-      if (!filtered.length) return '';
-      return `<div class="props-game-group">
-        <div class="props-game-label">${SPORT_EMOJIS[game.sport_key] || '🎯'} ${game.away_team} @ ${game.home_team}</div>
-        ${filtered.map(p => {
-          const pk = `${game.id}|${p.player}|${p.marketKey}|${p.line}`;
-          const side = propsSideState[pk] || 'over';
-          return `<div class="prop-card">
-            <div class="prop-card-info">
-              <div class="prop-card-player">${p.player}</div>
-              <div class="prop-card-type">${p.market}</div>
-            </div>
-            <div class="prop-card-line">O/U ${p.line}</div>
-            <div class="prop-card-odds">${side === 'over' ? fmtOdds(p.over) : fmtOdds(p.under)}<br><span style="font-size:10px;color:var(--text-hint);">${side === 'over' ? (p.overBook||'') : (p.underBook||'')}</span></div>
-            <div class="prop-ou-toggle">
-              <button class="prop-ou-btn${side==='over'?' active':''}" onclick="selectPropSide('${pk}','over',this)">O</button>
-              <button class="prop-ou-btn${side==='under'?' active':''}" onclick="selectPropSide('${pk}','under',this)">U</button>
-            </div>
-            <button class="prop-add-btn" onclick="addPropLeg('${game.id}','${p.player.replace(/'/g,"\\'")}','${p.market}','${p.marketKey}',${p.line},${p.over},${p.under},'${p.overBook}','${p.underBook}','${game.home_team.replace(/'/g,"\\'")}','${game.away_team.replace(/'/g,"\\'")}','${game.sport_key}','${game.commence_time}','${pk}')">➕ Add</button>
-          </div>`;
-        }).join('')}
-      </div>`;
-    }).join('');
-    container.innerHTML = html || '<div class="props-empty-msg">No props match your search.</div>';
-  }
-
-  function selectPropSide(pk, side, btn) {
-    propsSideState[pk] = side;
-    const toggle = btn.closest('.prop-ou-toggle');
-    toggle.querySelectorAll('.prop-ou-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // Update the odds display
-    renderPropsTab(document.getElementById('props-search')?.value?.toLowerCase() || '');
-  }
-
-  function addPropLeg(gameId, player, market, marketKey, line, overOdds, underOdds, overBook, underBook, homeTeam, awayTeam, sportKey, commenceTime, pk) {
-    const side = propsSideState[pk] || 'over';
-    const odds = side === 'over' ? overOdds : underOdds;
-    const bookName = side === 'over' ? overBook : underBook;
-    if (odds == null || odds === 'null') return;
-
-    const propId = `${gameId}_prop_${player}_${marketKey}_${line}`;
-    const leg = {
-      gameId: propId,
-      isProp: true,
-      player, market, marketKey, line: parseFloat(line),
-      propSide: side,
-      side: player,
-      sideType: `prop_${side}`,
-      odds: parseInt(odds),
-      bookName: bookName || '—',
-      homeTeam, awayTeam,
-      sportKey, commenceTime,
-      otherSideOdds: null,
-      propLabel: `${player} — ${side === 'over' ? 'Over' : 'Under'} ${line} ${market}`,
-    };
-
-    parlayLegs = parlayLegs.filter(l => l.gameId !== propId);
-    if (parlayLegs.length >= 10) { alert('Maximum 10 legs per parlay.'); return; }
-    parlayLegs.push(leg);
-    saveLegs(parlayLegs);
-    renderAll();
-  }
-
   // ── Init ──────────────────────────────────────────────────────────────
   async function init() {
     parlayLegs = loadLegs();
@@ -1188,8 +915,7 @@
     }
 
     const suggested = buildSuggestedParlay();
-    // Async: try to add best prop leg to suggested parlay
-    loadBestPropForSuggested(suggested).then(withProp => renderSuggested(withProp));
+    renderSuggested(suggested);
     renderAll();
 
     // Auto-refresh every 60 seconds

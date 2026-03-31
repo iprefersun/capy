@@ -352,23 +352,6 @@
       .pick-bet-btn { width: 100%; }
     }
 
-    /* ── PROPS PREVIEW ───────────────────────────────────── */
-    .props-preview-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--amber-dark); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 7px 14px; text-align: center; cursor: pointer; transition: background 0.15s; }
-    .props-preview-btn:hover { background: var(--amber); color: #fff; }
-    .props-preview-panel { padding: 10px 14px 12px; border-top: 0.5px solid var(--border); background: var(--surface-2); }
-    .props-preview-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); margin-bottom: 8px; }
-    .prop-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 0.5px solid var(--border); gap: 6px; }
-    .prop-row:last-child { border-bottom: none; }
-    .prop-player { font-size: 12px; font-weight: 600; color: var(--text); }
-    .prop-type { font-size: 10px; color: var(--text-hint); }
-    .prop-line { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
-    .prop-odds { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700; }
-    .prop-odds.best { color: var(--green-dark); }
-    .prop-book { font-size: 10px; color: var(--text-hint); }
-    .props-grid-badge { font-size: 10px; font-weight: 700; color: var(--amber-dark); background: var(--amber-light); border-radius: 10px; padding: 2px 8px; text-decoration: none; white-space: nowrap; transition: background 0.12s; }
-    .props-grid-badge:hover { background: var(--amber); color: #fff; }
-    .props-skeleton { font-size: 12px; color: var(--text-hint); padding: 8px 0; }
-
     /* ── DARK MODE ────────────────────────────────────────── */
     body, nav, .game-card, .stat-card, .pick-card, .affiliate-bar, .gate-modal,
     .method-banner, .filter-btn, .sort-toggle-btn, .view-toggle-btn,
@@ -683,8 +666,6 @@
     let allGames = [];
     let currentSport = 'basketball_nba';
     let oddsCache = {};
-    let pinnacleCache = {}; // keyed by sport, then "home|away"
-    let propsCache = {};    // keyed by eventId, value: { data, ts }
     let userEmail = localStorage.getItem('capy_email') || null;
     let gateShown = false;
     let viewMode = (() => {
@@ -769,30 +750,10 @@
       return null;
     }
 
-    // Use Pinnacle as sharp reference if available, otherwise fall back to reference book
-    function getSharpRef(game) {
-      const sport = game.sport_key;
-      const pk = pinnacleCache[sport] || {};
-      const pinnacleGame = pk[`${game.home_team}|${game.away_team}`];
-      if (pinnacleGame) {
-        const h2h = pinnacleGame.bookmakers?.[0]?.markets?.find(m => m.key === 'h2h');
-        if (h2h) {
-          const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
-          const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
-          if (homeO?.price != null && awayO?.price != null) {
-            return { homePrice: homeO.price, awayPrice: awayO.price, bookName: 'Pinnacle', source: 'Pinnacle' };
-          }
-        }
-      }
-      const ref = getRefBook(game);
-      if (ref) return { ...ref, source: 'Market' };
-      return null;
-    }
-
     // Returns { home, away } each: { ev, fairProb, bestOdds, bestBook } or null
     function calcGameEV(game) {
-      // Step 1: derive fair probs from sharp reference (Pinnacle if available, else DK/FD)
-      const ref = getSharpRef(game);
+      // Step 1: derive fair probs from single reference book (no circular reference)
+      const ref = getRefBook(game);
       if (!ref) return null;
 
       const impH = amToImpliedProb(ref.homePrice);
@@ -835,7 +796,6 @@
       return {
         home: { ev: calcEVFromOdds(bestHome.price, fairH), fairProb: fairH, bestOdds: bestHome.price, bestBook: bestHome.bookName },
         away: { ev: calcEVFromOdds(bestAway.price, fairA), fairProb: fairA, bestOdds: bestAway.price, bestBook: bestAway.bookName },
-        refSource: ref.source || 'Market',
       };
     }
     // Returns true if the game has any positive EV line
@@ -896,19 +856,9 @@
 
     async function fetchForSport(key) {
       if (oddsCache[key]) return oddsCache[key];
-      const data = await fetch(`/api/odds?sport=${key}`).then(r => r.json()).catch(() => ({}));
-      // Handle both new { usOdds, pinnacleOdds } format and legacy array fallback
-      const usGames = Array.isArray(data.usOdds) ? data.usOdds : (Array.isArray(data) ? data : []);
-      const games = usGames.filter(g => g && g.bookmakers?.length);
+      const data = await fetch(`/api/odds?sport=${key}`).then(r => r.json()).catch(() => []);
+      const games = Array.isArray(data) ? data.filter(g => g && g.bookmakers?.length) : [];
       oddsCache[key] = games;
-      // Cache Pinnacle data keyed by "home|away"
-      if (Array.isArray(data.pinnacleOdds) && data.pinnacleOdds.length) {
-        if (!pinnacleCache[key]) pinnacleCache[key] = {};
-        data.pinnacleOdds.forEach(g => {
-          pinnacleCache[key][`${g.home_team}|${g.away_team}`] = g;
-        });
-        console.log('[Capy] Using Pinnacle as sharp reference');
-      }
       return games;
     }
 
@@ -972,105 +922,6 @@
         btn.textContent = showEvOnly ? '✅ +EV Only (on)' : 'Show +EV only';
       }
       renderGames();
-    }
-
-    // ── Player Props ──────────────────────────────────────────────────────
-    const PROPS_CACHE_TTL = 5 * 60 * 1000; // 5 min
-
-    async function fetchPropsData(eventId, sport) {
-      const cached = propsCache[eventId];
-      if (cached && Date.now() - cached.ts < PROPS_CACHE_TTL) return cached.data;
-      try {
-        const res = await fetch(`/api/props?sport=${sport}&eventId=${eventId}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'API error');
-        propsCache[eventId] = { data, ts: Date.now() };
-        return data;
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function parsePropsData(apiData) {
-      if (!apiData?.bookmakers?.length) return [];
-      const MARKET_LABELS = {
-        player_points: 'Points', player_rebounds: 'Rebounds', player_assists: 'Assists',
-        player_threes: '3-Pointers', player_blocks: 'Blocks', player_steals: 'Steals',
-        player_pass_tds: 'Pass TDs', player_pass_yards: 'Pass Yards', player_rush_yards: 'Rush Yards',
-        player_reception_yards: 'Rec Yards', player_receptions: 'Receptions',
-        player_hits: 'Hits', player_home_runs: 'Home Runs', player_rbis: 'RBIs',
-        player_strikeouts_thrown: 'Strikeouts', player_goals: 'Goals',
-      };
-      const propMap = {};
-      apiData.bookmakers.forEach(book => {
-        book.markets?.forEach(mkt => {
-          const marketLabel = MARKET_LABELS[mkt.key] || mkt.key;
-          const grouped = {};
-          mkt.outcomes?.forEach(o => {
-            const key = `${o.name}|${mkt.key}|${o.point}`;
-            if (!grouped[key]) grouped[key] = { player: o.name, market: marketLabel, line: o.point, over: null, under: null, overBook: null, underBook: null };
-            if (o.description === 'Over' || o.name.includes('Over')) {
-              if (grouped[key].over === null || o.price > grouped[key].over) {
-                grouped[key].over = o.price; grouped[key].overBook = book.title;
-              }
-            } else if (o.description === 'Under' || o.name.includes('Under')) {
-              if (grouped[key].under === null || o.price > grouped[key].under) {
-                grouped[key].under = o.price; grouped[key].underBook = book.title;
-              }
-            }
-          });
-          Object.values(grouped).forEach(p => {
-            const k = `${p.player}|${p.market}|${p.line}`;
-            if (!propMap[k]) { propMap[k] = p; return; }
-            const existing = propMap[k];
-            if (p.over !== null && (existing.over === null || p.over > existing.over)) { existing.over = p.over; existing.overBook = p.overBook; }
-            if (p.under !== null && (existing.under === null || p.under > existing.under)) { existing.under = p.under; existing.underBook = p.underBook; }
-          });
-        });
-      });
-      return Object.values(propMap).filter(p => p.over !== null || p.under !== null);
-    }
-
-    async function togglePropsPreview(gameId, sport) {
-      const panel = document.getElementById(`props-panel-${gameId}`);
-      const btn = document.getElementById(`props-btn-${gameId}`);
-      if (!panel) return;
-
-      if (panel.style.display !== 'none') {
-        panel.style.display = 'none';
-        if (btn) btn.textContent = '🎯 Player Props ▼';
-        return;
-      }
-
-      panel.style.display = 'block';
-      if (btn) btn.textContent = '🎯 Player Props ▲';
-      panel.innerHTML = '<div class="props-skeleton">Loading props...</div>';
-
-      const game = allGames.find(g => g.id === gameId);
-      if (!game) { panel.innerHTML = '<div class="props-skeleton">Game not found.</div>'; return; }
-
-      const data = await fetchPropsData(gameId, sport);
-      const props = parsePropsData(data);
-
-      if (!props.length) {
-        panel.innerHTML = '<div class="props-skeleton">Props not available for this game yet — check back closer to tip-off.</div>';
-        return;
-      }
-
-      // Show top 3 props by best odds (most favorable over line)
-      const top3 = props.filter(p => p.over !== null).sort((a, b) => b.over - a.over).slice(0, 3);
-
-      const fmtOdds = o => o == null ? '—' : (o > 0 ? `+${o}` : `${o}`);
-      panel.innerHTML = `
-        <div class="props-preview-title">🎯 Top Props — Best Available Lines</div>
-        ${top3.map(p => `
-          <div class="prop-row">
-            <div><div class="prop-player">${p.player}</div><div class="prop-type">${p.market}</div></div>
-            <div class="prop-line">O/U ${p.line}</div>
-            <div><div class="prop-odds best">Over ${fmtOdds(p.over)}</div><div class="prop-book">${p.overBook || ''}</div></div>
-            <div><div class="prop-odds">Under ${fmtOdds(p.under)}</div><div class="prop-book">${p.underBook || ''}</div></div>
-          </div>`).join('')}
-        <div style="font-size:10px;color:var(--text-hint);margin-top:6px;text-align:right;"><a href="/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${sport}&time=${encodeURIComponent(game.commence_time)}&id=${gameId}" style="color:var(--amber);">See all props →</a></div>`;
     }
 
     function renderGames() {
@@ -1182,11 +1033,8 @@
       if (gridGameEV) {
         const bestEV = gridGameEV.home.ev >= gridGameEV.away.ev ? gridGameEV.home : gridGameEV.away;
         const evInfo = classifyEV(bestEV.ev);
-        const refLbl = gridGameEV.refSource === 'Pinnacle' ? ' 📍' : '';
-        gridEvBadge = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line beats the true probability.">${evInfo.emoji} ${evInfo.label}${refLbl}</span>`;
+        gridEvBadge = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line beats the true probability.">${evInfo.emoji} ${evInfo.label}</span>`;
       }
-      const gridPropsBadge = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(sport)
-        ? `<a href="${gameUrl}" class="props-grid-badge">🎯 Props →</a>` : '';
       return `
         <div class="game-card grid-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
           <div class="game-header">
@@ -1196,7 +1044,6 @@
               <span class="game-time">${time}</span>
               ${edgeBadge}
               ${gridEvBadge}
-              ${gridPropsBadge}
               <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlayGrid ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlayGrid ? '✓ Added' : '➕ Add to parlay'}</button>
             </div>
           </div>
@@ -1393,11 +1240,9 @@
         const aEV = classifyEV(gameEV.away.ev);
         const homeShort = game.home_team.split(' ').pop();
         const awayShort = game.away_team.split(' ').pop();
-        const refLabel = gameEV.refSource === 'Pinnacle' ? '📍 vs Pinnacle' : '📍 vs Market';
         evRowHtml = `<div class="ev-game-row">
           <span class="ev-game-item"><span class="ev-badge ${hEV.cls}">${hEV.emoji} ${hEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${homeShort} ML at ${gameEV.home.bestBook}</span><span class="ev-tip" data-tip="${evTipText}">?</span></span>
           <span class="ev-game-item"><span class="ev-badge ${aEV.cls}">${aEV.emoji} ${aEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${awayShort} ML at ${gameEV.away.bestBook}</span></span>
-          <span style="font-size:10px;color:var(--text-hint);font-style:italic;">${refLabel}</span>
         </div>`;
       }
       return `
@@ -1437,9 +1282,6 @@
             </div>
           </div>
           <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show all books ▼</button>
-          ${['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(game.sport_key) ? `
-          <button class="props-preview-btn" id="props-btn-${game.id}" onclick="event.stopPropagation();togglePropsPreview('${game.id}','${game.sport_key}')">🎯 Player Props ▼</button>
-          <div class="props-preview-panel" id="props-panel-${game.id}" style="display:none;"></div>` : ''}
         </div>`;
     }
 
