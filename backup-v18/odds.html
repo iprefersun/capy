@@ -97,14 +97,6 @@
     .game-card.grid-card .odds-legend { padding: 4px 14px 2px; }
     .grid-expand-btn { display: block; width: 100%; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-light); border: none; border-top: 0.5px solid var(--border); padding: 8px 14px; text-align: center; cursor: pointer; transition: background 0.15s; margin-top: auto; }
     .grid-expand-btn:hover { background: var(--amber); color: #fff; }
-    .add-parlay-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--green-dark); background: var(--green-light); border: none; border-radius: 20px; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: background 0.12s; }
-    .add-parlay-btn:hover { background: var(--green); color: #fff; }
-    .add-parlay-btn.added { background: var(--green); color: #fff; }
-    /* PARLAY TOAST */
-    .parlay-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f1117; color: #eeedf0; font-size: 13px; font-weight: 600; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; gap: 10px; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
-    .parlay-toast.show { opacity: 1; pointer-events: auto; }
-    .parlay-toast a { color: #22c48a; text-decoration: none; font-weight: 700; }
-    .parlay-toast a:hover { text-decoration: underline; }
 
     .game-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; gap: 8px; }
     .game-teams { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.1px; }
@@ -384,10 +376,8 @@
         Capy
       </a>
       <div class="nav-right">
-        <a href="/parlay.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">Parlay</a>
         <a href="/stats.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f3'" onmouseout="this.style.background='none'">Stats</a>
         <span style="font-size:12px;color:var(--text-muted);"><span class="live-dot"></span>Live odds</span>
-        <a href="/parlay.html" id="parlay-nav-count" style="display:none;font-size:12px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:4px 10px;border-radius:20px;text-decoration:none;">🎰 Parlay (<span id="parlay-count">0</span>)</a>
         <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
         <a href="/#signup" class="btn-small">Go Pro</a>
         <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
@@ -898,8 +888,6 @@
 
       const mobileSnapshot = buildMobileSnapshot(game, books);
 
-      const parlayLegsGrid = loadParlayLegs();
-      const alreadyInParlayGrid = parlayLegsGrid.some(l => l.gameId === game.id);
       return `
         <div class="game-card grid-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
           <div class="game-header">
@@ -908,7 +896,6 @@
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
               ${edgeBadge}
-              <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlayGrid ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlayGrid ? '✓ Added' : '➕ Add to parlay'}</button>
             </div>
           </div>
           ${mobileSnapshot}
@@ -1094,8 +1081,6 @@
 
       const mobileSnapshot = buildMobileSnapshot(game, books);
 
-      const parlayLegsNow = loadParlayLegs();
-      const alreadyInParlay = parlayLegsNow.some(l => l.gameId === game.id);
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
           <div class="game-header">
@@ -1104,7 +1089,6 @@
               <span class="sport-tag ${tagClass}">${label}</span>
               <span class="game-time">${time}</span>
               ${edgeBadge}
-              <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlay ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlay ? '✓ Added' : '➕ Add to parlay'}</button>
             </div>
           </div>
           ${mobileSnapshot}
@@ -1385,76 +1369,6 @@
       }
     }
 
-    // ── Parlay integration ────────────────────────────────────────────────
-    function loadParlayLegs() {
-      try { return JSON.parse(localStorage.getItem('capy_parlay') || '[]'); } catch { return []; }
-    }
-    function saveParlayLegs(legs) {
-      localStorage.setItem('capy_parlay', JSON.stringify(legs));
-    }
-    function updateParlayNavCount() {
-      const legs = loadParlayLegs();
-      const count = legs.length;
-      const el = document.getElementById('parlay-nav-count');
-      const countEl = document.getElementById('parlay-count');
-      if (el) el.style.display = count > 0 ? 'inline-flex' : 'none';
-      if (countEl) countEl.textContent = count;
-    }
-    function showParlayToast(awayTeam, homeTeam) {
-      const toast = document.getElementById('parlay-toast');
-      if (!toast) return;
-      toast.querySelector('.toast-teams').textContent = `${awayTeam.split(' ').pop()} @ ${homeTeam.split(' ').pop()} added`;
-      toast.classList.add('show');
-      clearTimeout(toast._timer);
-      toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
-    }
-    function addToParlayFromGame(gameId) {
-      const game = allGames.find(g => g.id === gameId);
-      if (!game) return;
-      const bestBook = getBestBookForGame(game);
-      if (!bestBook) return;
-
-      // Get the other side's odds for EV calculation
-      let otherSideOdds = null;
-      BOOK_KEYS.forEach((k, i) => {
-        const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
-                     game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
-        if (!book) return;
-        const h2h = book.markets?.find(m => m.key === 'h2h');
-        const other = h2h?.outcomes?.find(o => o.name !== bestBook.side);
-        if (other && (otherSideOdds === null || other.price > otherSideOdds)) otherSideOdds = other.price;
-      });
-
-      const leg = {
-        gameId: game.id,
-        sideType: bestBook.side === game.home_team ? 'home_ml' : 'away_ml',
-        side: bestBook.side,
-        market: 'h2h',
-        odds: bestBook.price,
-        point: null,
-        homeTeam: game.home_team,
-        awayTeam: game.away_team,
-        sportKey: game.sport_key,
-        commenceTime: game.commence_time,
-        bookName: bestBook.bookName,
-        otherSideOdds,
-      };
-
-      let legs = loadParlayLegs();
-      legs = legs.filter(l => l.gameId !== gameId);
-      if (legs.length < 10) {
-        legs.push(leg);
-        saveParlayLegs(legs);
-        updateParlayNavCount();
-        showParlayToast(game.away_team, game.home_team);
-        // Update button state
-        const btn = document.getElementById('parlay-btn-' + gameId);
-        if (btn) { btn.textContent = '✓ Added'; btn.classList.add('added'); }
-      }
-    }
-    // Init parlay count on load
-    updateParlayNavCount();
-
     // ── Theme toggle ─────────────────────────────────────────────────────
     function toggleTheme() {
       const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -1468,10 +1382,6 @@
       if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
     })();
   </script>
-
-  <div class="parlay-toast" id="parlay-toast">
-    🎰 <span class="toast-teams"></span> · <a href="/parlay.html">View parlay →</a>
-  </div>
 
 </body>
 </html>
