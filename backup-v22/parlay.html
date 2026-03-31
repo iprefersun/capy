@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parlay Builder | Capy</title>
+  <meta name="description" content="Build winning parlays from today's best edges. Capy auto-builds the top parlay — customize it or bet it as-is." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,900;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --amber: #BA7517;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --amber-mid: #EF9F27;
+      --green: #1D9E75;
+      --green-light: #EAF3DE;
+      --green-dark: #27500A;
+      --red: #D85A30;
+      --red-light: #FAECE7;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --text-hint: #9b9b9b;
+      --border: rgba(0,0,0,0.09);
+      --border-mid: rgba(0,0,0,0.15);
+      --surface: #fff;
+      --surface-2: #f7f6f3;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: #f5f4f1; line-height: 1.5; }
+
+    /* NAV */
+    nav { background: var(--surface); border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1300px; margin: 0 auto; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
+    .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-link { font-size: 13px; color: var(--text-muted); text-decoration: none; padding: 5px 8px; border-radius: 6px; transition: background 0.12s; }
+    .nav-link:hover { background: var(--surface-2); color: var(--text); }
+    .nav-link.active { color: var(--green); font-weight: 600; }
+    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
+    .btn-small { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 6px; border: none; background: var(--amber); color: #fff; cursor: pointer; text-decoration: none; }
+    .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; flex-shrink: 0; padding: 0; line-height: 1; }
+    .theme-toggle-btn:hover { opacity: 0.8; }
+
+    /* MAIN */
+    .main { max-width: 1300px; margin: 0 auto; padding: 1.5rem; padding-bottom: 100px; }
+
+    /* PAGE HEADER */
+    .parlay-page-header { margin-bottom: 1.5rem; }
+    .parlay-page-title { font-family: 'Fraunces', serif; font-size: clamp(24px, 4vw, 36px); font-weight: 900; color: var(--text); line-height: 1.1; }
+    .parlay-page-sub { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+    /* LAYOUT */
+    .parlay-layout { display: grid; grid-template-columns: 60fr 40fr; gap: 1.25rem; align-items: start; }
+
+    /* SPORT TABS */
+    .sport-tabs { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .sport-tab { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
+    .sport-tab:hover { border-color: var(--green); color: var(--green); }
+    .sport-tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+    /* SECTION LABEL */
+    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-hint); margin-bottom: 10px; }
+
+    /* LEFT COLUMN */
+    .parlay-left { display: flex; flex-direction: column; }
+    .left-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+    .leg-count-note { font-size: 12px; color: var(--text-hint); }
+
+    /* GAME SELECTOR CARDS */
+    .game-selector-list { display: flex; flex-direction: column; gap: 8px; }
+    .selector-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; transition: border-color 0.15s, box-shadow 0.15s; }
+    .selector-card.selected { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-light); }
+    .selector-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .selector-teams { font-size: 14px; font-weight: 600; color: var(--text); }
+    .selector-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+    .selector-time { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-hint); }
+    .selector-edge { font-size: 11px; font-weight: 700; background: var(--green-light); color: var(--green-dark); padding: 2px 7px; border-radius: 20px; }
+    .selector-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .leg-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--border-mid); background: var(--surface-2); color: var(--text-muted); cursor: pointer; transition: all 0.12s; white-space: nowrap; }
+    .leg-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+    .leg-btn.selected-btn { border-color: var(--green); background: var(--green); color: #fff; }
+    .leg-btn .check { margin-right: 4px; }
+
+    /* SKELETON */
+    .skeleton-row { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px; animation: pulse-skeleton 1.4s ease infinite; }
+    .skeleton-line { background: var(--border-mid); border-radius: 4px; height: 12px; margin-bottom: 8px; }
+    @keyframes pulse-skeleton { 0%,100%{opacity:1} 50%{opacity:0.45} }
+
+    /* RIGHT COLUMN */
+    .parlay-right { display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 72px; }
+
+    /* SUGGESTED PARLAY CARD */
+    .suggested-card { background: #0f1117; border-radius: var(--radius); padding: 1.25rem; }
+    .suggested-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .suggested-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 900; color: #eeedf0; margin-bottom: 4px; }
+    .suggested-conf { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 12px; }
+    .suggested-legs-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .suggested-leg { background: rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .suggested-leg-teams { font-size: 12px; font-weight: 600; color: #eeedf0; margin-bottom: 3px; }
+    .suggested-leg-pick { font-size: 13px; font-weight: 700; color: #22c48a; }
+    .suggested-leg-book { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .suggested-odds-block { text-align: center; margin-bottom: 12px; }
+    .suggested-odds-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 2px; }
+    .suggested-odds-num { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 700; color: #22c48a; line-height: 1; }
+    .suggested-btns { display: flex; gap: 8px; }
+    .btn-copy-parlay { flex: 1; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 9px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.2); background: transparent; color: #eeedf0; cursor: pointer; transition: background 0.12s; }
+    .btn-copy-parlay:hover { background: rgba(255,255,255,0.08); }
+    .btn-bet-suggested { flex: 1; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 9px; border-radius: 6px; border: none; background: #22c48a; color: #fff; cursor: pointer; text-decoration: none; display: block; text-align: center; transition: opacity 0.12s; }
+    .btn-bet-suggested:hover { opacity: 0.88; }
+
+    /* CUSTOM SUMMARY CARD */
+    .summary-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+    .summary-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 900; color: var(--text); margin-bottom: 12px; }
+    .summary-empty { font-size: 14px; color: var(--text-muted); text-align: center; padding: 24px 0; }
+    .summary-legs { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .summary-leg { background: var(--surface-2); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .summary-leg-left { flex: 1; min-width: 0; }
+    .summary-leg-teams { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .summary-leg-pick { font-size: 13px; font-weight: 700; color: var(--text); }
+    .summary-leg-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+    .summary-leg-book { font-size: 11px; color: var(--text-hint); }
+    .ev-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; cursor: help; white-space: nowrap; }
+    .ev-strong { background: var(--green-light); color: var(--green-dark); }
+    .ev-pos    { background: var(--green-light); color: var(--green); }
+    .ev-neutral{ background: var(--surface-2); color: var(--text-muted); }
+    .ev-neg    { background: var(--red-light); color: var(--red); }
+    .kelly-line { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .ev-warning { font-size: 11px; font-weight: 600; color: var(--red); background: var(--red-light); padding: 6px 10px; border-radius: 6px; margin-top: 6px; }
+    .combined-ev { font-size: 13px; font-weight: 700; margin-top: 6px; }
+    /* EV explanation section */
+    .ev-explainer { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); margin-top: 1rem; overflow: hidden; }
+    .ev-explainer-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); background: none; border: none; cursor: pointer; text-align: left; }
+    .ev-explainer-toggle:hover { background: var(--surface-2); }
+    .ev-explainer-body { padding: 0 18px 18px; display: none; }
+    .ev-explainer-body.open { display: block; }
+    .ev-scale { display: flex; height: 20px; border-radius: 6px; overflow: hidden; margin: 12px 0 4px; }
+    .ev-scale-pos { flex: 1; background: var(--green); }
+    .ev-scale-neg { flex: 1; background: var(--red-light); }
+    .ev-scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-hint); margin-bottom: 12px; }
+    .ev-faq { margin-top: 14px; }
+    .ev-faq-item { border-top: 0.5px solid var(--border); }
+    .ev-faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px 0; font-size: 13px; font-weight: 600; color: var(--text); background: none; border: none; cursor: pointer; text-align: left; }
+    .ev-faq-a { font-size: 13px; color: var(--text-muted); padding-bottom: 10px; line-height: 1.55; display: none; }
+    .ev-faq-a.open { display: block; }
+    .ev-disclaimer { font-size: 11px; color: var(--text-hint); font-style: italic; margin-top: 1rem; line-height: 1.5; }
+    .summary-leg-right { text-align: right; flex-shrink: 0; }
+    .summary-leg-odds { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--green); }
+    .remove-leg-btn { font-size: 16px; color: var(--text-hint); background: none; border: none; cursor: pointer; padding: 0; line-height: 1; margin-top: 1px; }
+    .remove-leg-btn:hover { color: var(--red); }
+
+    /* COMBINED ODDS DISPLAY */
+    .combined-block { background: var(--surface-2); border-radius: var(--radius-sm); padding: 12px; text-align: center; margin-bottom: 12px; }
+    .combined-label { font-size: 11px; color: var(--text-hint); margin-bottom: 4px; }
+    .combined-odds { font-family: 'DM Mono', monospace; font-size: 40px; font-weight: 700; color: var(--green); line-height: 1; }
+    .combined-decimal { font-size: 12px; color: var(--text-hint); margin-top: 4px; }
+
+    /* PAYOUT CALC */
+    .payout-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .payout-label { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; }
+    .payout-input { flex: 1; font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 600; padding: 8px 12px; border: 1.5px solid var(--border-mid); border-radius: 6px; background: var(--surface); color: var(--text); outline: none; }
+    .payout-input:focus { border-color: var(--green); }
+    .payout-result { font-size: 14px; font-weight: 700; color: var(--green); text-align: right; white-space: nowrap; }
+
+    /* ACTION BUTTONS */
+    .summary-actions { display: flex; gap: 8px; }
+    .btn-clear { flex: 1; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 9px; border-radius: 6px; border: 1.5px solid var(--border-mid); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
+    .btn-clear:hover { border-color: var(--red); color: var(--red); }
+    .btn-bet-parlay { flex: 2; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 9px; border-radius: 6px; border: none; background: var(--green); color: #fff; cursor: pointer; text-decoration: none; display: block; text-align: center; transition: opacity 0.12s; }
+    .btn-bet-parlay:hover { opacity: 0.88; }
+
+    /* MOBILE FIXED BAR */
+    .mobile-parlay-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1117; border-top: 1.5px solid rgba(255,255,255,0.1); padding: 12px 16px; z-index: 200; align-items: center; justify-content: space-between; gap: 12px; }
+    .mobile-bar-info { flex: 1; }
+    .mobile-bar-count { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .mobile-bar-odds { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 700; color: #22c48a; line-height: 1.2; }
+    .mobile-bar-btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: 6px; border: none; background: #22c48a; color: #fff; cursor: pointer; white-space: nowrap; text-decoration: none; }
+
+    /* EMPTY / LOADING */
+    .selector-empty { text-align: center; padding: 2rem; font-size: 14px; color: var(--text-muted); }
+
+    /* DARK MODE */
+    body, nav, .selector-card, .summary-card, .leg-btn, .sport-tab, .payout-input,
+    .combined-block { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+
+    [data-theme="dark"] {
+      --amber: #e8991e; --amber-light: #2d1f08; --amber-dark: #f5c87a;
+      --green: #22c48a; --green-light: #0a2118; --green-dark: #7dd9b4;
+      --red: #F07050; --red-light: #2a1009;
+      --text: #eeedf0; --text-muted: #9898a4; --text-hint: #505058;
+      --border: rgba(255,255,255,0.07); --border-mid: rgba(255,255,255,0.13);
+      --surface: #1a1d27; --surface-2: #13151f;
+    }
+    [data-theme="dark"] body { background: #0f1117; }
+    [data-theme="dark"] nav { background: #161920; border-color: rgba(255,255,255,0.07); }
+    [data-theme="dark"] .suggested-card { background: #1a1d27; border: 0.5px solid rgba(255,255,255,0.08); }
+    [data-theme="dark"] .suggested-leg { background: rgba(255,255,255,0.04); }
+    [data-theme="dark"] .mobile-parlay-bar { background: #13151f; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .parlay-layout { grid-template-columns: 1fr; }
+      .parlay-right { position: static; }
+      .mobile-parlay-bar { display: flex; }
+    }
+    @media (max-width: 600px) {
+      .main { padding: 1rem; }
+      .nav-inner { padding: 0.75rem 1rem; }
+      .selector-btns { gap: 4px; }
+      .leg-btn { font-size: 11px; padding: 5px 9px; }
+    }
+  </style>
+  <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="logo-mark">🐾</div>
+      Capy
+    </a>
+    <div class="nav-right">
+      <a href="/odds" class="nav-link">Live odds</a>
+      <a href="/parlay.html" class="nav-link active">Parlay</a>
+      <a href="/stats.html" class="nav-link">Stats</a>
+      <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
+      <a href="/#signup" class="btn-small">Go Pro</a>
+      <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+
+  <div class="parlay-page-header">
+    <div class="parlay-page-title">🦫 Capy Parlay Builder</div>
+    <div class="parlay-page-sub">We find the edges. You build the parlay.</div>
+  </div>
+
+  <div class="parlay-layout">
+
+    <!-- LEFT: GAME SELECTOR -->
+    <div class="parlay-left">
+      <div class="section-label">Today's games</div>
+      <div class="sport-tabs" id="sport-tabs">
+        <button class="sport-tab active" onclick="filterSport('all')">All</button>
+        <button class="sport-tab" onclick="filterSport('basketball_nba')">🏀 NBA</button>
+        <button class="sport-tab" onclick="filterSport('americanfootball_nfl')">🏈 NFL</button>
+        <button class="sport-tab" onclick="filterSport('baseball_mlb')">⚾ MLB</button>
+        <button class="sport-tab" onclick="filterSport('icehockey_nhl')">🏒 NHL</button>
+      </div>
+      <div class="left-header">
+        <span id="game-count-note" class="leg-count-note"></span>
+        <span class="leg-count-note" id="legs-count-note"></span>
+      </div>
+      <div id="game-selector">
+        <div class="skeleton-row"><div class="skeleton-line" style="width:60%"></div><div class="skeleton-line" style="width:40%"></div></div>
+        <div class="skeleton-row"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:35%"></div></div>
+        <div class="skeleton-row"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:45%"></div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: SUGGESTED + SUMMARY -->
+    <div class="parlay-right">
+
+      <!-- CAPY'S SUGGESTED PARLAY -->
+      <div class="suggested-card" id="suggested-card">
+        <div class="suggested-label">🦫 Capy's Pick — Updated every 60 seconds</div>
+        <div class="suggested-title">Building your parlay...</div>
+        <div class="suggested-conf"></div>
+      </div>
+
+      <!-- CUSTOM PARLAY SUMMARY -->
+      <div class="summary-card">
+        <div class="summary-title">Your Custom Parlay</div>
+        <div id="parlay-summary-body">
+          <div class="summary-empty">Add games from the left to build your parlay 🦫</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EV EXPLAINER -->
+  <div class="ev-explainer" style="margin-top:1.5rem;">
+    <button class="ev-explainer-toggle" onclick="toggleEvExplainer(this)">
+      <span>What is Expected Value and why does it matter?</span>
+      <span class="ev-explainer-icon">▼</span>
+    </button>
+    <div class="ev-explainer-body">
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">Expected Value (EV) is the single most important concept in sports betting. It answers one question: is this bet mathematically profitable over the long run?</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">A bet is +EV when the odds you're getting are better than the true probability of the outcome. Sportsbooks build in a margin (called the 'vig' or 'juice') so most bets are actually -EV by default. Capy strips out the vig to find the true probability, then checks whether the best available line across all books beats it.</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">Example: If the true probability of the Lakers winning is 60%, but FanDuel is offering odds that imply only 55% — you're getting a better price than the market thinks is fair. That's +EV. Bet enough +EV spots and you'll be profitable long term.</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;">The Kelly Criterion takes this further — it tells you exactly how much of your bankroll to risk on each +EV bet to maximize long-term growth without going broke.</p>
+
+      <div style="margin-top:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">True probability vs. Implied probability from odds</div>
+        <div class="ev-scale">
+          <div class="ev-scale-pos" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">+EV (implied &lt; true)</div>
+          <div class="ev-scale-neg" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--red);">-EV (implied &gt; true)</div>
+        </div>
+        <div class="ev-scale-labels">
+          <span>You're getting better price than market</span>
+          <span>Market is pricing you out</span>
+        </div>
+      </div>
+
+      <div class="ev-faq">
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>Why do I need to remove the vig?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Books price both sides so they profit regardless of outcome. The vig inflates implied probabilities. Removing it reveals the true market price.</div>
+        </div>
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>What EV % should I look for?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Anything above +2% is strong. Even +1% adds up over hundreds of bets. Avoid -EV bets.</div>
+        </div>
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>Is Kelly Criterion safe to use?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Kelly maximizes long-term growth but can suggest large bets on high-confidence edges. Many bettors use Half-Kelly (half the suggested %) to be more conservative.</div>
+        </div>
+      </div>
+
+      <p class="ev-disclaimer">EV calculations are estimates based on market-implied probabilities. Past performance does not guarantee future results. Bet responsibly.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- MOBILE FIXED BAR -->
+<div class="mobile-parlay-bar" id="mobile-parlay-bar">
+  <div class="mobile-bar-info">
+    <div class="mobile-bar-count" id="mobile-bar-count">0 legs selected</div>
+    <div class="mobile-bar-odds" id="mobile-bar-odds">—</div>
+  </div>
+  <a href="#parlay-summary-anchor" class="mobile-bar-btn" onclick="scrollToSummary()">View parlay →</a>
+</div>
+
+<script>
+  const BETONLINE_URL = 'https://record.betonlineaffiliates.ag/_otQU8R9fzqnYJMJFEJBL7mNd7ZgqdRLk/1/';
+
+  const BOOKS = ['FanDuel','DraftKings','BetMGM','BetRivers','BetOnline.ag'];
+  const BOOK_KEYS = ['fanduel','draftkings','betmgm','betrivers','betonlineag'];
+  const BOOK_URLS = {
+    'fanduel': 'https://fanduel.com',
+    'draftkings': 'https://draftkings.com',
+    'betmgm': 'https://betmgm.com',
+    'betrivers': 'https://betrivers.com',
+    'betonlineag': BETONLINE_URL,
+  };
+  const SPORT_EMOJIS = {
+    basketball_nba: '🏀', americanfootball_nfl: '🏈',
+    baseball_mlb: '⚾', icehockey_nhl: '🏒',
+  };
+  const SPORT_LABELS = {
+    basketball_nba: 'NBA', americanfootball_nfl: 'NFL',
+    baseball_mlb: 'MLB', icehockey_nhl: 'NHL',
+  };
+
+  let allGamesData = []; // all fetched games (all sports)
+  let parlayLegs = [];   // user's selected legs
+  let currentFilter = 'all';
+  let betAmount = 100;
+
+  // ── Odds math ──────────────────────────────────────────────────────────
+  function amToDecimal(american) {
+    if (american > 0) return american / 100 + 1;
+    return 100 / Math.abs(american) + 1;
+  }
+  function decimalToAm(decimal) {
+    if (decimal >= 2) return Math.round((decimal - 1) * 100);
+    return Math.round(-100 / (decimal - 1));
+  }
+  function fmtAm(american) {
+    return american > 0 ? `+${american}` : `${american}`;
+  }
+  function calcParlayDecimal(legs) {
+    if (!legs.length) return 1;
+    return legs.reduce((acc, l) => acc * amToDecimal(l.odds), 1);
+  }
+  function amToImpliedProb(american) {
+    if (american > 0) return 100 / (american + 100);
+    return Math.abs(american) / (Math.abs(american) + 100);
+  }
+  // Returns { evPct, fairProb, kelly } for a leg (needs otherSideOdds for fair prob calc)
+  function calcLegEV(selectedOdds, otherSideOdds) {
+    if (!otherSideOdds) return null;
+    const imp1 = amToImpliedProb(selectedOdds);
+    const imp2 = amToImpliedProb(otherSideOdds);
+    const total = imp1 + imp2;
+    const fairProb = imp1 / total;
+    const decimal = amToDecimal(selectedOdds);
+    const evPct = parseFloat((((fairProb * (decimal - 1)) - (1 - fairProb)) * 100).toFixed(1));
+    const kellyRaw = (fairProb * (decimal - 1) - (1 - fairProb)) / (decimal - 1);
+    const kelly = parseFloat((Math.min(kellyRaw * 100, 25)).toFixed(1));
+    return { evPct, fairProb, kelly };
+  }
+  function classifyEV(evPct) {
+    const sign = evPct > 0 ? '+' : '';
+    const label = `${sign}${evPct.toFixed(1)}%`;
+    if (evPct > 3)  return { label, cls: 'ev-strong', emoji: '🔥', full: '🔥 Strong +EV' };
+    if (evPct >= 1) return { label, cls: 'ev-pos',    emoji: '✅', full: '✅ +EV' };
+    if (evPct >= -1)return { label, cls: 'ev-neutral', emoji: '➖', full: '➖ Neutral' };
+    return           { label, cls: 'ev-neg',    emoji: '⚠️', full: '⚠️ -EV' };
+  }
+
+  // ── Edge calc ──────────────────────────────────────────────────────────
+  function calcEdgeForGame(game) {
+    let best = -Infinity, worst = Infinity, count = 0;
+    BOOK_KEYS.forEach(k => {
+      const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
+                   game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
+      if (!book) return;
+      const spreads = book.markets?.find(m => m.key === 'spreads');
+      spreads?.outcomes?.forEach(o => {
+        if (o.point != null) { best = Math.max(best, o.point); worst = Math.min(worst, o.point); count++; }
+      });
+    });
+    if (count >= 2 && isFinite(best) && isFinite(worst)) return parseFloat((best - worst).toFixed(1));
+    return 0;
+  }
+
+  function getBestBook(game) {
+    let best = null;
+    BOOK_KEYS.forEach((k, i) => {
+      const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
+                   game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
+      if (!book) return;
+      const h2h = book.markets?.find(m => m.key === 'h2h');
+      h2h?.outcomes?.forEach(o => {
+        if (!best || o.price > best.price) {
+          best = { bookName: BOOKS[i], bookKey: k, bookUrl: BOOK_URLS[k] || '#', price: o.price, side: o.name };
+        }
+      });
+    });
+    return best;
+  }
+
+  function getOddsForSide(game, side, market) {
+    let bestOdds = null;
+    BOOK_KEYS.forEach(k => {
+      const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
+                   game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
+      if (!book) return;
+      const mkt = book.markets?.find(m => m.key === market);
+      const outcome = mkt?.outcomes?.find(o => o.name === side);
+      if (outcome?.price != null) {
+        if (market === 'h2h') {
+          if (bestOdds === null || outcome.price > bestOdds) bestOdds = outcome.price;
+        } else if (market === 'spreads' && bestOdds === null) {
+          bestOdds = outcome.point;
+        }
+      }
+    });
+    return bestOdds;
+  }
+
+  function getBestBookForSide(game, side, market) {
+    let best = null;
+    BOOK_KEYS.forEach((k, i) => {
+      const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
+                   game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
+      if (!book) return;
+      const mkt = book.markets?.find(m => m.key === market);
+      const outcome = mkt?.outcomes?.find(o => o.name === side);
+      if (!outcome) return;
+      if (market === 'h2h') {
+        if (!best || outcome.price > best.price) {
+          best = { bookName: BOOKS[i], bookKey: k, bookUrl: BOOK_URLS[k] || '#', price: outcome.price };
+        }
+      } else if (market === 'spreads') {
+        if (!best) {
+          best = { bookName: BOOKS[i], bookKey: k, bookUrl: BOOK_URLS[k] || '#', price: outcome.price, point: outcome.point };
+        }
+      }
+    });
+    return best;
+  }
+
+  // ── LocalStorage ──────────────────────────────────────────────────────
+  function loadLegs() {
+    try { return JSON.parse(localStorage.getItem('capy_parlay') || '[]'); } catch { return []; }
+  }
+  function saveLegs(legs) {
+    localStorage.setItem('capy_parlay', JSON.stringify(legs));
+  }
+
+  // ── Parlay leg operations ─────────────────────────────────────────────
+  function addLeg(leg) {
+    parlayLegs = parlayLegs.filter(l => l.gameId !== leg.gameId);
+    if (parlayLegs.length >= 10) { alert('Maximum 10 legs per parlay.'); return; }
+    parlayLegs.push(leg);
+    saveLegs(parlayLegs);
+    renderAll();
+  }
+
+  function removeLeg(gameId) {
+    parlayLegs = parlayLegs.filter(l => l.gameId !== gameId);
+    saveLegs(parlayLegs);
+    renderAll();
+  }
+
+  function clearParlay() {
+    parlayLegs = [];
+    saveLegs([]);
+    renderAll();
+  }
+
+  function isLegSelected(gameId) {
+    return parlayLegs.some(l => l.gameId === gameId);
+  }
+
+  function getLegForGame(gameId) {
+    return parlayLegs.find(l => l.gameId === gameId) || null;
+  }
+
+  // ── Fetch data ────────────────────────────────────────────────────────
+  async function fetchAllGames() {
+    const sports = ['basketball_nba', 'americanfootball_nfl', 'baseball_mlb', 'icehockey_nhl'];
+    const results = await Promise.allSettled(
+      sports.map(s => fetch(`/api/odds?sport=${s}`).then(r => r.json()))
+    );
+    const games = [];
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled' && Array.isArray(r.value)) {
+        r.value.forEach(g => { if (!g.sport_key) g.sport_key = sports[i]; games.push(g); });
+      }
+    });
+    return games;
+  }
+
+  // ── Sport filter ──────────────────────────────────────────────────────
+  function filterSport(sport) {
+    currentFilter = sport;
+    document.querySelectorAll('.sport-tab').forEach(t => t.classList.remove('active'));
+    const tabs = { all: 0, basketball_nba: 1, americanfootball_nfl: 2, baseball_mlb: 3, icehockey_nhl: 4 };
+    document.querySelectorAll('.sport-tab')[tabs[sport] ?? 0]?.classList.add('active');
+    renderGameSelector();
+  }
+
+  // ── Render game selector (left column) ───────────────────────────────
+  function renderGameSelector() {
+    const container = document.getElementById('game-selector');
+    const filtered = currentFilter === 'all'
+      ? allGamesData
+      : allGamesData.filter(g => g.sport_key === currentFilter);
+
+    document.getElementById('game-count-note').textContent = `${filtered.length} game${filtered.length !== 1 ? 's' : ''} available`;
+    document.getElementById('legs-count-note').textContent = parlayLegs.length > 0
+      ? `${parlayLegs.length}/10 legs selected`
+      : '';
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="selector-empty">No games available for this sport right now. Check back closer to game time.</div>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(game => buildSelectorCard(game)).join('');
+  }
+
+  function buildSelectorCard(game) {
+    const sport = game.sport_key;
+    const emoji = SPORT_EMOJIS[sport] || '🎯';
+    const time = new Date(game.commence_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const edge = calcEdgeForGame(game);
+    const edgeBadge = edge > 0 ? `<span class="selector-edge">+${edge} pts</span>` : '';
+    const selected = isLegSelected(game.id);
+    const leg = getLegForGame(game.id);
+
+    const homeMlBook = getBestBookForSide(game, game.home_team, 'h2h');
+    const awayMlBook = getBestBookForSide(game, game.away_team, 'h2h');
+    const spreadBook = getBestBookForSide(game, game.home_team, 'spreads');
+
+    const homeMlOdds = homeMlBook ? fmtAm(homeMlBook.price) : '—';
+    const awayMlOdds = awayMlBook ? fmtAm(awayMlBook.price) : '—';
+    const spreadPt = spreadBook?.point != null ? (spreadBook.point >= 0 ? `+${spreadBook.point}` : `${spreadBook.point}`) : '—';
+
+    const homeSel = leg?.sideType === 'home_ml';
+    const awaySel = leg?.sideType === 'away_ml';
+    const spreadSel = leg?.sideType === 'spread_home';
+
+    const homeShort = game.home_team.split(' ').pop();
+    const awayShort = game.away_team.split(' ').pop();
+
+    const homeBtnCls = homeSel ? 'leg-btn selected-btn' : 'leg-btn';
+    const awayBtnCls = awaySel ? 'leg-btn selected-btn' : 'leg-btn';
+    const spreadBtnCls = spreadSel ? 'leg-btn selected-btn' : 'leg-btn';
+
+    return `<div class="selector-card${selected ? ' selected' : ''}" data-gameid="${game.id}">
+      <div class="selector-card-header">
+        <div>
+          <div class="selector-teams">${emoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;font-size:12px;">@</span> ${game.home_team}</div>
+          <div class="selector-meta">
+            <span class="selector-time">${time}</span>
+            ${edgeBadge}
+          </div>
+        </div>
+      </div>
+      <div class="selector-btns">
+        ${homeMlBook ? `<button class="${homeBtnCls}" onclick="selectLeg('${game.id}','home_ml')">${homeSel ? '<span class="check">✓</span>' : ''}${homeShort} ML ${homeMlOdds}</button>` : ''}
+        ${awayMlBook ? `<button class="${awayBtnCls}" onclick="selectLeg('${game.id}','away_ml')">${awaySel ? '<span class="check">✓</span>' : ''}${awayShort} ML ${awayMlOdds}</button>` : ''}
+        ${spreadBook ? `<button class="${spreadBtnCls}" onclick="selectLeg('${game.id}','spread_home')">${spreadSel ? '<span class="check">✓</span>' : ''}${homeShort} ${spreadPt}</button>` : ''}
+      </div>
+    </div>`;
+  }
+
+  function selectLeg(gameId, sideType) {
+    const game = allGamesData.find(g => g.id === gameId);
+    if (!game) return;
+
+    const existingLeg = getLegForGame(gameId);
+    if (existingLeg && existingLeg.sideType === sideType) {
+      removeLeg(gameId);
+      return;
+    }
+
+    let side, market, odds, point, otherSideOdds, bookName;
+
+    if (sideType === 'home_ml') {
+      const b = getBestBookForSide(game, game.home_team, 'h2h');
+      if (!b) return;
+      side = game.home_team; market = 'h2h'; odds = b.price; bookName = b.bookName;
+      otherSideOdds = getOddsForSide(game, game.away_team, 'h2h');
+    } else if (sideType === 'away_ml') {
+      const b = getBestBookForSide(game, game.away_team, 'h2h');
+      if (!b) return;
+      side = game.away_team; market = 'h2h'; odds = b.price; bookName = b.bookName;
+      otherSideOdds = getOddsForSide(game, game.home_team, 'h2h');
+    } else if (sideType === 'spread_home') {
+      const b = getBestBookForSide(game, game.home_team, 'spreads');
+      if (!b) return;
+      side = game.home_team; market = 'spreads'; odds = b.price ?? -110; point = b.point; bookName = b.bookName;
+      otherSideOdds = null;
+    }
+
+    addLeg({
+      gameId, sideType, side, market, odds, point: point ?? null,
+      homeTeam: game.home_team, awayTeam: game.away_team,
+      sportKey: game.sport_key, commenceTime: game.commence_time,
+      bookName: bookName || '—', otherSideOdds: otherSideOdds ?? null,
+    });
+  }
+
+  // ── Render suggested parlay (right column top) ────────────────────────
+  function buildSuggestedParlay() {
+    const sorted = [...allGamesData]
+      .filter(g => g.bookmakers?.length > 0)
+      .sort((a, b) => calcEdgeForGame(b) - calcEdgeForGame(a))
+      .slice(0, 3);
+
+    return sorted.map(game => {
+      const bestBook = getBestBook(game);
+      if (!bestBook) return null;
+      const edge = calcEdgeForGame(game);
+      const emoji = SPORT_EMOJIS[game.sport_key] || '🎯';
+      return {
+        gameId: game.id,
+        homeTeam: game.home_team,
+        awayTeam: game.away_team,
+        sportKey: game.sport_key,
+        commenceTime: game.commence_time,
+        side: bestBook.side,
+        sideType: bestBook.side === game.home_team ? 'home_ml' : 'away_ml',
+        market: 'h2h',
+        odds: bestBook.price,
+        bookName: bestBook.bookName,
+        bookUrl: bestBook.bookUrl,
+        otherSideOdds: getOddsForSide(game, bestBook.side === game.home_team ? game.away_team : game.home_team, 'h2h'),
+        edge,
+        emoji,
+        teamsLabel: `${emoji} ${game.away_team} @ ${game.home_team}`,
+      };
+    }).filter(Boolean);
+  }
+
+  function renderSuggested(suggested) {
+    const card = document.getElementById('suggested-card');
+    if (!suggested || !suggested.length) {
+      card.innerHTML = `<div class="suggested-label">🦫 Capy's Pick</div><div class="suggested-title">No strong edges found right now</div><div class="suggested-conf" style="color:rgba(255,255,255,0.4)">Check back when more games are live.</div>`;
+      return;
+    }
+
+    const combinedDecimal = suggested.reduce((acc, l) => acc * amToDecimal(l.odds), 1);
+    const combinedAm = decimalToAm(combinedDecimal);
+    const avgEdge = suggested.reduce((a, l) => a + l.edge, 0) / suggested.length;
+    const confLabel = avgEdge >= 4 ? '🔥 Strong Parlay' : '✅ Good Value Parlay';
+
+    // Compute combined EV for suggested parlay
+    let combinedEvPct = 0;
+    let hasAllEV = true;
+    const legItems = suggested.map(l => {
+      const oddsStr = fmtAm(l.odds);
+      const sideShort = l.side.split(' ').pop();
+      const evData = l.otherSideOdds ? calcLegEV(l.odds, l.otherSideOdds) : null;
+      let evHtml = '', kellyHtml = '';
+      if (evData) {
+        const evInfo = classifyEV(evData.evPct);
+        evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg">${evInfo.emoji} ${evInfo.label}</span>`;
+        kellyHtml = evData.kelly > 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;">Kelly: ${evData.kelly}%</span>` : '';
+        const legEVDecimal = (evData.evPct / 100) + 1;
+        combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
+      } else { hasAllEV = false; }
+      return `<div class="suggested-leg">
+        <div class="suggested-leg-teams">${l.teamsLabel}</div>
+        <div class="suggested-leg-pick">${sideShort} ML ${oddsStr}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">${evHtml}${kellyHtml}</div>
+        <div class="suggested-leg-book">Best at ${l.bookName}</div>
+      </div>`;
+    }).join('');
+
+    const combinedEvDisplay = hasAllEV && suggested.length > 0
+      ? (() => { const e = classifyEV(combinedEvPct); return `<div style="font-size:12px;margin-top:8px;color:rgba(255,255,255,0.6);">Combined EV: <span class="${e.cls}" style="font-weight:700;">${e.emoji} ${e.label}</span></div>`; })()
+      : '';
+
+    card.innerHTML = `
+      <div class="suggested-label">🦫 Capy's Pick — Updated every 60 seconds</div>
+      <div class="suggested-title">${confLabel}</div>
+      <div class="suggested-conf">${suggested.length}-leg parlay · Top edges today</div>
+      <div class="suggested-odds-block">
+        <div class="suggested-odds-label">Combined odds</div>
+        <div class="suggested-odds-num">${fmtAm(combinedAm)}</div>
+        ${combinedEvDisplay}
+      </div>
+      <div class="suggested-legs-list">${legItems}</div>
+      <div class="suggested-btns">
+        <button class="btn-copy-parlay" onclick="copySuggestedParlay()">Copy to builder</button>
+        <a href="${BETONLINE_URL}" target="_blank" rel="noopener" class="btn-bet-suggested">Bet this parlay →</a>
+      </div>`;
+
+    // Store suggested for copy operation
+    card._suggestedLegs = suggested;
+  }
+
+  function copySuggestedParlay() {
+    const card = document.getElementById('suggested-card');
+    const legs = card._suggestedLegs;
+    if (!legs) return;
+    parlayLegs = legs.map(l => ({
+      gameId: l.gameId, sideType: l.sideType, side: l.side,
+      market: l.market, odds: l.odds, point: null,
+      homeTeam: l.homeTeam, awayTeam: l.awayTeam,
+      sportKey: l.sportKey, commenceTime: l.commenceTime,
+      bookName: l.bookName, otherSideOdds: l.otherSideOdds,
+    }));
+    saveLegs(parlayLegs);
+    renderAll();
+  }
+
+  // ── Render custom parlay summary (right column bottom) ────────────────
+  function renderSummary() {
+    const body = document.getElementById('parlay-summary-body');
+
+    if (!parlayLegs.length) {
+      body.innerHTML = '<div class="summary-empty">Add games from the left to build your parlay 🦫</div>';
+      return;
+    }
+
+    let combinedEvPct = 0;
+    let hasAllEV = true;
+    let combinedFairProb = 1;
+
+    const legItems = parlayLegs.map(leg => {
+      const sideShort = leg.side.split(' ').pop();
+      const oddsStr = fmtAm(leg.odds);
+      const spreadStr = leg.point != null ? ` (${leg.point >= 0 ? '+' : ''}${leg.point})` : '';
+      const pickStr = leg.market === 'spreads' ? `${sideShort}${spreadStr}` : `${sideShort} ML`;
+      const teamsStr = `${leg.awayTeam.split(' ').pop()} @ ${leg.homeTeam.split(' ').pop()}`;
+
+      let evHtml = '', kellyHtml = '', warnHtml = '';
+      if (leg.market === 'h2h' && leg.otherSideOdds) {
+        const evData = calcLegEV(leg.odds, leg.otherSideOdds);
+        if (evData) {
+          const evInfo = classifyEV(evData.evPct);
+          evHtml = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line is mathematically profitable long term.">${evInfo.emoji} ${evInfo.label}</span>`;
+          if (evData.kelly > 0) {
+            kellyHtml = `<div class="kelly-line">Kelly: ${evData.kelly}% of bankroll</div>`;
+          }
+          if (evData.evPct < -1) {
+            warnHtml = `<div class="ev-warning">⚠️ This leg has negative expected value — it reduces your overall edge</div>`;
+          }
+          combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
+          combinedFairProb *= evData.fairProb;
+        } else { hasAllEV = false; }
+      } else { hasAllEV = false; }
+
+      return `<div class="summary-leg">
+        <div class="summary-leg-left">
+          <div class="summary-leg-teams">${teamsStr}</div>
+          <div class="summary-leg-pick">${pickStr}</div>
+          <div class="summary-leg-meta">
+            <span class="summary-leg-book">${leg.bookName}</span>
+            ${evHtml}
+          </div>
+          ${kellyHtml}
+          ${warnHtml}
+        </div>
+        <div class="summary-leg-right">
+          <div class="summary-leg-odds">${oddsStr}</div>
+          <button class="remove-leg-btn" onclick="removeLeg('${leg.gameId}')" title="Remove leg">×</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    const combinedDecimal = calcParlayDecimal(parlayLegs);
+    const combinedAm = decimalToAm(combinedDecimal);
+    const payout = (betAmount * combinedDecimal).toFixed(2);
+    const profit = ((betAmount * combinedDecimal) - betAmount).toFixed(2);
+
+    // Combined EV and Kelly for the whole parlay
+    let combinedEvBlock = '';
+    if (hasAllEV && parlayLegs.length > 0) {
+      const evInfo = classifyEV(combinedEvPct);
+      const kellyRaw = (combinedFairProb * (combinedDecimal - 1) - (1 - combinedFairProb)) / (combinedDecimal - 1);
+      const parlayKelly = Math.min(parseFloat((kellyRaw * 100).toFixed(1)), 25);
+      const kellyMsg = parlayKelly > 0
+        ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Kelly suggests: ${parlayKelly}% of bankroll for this parlay</div>`
+        : `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">No edge — skip this bet</div>`;
+      combinedEvBlock = `
+        <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">Combined EV: <span class="ev-badge ${evInfo.cls}" style="font-size:11px;">${evInfo.emoji} ${evInfo.label}</span></div>
+        ${kellyMsg}
+        <div style="font-size:10px;color:var(--text-hint);margin-top:3px;font-style:italic;">Parlay EV compounds — each leg must be +EV for the parlay to be +EV overall</div>`;
+    }
+
+    body.innerHTML = `
+      <div class="summary-legs">${legItems}</div>
+      <div class="combined-block">
+        <div class="combined-label">Combined parlay odds</div>
+        <div class="combined-odds">${fmtAm(combinedAm)}</div>
+        <div class="combined-decimal">${combinedDecimal.toFixed(2)}x decimal</div>
+        ${combinedEvBlock}
+      </div>
+      <div class="payout-row">
+        <span class="payout-label">Bet $</span>
+        <input type="number" class="payout-input" id="bet-amount-input" value="${betAmount}" min="1" oninput="updatePayout(this.value)" placeholder="100" />
+        <span class="payout-result" id="payout-display">→ $${payout}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-hint);margin-bottom:10px;">Profit: $${profit} · ${parlayLegs.length} leg${parlayLegs.length !== 1 ? 's' : ''}</div>
+      <div class="summary-actions">
+        <button class="btn-clear" onclick="clearParlay()">Clear parlay</button>
+        <a href="${BETONLINE_URL}" target="_blank" rel="noopener" class="btn-bet-parlay">Bet this parlay →</a>
+      </div>`;
+  }
+
+  function updatePayout(val) {
+    betAmount = parseFloat(val) || 0;
+    const combinedDecimal = calcParlayDecimal(parlayLegs);
+    const payout = (betAmount * combinedDecimal).toFixed(2);
+    const el = document.getElementById('payout-display');
+    if (el) el.textContent = `→ $${payout}`;
+  }
+
+  // ── Mobile bar ────────────────────────────────────────────────────────
+  function updateMobileBar() {
+    const count = parlayLegs.length;
+    document.getElementById('mobile-bar-count').textContent = `${count} leg${count !== 1 ? 's' : ''} selected`;
+    if (count > 0) {
+      const combinedDecimal = calcParlayDecimal(parlayLegs);
+      document.getElementById('mobile-bar-odds').textContent = fmtAm(decimalToAm(combinedDecimal));
+    } else {
+      document.getElementById('mobile-bar-odds').textContent = '—';
+    }
+  }
+
+  function scrollToSummary() {
+    document.querySelector('.parlay-right')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Full re-render ────────────────────────────────────────────────────
+  function renderAll() {
+    renderGameSelector();
+    renderSummary();
+    updateMobileBar();
+  }
+
+  // ── Dark mode ─────────────────────────────────────────────────────────
+  function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('capy_theme', next);
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = next === 'dark' ? '☀️' : '🌙';
+  }
+  (function() {
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  })();
+
+  // ── EV Explainer toggles ──────────────────────────────────────────────
+  function toggleEvExplainer(btn) {
+    const body = btn.closest('.ev-explainer').querySelector('.ev-explainer-body');
+    const icon = btn.querySelector('.ev-explainer-icon');
+    const isOpen = body.classList.toggle('open');
+    if (icon) icon.textContent = isOpen ? '▲' : '▼';
+  }
+  function toggleFaq(btn) {
+    const item = btn.closest('.ev-faq-item');
+    const ans = item.querySelector('.ev-faq-a');
+    const icon = btn.querySelector('.faq-icon');
+    const isOpen = ans.classList.toggle('open');
+    if (icon) icon.textContent = isOpen ? '−' : '+';
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────
+  async function init() {
+    parlayLegs = loadLegs();
+
+    try {
+      allGamesData = await fetchAllGames();
+    } catch (e) {
+      allGamesData = [];
+    }
+
+    const suggested = buildSuggestedParlay();
+    renderSuggested(suggested);
+    renderAll();
+
+    // Auto-refresh every 60 seconds
+    setInterval(async () => {
+      try { allGamesData = await fetchAllGames(); }
+      catch (e) { return; }
+      const s = buildSuggestedParlay();
+      renderSuggested(s);
+      renderGameSelector();
+    }, 60000);
+  }
+
+  init();
+</script>
+</body>
+</html>

@@ -1059,10 +1059,10 @@
     }
 
     // ── Capy's Picks ─────────────────────────────────────────────────────
-    function getPickConfidence(edge) {
-      if (edge > 6)  return { label: '🔥 Strong Pick',        cls: 'pick-conf-strong' };
-      if (edge >= 3) return { label: '✅ Good Value',          cls: 'pick-conf-good' };
-      return                { label: '📊 Best Available Line', cls: 'pick-conf-look' };
+    function getPickConfidence(evPct) {
+      if (evPct > 3)  return { label: '🔥 Strong Pick', cls: 'pick-conf-strong' };
+      if (evPct >= 1) return { label: '✅ Good Value',  cls: 'pick-conf-good' };
+      return                 { label: '📊 Best Available Line', cls: 'pick-conf-look' };
     }
 
     function getBestBookForGame(game) {
@@ -1088,27 +1088,26 @@
       const container = document.getElementById('picks-container');
       if (!allGames.length) { section.style.display = 'none'; return; }
 
-      // Only show games where at least one side has positive EV
-      const evGames = [...allGames]
-        .filter(g => gameHasPositiveEV(g))
-        .sort((a, b) => calcEdge(b) - calcEdge(a));
+      const sorted = [...allGames].sort((a, b) => calcEdge(b) - calcEdge(a));
+      const top3 = sorted.slice(0, 3);
+      if (!top3.length) { section.style.display = 'none'; return; }
 
       section.style.display = 'block';
       const hasAccess = !!userEmail;
-
-      if (!evGames.length) {
-        container.innerHTML = `<div style="font-size:14px;color:var(--text-muted);padding:1rem 0;">No strong +EV edges found right now — check back closer to game time when lines sharpen.</div>`;
-        return;
-      }
-
-      const top3 = evGames.slice(0, 3);
 
       const cards = top3.map((game, idx) => {
         const edgeInfo = calcEdgeInfo(game);
         const edge = edgeInfo.value;
         const bestBook = getBestBookForGame(game);
         if (!bestBook) return '';
-        const conf = getPickConfidence(edge);
+        const gameEVData = calcGameEV(game);
+        // Pick EV: use the side's EV that corresponds to the best pick
+        let pickEV = null;
+        if (gameEVData) {
+          pickEV = bestBook.side === game.home_team ? gameEVData.home.ev : gameEVData.away.ev;
+        }
+        const evPctForConf = pickEV !== null ? pickEV : (edgeInfo.type === 'spread' ? edge * 0.5 : 0);
+        const conf = getPickConfidence(evPctForConf);
         const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
         const label = SPORT_LABELS[game.sport_key] || game.sport_key;
         const oddsStr = bestBook.price > 0 ? `+${bestBook.price}` : `${bestBook.price}`;
@@ -1118,6 +1117,9 @@
           ? `${bestBook.bookName} has this spread ${edge} pts better than the worst available line — that's real money on the table.`
           : `${bestBook.bookName} has the best moneyline on this game — ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books.`;
         const isLocked = !hasAccess && idx > 0;
+        const evDisplay = pickEV !== null
+          ? (() => { const e = classifyEV(pickEV); return `<div class="pick-ev-num ${e.cls}" style="margin-bottom:2px;">${e.emoji} ${e.label}</div><div class="pick-ev-label">Expected Value</div>`; })()
+          : '';
 
         return `
           <div class="pick-card${isLocked ? ' locked-card' : ''}">
@@ -1132,6 +1134,7 @@
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
                 <div><div class="pick-rec">${recText}</div></div>
                 <div style="text-align:right;flex-shrink:0;">
+                  ${evDisplay}
                   ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts edge</div>` : ''}
                 </div>
               </div>
