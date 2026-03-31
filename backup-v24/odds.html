@@ -106,7 +106,7 @@
     .ev-strong { background: var(--green-light); color: var(--green-dark); }
     .ev-pos    { background: var(--green-light); color: var(--green); }
     .ev-neutral{ background: var(--surface-2);   color: var(--text-muted); }
-    .ev-neg    { background: transparent;          color: var(--text-hint); }
+    .ev-neg    { background: var(--red-light);    color: var(--red); }
     .ev-cell   { font-size: 9px; line-height: 1; margin-top: 3px; border-radius: 3px; padding: 1px 3px; display: inline-block; }
     .ev-game-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
     .ev-game-item { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
@@ -720,7 +720,7 @@
       if (evPct > 3)  return { label, cls: 'ev-strong', emoji: '🔥', full: `🔥 Strong +EV` };
       if (evPct >= 1) return { label, cls: 'ev-pos',    emoji: '✅', full: `✅ +EV` };
       if (evPct >= -1)return { label, cls: 'ev-neutral', emoji: '➖', full: `➖ Neutral` };
-      return           { label, cls: 'ev-neg',    emoji: '',    full: label };
+      return           { label, cls: 'ev-neg',    emoji: '⚠️', full: `⚠️ -EV` };
     }
     function calcEVFromOdds(americanOdds, fairProb) {
       const decimal = americanOdds > 0 ? americanOdds/100 + 1 : 100/Math.abs(americanOdds) + 1;
@@ -1074,12 +1074,10 @@
     }
 
     // ── Capy's Picks ─────────────────────────────────────────────────────
-    function getPickConfidence(edge, pickEV) {
-      if (pickEV > 0) {
-        if (edge > 6)  return { label: '🔥 Strong Pick', cls: 'pick-conf-strong' };
-        if (edge >= 3) return { label: '✅ Good Value',   cls: 'pick-conf-good' };
-      }
-      return { label: '📊 Best Available Line', cls: 'pick-conf-look' };
+    function getPickConfidence(edge) {
+      if (edge > 6)  return { label: '🔥 Strong Pick',        cls: 'pick-conf-strong' };
+      if (edge >= 3) return { label: '✅ Good Value',          cls: 'pick-conf-good' };
+      return                { label: '📊 Best Available Line', cls: 'pick-conf-look' };
     }
 
     function getBestBookForGame(game) {
@@ -1105,25 +1103,27 @@
       const container = document.getElementById('picks-container');
       if (!allGames.length) { section.style.display = 'none'; return; }
 
-      // Sort all games by best-side EV (highest first), show top 3 regardless of EV sign
-      const getBestEV = g => { const ev = calcGameEV(g); return ev ? Math.max(ev.home.ev, ev.away.ev) : -Infinity; };
-      const top3 = [...allGames]
-        .sort((a, b) => getBestEV(b) - getBestEV(a))
-        .slice(0, 3);
-
-      if (!top3.length) { section.style.display = 'none'; return; }
+      // Only show games where at least one side has positive EV
+      const evGames = [...allGames]
+        .filter(g => gameHasPositiveEV(g))
+        .sort((a, b) => calcEdge(b) - calcEdge(a));
 
       section.style.display = 'block';
       const hasAccess = !!userEmail;
+
+      if (!evGames.length) {
+        container.innerHTML = `<div style="font-size:14px;color:var(--text-muted);padding:1rem 0;">No strong +EV edges found right now — check back closer to game time when lines sharpen.</div>`;
+        return;
+      }
+
+      const top3 = evGames.slice(0, 3);
 
       const cards = top3.map((game, idx) => {
         const edgeInfo = calcEdgeInfo(game);
         const edge = edgeInfo.value;
         const bestBook = getBestBookForGame(game);
         if (!bestBook) return '';
-        const gameEVData = calcGameEV(game);
-        const pickEV = gameEVData ? Math.max(gameEVData.home.ev, gameEVData.away.ev) : -Infinity;
-        const conf = getPickConfidence(edge, pickEV);
+        const conf = getPickConfidence(edge);
         const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
         const label = SPORT_LABELS[game.sport_key] || game.sport_key;
         const oddsStr = bestBook.price > 0 ? `+${bestBook.price}` : `${bestBook.price}`;
