@@ -731,39 +731,11 @@
       const kelly = (fairProb * (decimal - 1) - (1 - fairProb)) / (decimal - 1);
       return Math.min(parseFloat((kelly * 100).toFixed(1)), 25);
     }
-    // Reference book priority for no-vig fair prob: sharpest/most liquid first
-    const EV_REF_PRIORITY = ['draftkings','fanduel','betmgm','betrivers','betonlineag'];
-
-    // Find the highest-priority book that has BOTH sides of h2h for a game
-    function getRefBook(game) {
-      for (const refKey of EV_REF_PRIORITY) {
-        const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(refKey)) ||
-                     game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(refKey.slice(0,5)));
-        if (!book) continue;
-        const h2h = book.markets?.find(m => m.key === 'h2h');
-        if (!h2h) continue;
-        const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
-        const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
-        if (homeO?.price != null && awayO?.price != null)
-          return { homePrice: homeO.price, awayPrice: awayO.price, bookName: book.title || refKey };
-      }
-      return null;
-    }
-
     // Returns { home, away } each: { ev, fairProb, bestOdds, bestBook } or null
     function calcGameEV(game) {
-      // Step 1: derive fair probs from single reference book (no circular reference)
-      const ref = getRefBook(game);
-      if (!ref) return null;
-
-      const impH = amToImpliedProb(ref.homePrice);
-      const impA = amToImpliedProb(ref.awayPrice);
-      const total = impH + impA;
-      const fairH = impH / total;
-      const fairA = impA / total;
-
-      // Step 2: find best available price per side across ALL books
       let bestHome = null, bestAway = null;
+      let sumImpH = 0, sumImpA = 0, pairCount = 0;
+
       BOOK_KEYS.forEach((k, i) => {
         const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
                      game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
@@ -772,24 +744,37 @@
         if (!h2h) return;
         const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
         const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
+        // Accumulate average implied probs — only from books pricing BOTH sides
+        if (homeO?.price != null && awayO?.price != null) {
+          sumImpH += amToImpliedProb(homeO.price);
+          sumImpA += amToImpliedProb(awayO.price);
+          pairCount++;
+        }
+        // Best available price per side (can come from different books)
         if (homeO?.price != null && (bestHome === null || homeO.price > bestHome.price))
           bestHome = { price: homeO.price, bookName: BOOKS[i] };
         if (awayO?.price != null && (bestAway === null || awayO.price > bestAway.price))
           bestAway = { price: awayO.price, bookName: BOOKS[i] };
       });
-      if (!bestHome || !bestAway) return null;
 
-      // Debug: log Suns/Magic if present, otherwise first game only
-      const isSunsMagic = game.home_team.includes('Magic') || game.away_team.includes('Suns') ||
-                          game.home_team.includes('Suns') || game.away_team.includes('Magic');
-      if (isSunsMagic || !calcGameEV._logged) {
-        if (!isSunsMagic) calcGameEV._logged = true;
+      if (!bestHome || !bestAway || pairCount === 0) return null;
+
+      // Fair prob from consensus market average — not from best lines (avoids circular reference)
+      const avgImpH = sumImpH / pairCount;
+      const avgImpA = sumImpA / pairCount;
+      const total = avgImpH + avgImpA;
+      const fairH = avgImpH / total;
+      const fairA = avgImpA / total;
+
+      // Debug: log first game only
+      if (!calcGameEV._logged) {
+        calcGameEV._logged = true;
         console.log('[Capy EV Debug]', game.away_team, '@', game.home_team);
-        console.log('  Reference book:', ref.bookName, '| Home:', ref.homePrice, '| Away:', ref.awayPrice);
-        console.log('  Implied home:', impH.toFixed(4), '| Implied away:', impA.toFixed(4));
-        console.log('  Sum (pre-norm):', total.toFixed(4), '→ vig:', ((total - 1) * 100).toFixed(2) + '%');
+        console.log('  Best home odds:', bestHome.price, 'at', bestHome.bookName);
+        console.log('  Best away odds:', bestAway.price, 'at', bestAway.bookName);
+        console.log('  Avg implied home:', avgImpH.toFixed(4), '| Avg implied away:', avgImpA.toFixed(4));
+        console.log('  Sum implied (pre-norm):', total.toFixed(4), '→ vig:', ((total - 1) * 100).toFixed(2) + '%');
         console.log('  Fair prob home:', fairH.toFixed(4), '| Fair prob away:', fairA.toFixed(4));
-        console.log('  Best home:', bestHome.price, 'at', bestHome.bookName, '| Best away:', bestAway.price, 'at', bestAway.bookName);
         console.log('  EV home:', calcEVFromOdds(bestHome.price, fairH).toFixed(1) + '%', '| EV away:', calcEVFromOdds(bestAway.price, fairA).toFixed(1) + '%');
       }
 
@@ -1381,17 +1366,29 @@
       const sides = market === 'totals' ? ['Over','Under'] : [game.away_team, game.home_team];
       if (!sides[0]) return '';
 
-      // Pre-compute fair probs for EV (h2h only) — use reference book, not average
+      // Pre-compute fair probs for EV (h2h only) — use average market, not best lines
       const fairProbs = {};
       if (market === 'h2h') {
-        const ref = getRefBook(game);
-        if (ref) {
-          const imp0 = amToImpliedProb(ref.homePrice);
-          const imp1 = amToImpliedProb(ref.awayPrice);
-          const tot = imp0 + imp1;
-          // sides = [away_team, home_team], ref has homePrice/awayPrice
-          fairProbs[game.home_team] = imp0 / tot;
-          fairProbs[game.away_team] = imp1 / tot;
+        const sumImp = { [sides[0]]: 0, [sides[1]]: 0 };
+        let pairCnt = 0;
+        books.forEach(book => {
+          if (!book) return;
+          const h2h = book.markets?.find(m => m.key === 'h2h');
+          if (!h2h) return;
+          const o0 = h2h.outcomes?.find(o => o.name === sides[0]);
+          const o1 = h2h.outcomes?.find(o => o.name === sides[1]);
+          if (o0?.price != null && o1?.price != null) {
+            sumImp[sides[0]] += amToImpliedProb(o0.price);
+            sumImp[sides[1]] += amToImpliedProb(o1.price);
+            pairCnt++;
+          }
+        });
+        if (pairCnt > 0) {
+          const avg0 = sumImp[sides[0]] / pairCnt;
+          const avg1 = sumImp[sides[1]] / pairCnt;
+          const tot = avg0 + avg1;
+          fairProbs[sides[0]] = avg0 / tot;
+          fairProbs[sides[1]] = avg1 / tot;
         }
       }
 

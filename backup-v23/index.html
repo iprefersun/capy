@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capy — Stop Losing Money on Bad Lines</title>
+  <meta name="description" content="Real-time odds comparison across every major sportsbook. Always know where the best number lives — before it's gone." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber: #BA7517;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --amber-mid: #EF9F27;
+      --green: #1D9E75;
+      --green-light: #EAF3DE;
+      --green-dark: #27500A;
+      --red-light: #FAECE7;
+      --red-dark: #993C1D;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --text-hint: #9b9b9b;
+      --border: rgba(0,0,0,0.1);
+      --border-mid: rgba(0,0,0,0.15);
+      --surface: #fff;
+      --surface-2: #f7f6f3;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #fafaf8;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 0.5px solid var(--border);
+      background: #fafaf8;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--amber-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+
+    .nav-link:hover { background: var(--surface-2); color: var(--text); }
+
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary { background: var(--amber); color: #fff; }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-outline {
+      background: none;
+      border: 1.5px solid var(--border-mid);
+      color: var(--text);
+    }
+    .btn-outline:hover { background: var(--surface-2); }
+
+    /* HERO */
+    .hero {
+      padding: 5rem 0 3rem;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--amber-dark);
+      background: var(--amber-light);
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+    }
+
+    .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--amber);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero-capy {
+      font-size: 80px;
+      line-height: 1;
+      display: block;
+      margin-bottom: 1.25rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .hero h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(38px, 7vw, 62px);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      margin-bottom: 1.25rem;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--amber);
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 440px;
+      margin: 0 auto 2rem;
+      line-height: 1.65;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .btn-hero {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px 28px;
+      border-radius: 8px;
+      border: none;
+      background: var(--amber);
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      text-decoration: none;
+    }
+
+    .btn-hero:hover { opacity: 0.88; }
+
+    .btn-hero-out {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px 28px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-mid);
+      background: none;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+    }
+
+    .btn-hero-out:hover { background: var(--surface-2); }
+
+    .hero-urgency { font-size: 13px; font-weight: 600; color: var(--amber-dark); margin-bottom: 14px; }
+    .hero-proof {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .stars { color: var(--amber); font-size: 13px; }
+
+    /* TICKER */
+    .ticker {
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      padding: 10px 0;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .ticker-inner {
+      display: flex;
+      gap: 2.5rem;
+      animation: scroll 22s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      font-family: 'DM Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    .t-up {
+      color: var(--green-dark);
+      background: var(--green-light);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .t-down {
+      color: var(--red-dark);
+      background: var(--red-light);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* SECTIONS */
+    section { padding: 4rem 0; border-top: 0.5px solid var(--border); }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-hint);
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 460px;
+    }
+
+    /* COST SECTION */
+    .cost-section { background: #13151f; border-radius: var(--radius); padding: 2.5rem 2rem; margin-bottom: 2.5rem; }
+    .cost-section .section-label { color: #9898a4; }
+    .cost-section .section-title { color: #eeedf0; margin-bottom: 1.5rem; }
+    .cost-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 1.25rem; }
+    .cost-card { background: #1a1d27; border: 0.5px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 1.5rem 1.25rem; }
+    .cost-num { font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 700; color: #22c48a; margin-bottom: 6px; line-height: 1.1; }
+    .cost-label { font-size: 13px; color: #9898a4; line-height: 1.45; }
+    .cost-cta { font-size: 15px; font-weight: 700; color: #eeedf0; text-align: center; margin-bottom: 10px; }
+    .cost-disclaimer { font-size: 11px; color: #505058; text-align: center; }
+    @media (max-width: 700px) { .cost-cards { grid-template-columns: 1fr; } }
+
+    /* TAGLINE BLOCK */
+    .tagline-block {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .tagline-big {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(26px, 5vw, 44px);
+      font-weight: 900;
+      font-style: italic;
+      color: var(--text);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .tagline-big span { color: var(--amber); }
+
+    .tagline-right {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .tagline-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+
+    /* FEATURES */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-top: 2rem;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--amber);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--amber-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      margin-bottom: 12px;
+    }
+
+    .feature-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    .feature-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* BOOKS */
+    .books-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .book-pill {
+      background: var(--surface-2);
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: 0.5px solid var(--border);
+    }
+
+    /* PRICING */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 2rem;
+    }
+
+    .pricing-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: transform 0.15s;
+    }
+
+    .pricing-card:hover { transform: translateY(-2px); }
+    .pricing-card.featured { border: 2px solid var(--green); }
+
+    .plan-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--amber-light);
+      color: var(--amber-dark);
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .plan-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .plan-price {
+      font-family: 'Fraunces', serif;
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .plan-price sup { font-size: 20px; vertical-align: super; }
+
+    .plan-period {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      margin-top: 2px;
+    }
+
+    .plan-features {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .plan-features li {
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 6px 0;
+      border-bottom: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .plan-features li:last-child { border-bottom: none; }
+
+    .check {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--amber-light);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* TESTIMONIALS */
+    .t-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 1.75rem;
+    }
+
+    .t-card {
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+
+    .t-stars { color: var(--amber); font-size: 12px; margin-bottom: 8px; }
+    .t-text { font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 10px; font-style: italic; }
+    .t-author { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+
+    /* SIGNUP */
+    .signup-section {
+      text-align: center;
+      padding: 4rem 0;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .signup-section .section-title { margin-bottom: 0.5rem; }
+    .signup-section .section-sub { margin: 0 auto 1.5rem; text-align: center; }
+
+    .email-row {
+      display: flex;
+      gap: 8px;
+      max-width: 420px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .email-row input {
+      flex: 1;
+      min-width: 200px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 0.5px solid var(--border-mid);
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .email-row input:focus {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px var(--amber-light);
+    }
+
+    .email-row input::placeholder { color: var(--text-hint); }
+
+    .btn-join {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 22px;
+      border-radius: 8px;
+      border: none;
+      background: var(--amber);
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-join:hover { opacity: 0.88; }
+
+    .success-msg {
+      font-size: 13px;
+      color: var(--amber);
+      font-weight: 600;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .signup-sub {
+      font-size: 12px;
+      color: var(--text-hint);
+      margin-top: 10px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 0.5px solid var(--border);
+      padding: 1.5rem 0;
+    }
+
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .footer-copy { font-size: 11px; color: var(--text-hint); }
+
+    /* HERO PREVIEW WIDGET */
+    .hero-preview { background: var(--surface); border: 1.5px solid var(--border-mid); border-radius: var(--radius); padding: 1rem 1.25rem; max-width: 420px; margin: 1.5rem auto 0; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .preview-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+    .preview-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
+    .preview-game { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .preview-table { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+    .preview-book-row { display: flex; align-items: center; gap: 8px; }
+    .preview-book { font-size: 11px; color: var(--text-hint); width: 80px; flex-shrink: 0; font-weight: 500; }
+    .preview-cell { font-family: 'DM Mono', monospace; font-size: 12px; padding: 4px 10px; border-radius: 5px; background: var(--surface-2); color: var(--text); font-weight: 500; flex: 1; text-align: center; }
+    .preview-best { background: var(--green); color: #fff; font-weight: 700; }
+    .preview-worst { background: #f9ede9; color: #b04020; }
+    .preview-avg { background: var(--surface-2); }
+    .preview-edge { font-size: 11px; font-weight: 600; color: var(--green-dark); background: var(--green-light); padding: 5px 10px; border-radius: 5px; }
+
+    /* STATS BANNER */
+    .stats-banner-new { background: #0f1117; border-radius: var(--radius); padding: 2.5rem 2rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2rem; }
+    .stats-banner-new-item { text-align: center; }
+    .stats-banner-new-num { font-family: 'Fraunces', serif; font-size: clamp(28px, 4vw, 48px); font-weight: 900; color: #22c48a; line-height: 1; margin-bottom: 6px; }
+    .stats-banner-new-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.55); }
+    .stats-banner-new-flag { font-size: 9px; color: rgba(255,200,0,0.6); margin-top: 3px; }
+
+    /* PRO CARD GLOW */
+    .pricing-card.featured { border: 2px solid var(--green); box-shadow: 0 0 0 4px var(--green-light), 0 8px 30px rgba(29,158,117,0.2); }
+    .pricing-card.featured:hover { transform: translateY(-3px); box-shadow: 0 0 0 4px var(--green-light), 0 14px 40px rgba(29,158,117,0.28); }
+
+    /* FEATURE CARD ENHANCEMENTS */
+    .feature-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+    .feature-card::before { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; border-radius: 50%; opacity: 0.06; pointer-events: none; }
+    .feature-card.fc-radar::before { background: var(--amber); }
+    .feature-card.fc-odds::before { background: var(--green); }
+    .feature-card.fc-injury::before { background: #e74c3c; }
+    .feature-card.fc-alerts::before { background: #f39c12; }
+    .feature-card.fc-clv::before { background: #9b59b6; }
+    .feature-card.fc-stats::before { background: #3498db; }
+    .feature-card:hover { border-color: var(--amber); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .feature-who { font-size: 11px; color: var(--text-hint); font-style: italic; margin-top: 6px; line-height: 1.45; }
+
+    /* SCROLL FADE-IN ANIMATION */
+    .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* COUNT-UP */
+    .count-up { display: inline-block; }
+
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      .stats-banner-new { grid-template-columns: repeat(2, 1fr); padding: 1.5rem 1.25rem; }
+    }
+    @media (max-width: 600px) {
+      .nav-links .nav-link:not(.nav-link-odds):not(.nav-link-stats) { display: none; }
+      .hero { padding: 3rem 0 2rem; }
+      .hero-capy { font-size: 60px; }
+      .tagline-block { gap: 1.5rem; }
+      .stats-banner-new { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── DARK MODE ────────────────────────────────────────── */
+    body, nav, .feature-card, .pricing-card, .ticker { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+
+    [data-theme="dark"] {
+      --amber: #e8991e;
+      --amber-light: #2d1f08;
+      --amber-dark: #f5c87a;
+      --amber-mid: #e8991e;
+      --green: #22c48a;
+      --green-light: #0a2118;
+      --green-dark: #7dd9b4;
+      --red-light: #2a1009;
+      --red-dark: #f09070;
+      --text: #eeedf0;
+      --text-muted: #9898a4;
+      --text-hint: #505058;
+      --border: rgba(255,255,255,0.07);
+      --border-mid: rgba(255,255,255,0.13);
+      --surface: #1a1d27;
+      --surface-2: #13151f;
+    }
+    [data-theme="dark"] body { background: #0f1117; }
+    [data-theme="dark"] nav { background: #161920; border-color: rgba(255,255,255,0.07); }
+    [data-theme="dark"] .ticker { background: var(--surface); border-color: rgba(255,255,255,0.07); }
+    [data-theme="dark"] .preview-worst { background: #2a1009; color: #f07050; }
+    [data-theme="dark"] .pricing-card.featured { border-color: #22c48a; box-shadow: 0 0 0 4px #0a2118, 0 8px 30px rgba(34,196,138,0.2); }
+
+    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
+    .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
+    .theme-toggle-btn:hover { opacity: 0.8; }
+  </style>
+  <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="logo-mark">🐾</div>
+        Capy
+      </a>
+      <div class="nav-links">
+        <a href="/odds" class="nav-link nav-link-odds">Live odds</a>
+        <a href="/parlay.html" class="nav-link">Parlay</a>
+        <a href="/stats.html" class="nav-link nav-link-stats">Stats</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
+        <a href="#signup" class="btn btn-primary">Get early access</a>
+        <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="hero">
+      <div class="hero-eyebrow">
+        <div class="pulse"></div>
+        Watching 5 books, 24/7
+      </div>
+      <span class="hero-capy">🦫</span>
+      <h1>Lines move.<br><em>Capy</em> doesn't.</h1>
+      <p class="hero-sub">The average bettor loses hundreds of dollars a year betting at the wrong book. Capy finds the best line in seconds — for free.</p>
+      <div class="hero-cta">
+        <a href="#signup" class="btn-hero">Start for free</a>
+        <a href="/odds" class="btn-hero-out">See today's best lines</a>
+      </div>
+      <div class="hero-urgency">⚡ 2,400+ bettors already have the edge. You don't yet.</div>
+      <div class="hero-proof">
+        <span class="stars">★★★★★</span>
+        <span>2,400+ bettors on the waitlist &nbsp;·&nbsp; Updated every 60 seconds</span>
+      </div>
+
+      <!-- LIVE PREVIEW WIDGET -->
+      <div class="hero-preview">
+        <div class="preview-label">
+          <span class="preview-dot"></span>
+          Live example
+        </div>
+        <div class="preview-game">🏀 Lakers <span style="color:var(--text-hint);font-weight:400;font-size:13px;">vs</span> Celtics</div>
+        <div class="preview-table">
+          <div class="preview-book-row">
+            <span class="preview-book">FanDuel</span>
+            <span class="preview-cell preview-best">LAL -3.5</span>
+            <span class="preview-cell preview-avg">BOS +3</span>
+          </div>
+          <div class="preview-book-row">
+            <span class="preview-book">DraftKings</span>
+            <span class="preview-cell">LAL -4</span>
+            <span class="preview-cell">BOS +4</span>
+          </div>
+          <div class="preview-book-row">
+            <span class="preview-book">BetMGM</span>
+            <span class="preview-cell preview-worst">LAL -4.5</span>
+            <span class="preview-cell">BOS +4.5</span>
+          </div>
+        </div>
+        <div class="preview-edge">🔥 +1 pt edge on FanDuel — take the better number</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker-inner" id="ticker-inner">
+      <div class="ticker-item"><span>Loading live odds...</span><span class="t-up">Live data</span></div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <section>
+      <div class="tagline-block">
+        <div class="tagline-big">"Be the <span>capybara.</span><br>Stay calm.<br>Bet smart."</div>
+        <div class="tagline-right">
+          <p class="tagline-desc">Capybaras are famously unbothered. They sit in hot springs while everything around them panics. That's you with Capy — while other bettors frantically check 6 tabs, you've already got the best line.</p>
+          <a href="#signup" class="btn btn-primary">Join the waitlist</a>
+        </div>
+      </div>
+    </section>
+
+    <div style="background:linear-gradient(90deg,var(--amber-light),var(--green-light));border:1px solid var(--amber);border-radius:var(--radius-sm);padding:12px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <span style="font-size:14px;font-weight:600;color:var(--text);">New: 🎰 Capy Parlay Builder — Today's best edges, auto-built into a parlay. Try it free →</span>
+      <a href="/parlay.html" style="font-size:13px;font-weight:700;background:var(--green);color:#fff;padding:7px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;">Try Parlay Builder</a>
+    </div>
+
+    <div class="cost-section">
+      <div class="section-label">The real cost</div>
+      <div class="section-title">What bad lines are actually costing you</div>
+      <div class="cost-cards">
+        <div class="cost-card">
+          <div class="cost-num">~$340/year</div>
+          <div class="cost-label">what the average bettor loses betting at one book instead of shopping lines</div>
+        </div>
+        <div class="cost-card">
+          <div class="cost-num">+0.5 to 3 pts</div>
+          <div class="cost-label">the edge you're giving away on a typical game by not comparing books</div>
+        </div>
+        <div class="cost-card">
+          <div class="cost-num">60 seconds</div>
+          <div class="cost-label">how long it takes Capy to find you the best line across 5 books</div>
+        </div>
+      </div>
+      <div class="cost-cta">Capy Pro costs $7/month. One better line pays for a year.</div>
+      <div class="cost-disclaimer">Average figures based on industry estimates. Individual results vary.</div>
+    </div>
+
+    <section id="features">
+      <div class="section-label">Why Capy</div>
+      <div class="section-title">Every edge. Zero stress.</div>
+      <div class="section-sub">The tools serious bettors use, wrapped in the vibe of the chillest animal alive.</div>
+      <div class="features-grid">
+        <div class="feature-card fc-radar fade-in">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-title">Best bet radar</div>
+          <div class="feature-desc">Stop guessing. AI-ranked value plays updated every minute so you never miss an edge.</div>
+          <div class="feature-who">Perfect for bettors who just want to be told the best bet — no research required.</div>
+        </div>
+        <div class="feature-card fc-odds fade-in">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">Live odds comparison</div>
+          <div class="feature-desc">5 books. 1 dashboard. The best line highlighted before it moves.</div>
+          <div class="feature-who">Great for anyone who wants to stop leaving money on the table by betting the wrong book.</div>
+        </div>
+        <div class="feature-card fc-alerts fade-in">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Line movement alerts</div>
+          <div class="feature-desc">Sharp money moves lines fast. Get notified the moment it happens.</div>
+          <div class="feature-who">Perfect for bettors who want to catch line movement early and act before the market corrects.</div>
+        </div>
+        <div class="feature-card fc-injury fade-in">
+          <div class="feature-icon">🏥</div>
+          <div class="feature-title">Injury reports</div>
+          <div class="feature-desc">Never bet blind. Real-time injury status for every player across all major sports.</div>
+          <div class="feature-who">Essential for casual bettors who don't have time to monitor team news before tip-off.</div>
+        </div>
+        <div class="feature-card fc-clv fade-in">
+          <div class="feature-icon">📈</div>
+          <div class="feature-title">CLV tracking</div>
+          <div class="feature-desc">Prove you have a real edge. See how your bets close versus the opening line.</div>
+          <div class="feature-who">For serious bettors who want proof — not just feels — that their process is working.</div>
+        </div>
+        <div class="feature-card fc-stats fade-in">
+          <div class="feature-icon">🏆</div>
+          <div class="feature-title">Team & player stats</div>
+          <div class="feature-desc">Everything you need to research and bet without switching tabs.</div>
+          <div class="feature-who">Ideal for bettors who do their homework before every game and hate juggling 6 tabs.</div>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">🎰</div>
+          <div class="feature-title">Parlay Builder</div>
+          <div class="feature-desc">Capy builds the best parlay from today's edges. Customize it or bet it as-is.</div>
+          <div class="feature-who"><a href="/parlay.html" style="color:var(--green);font-weight:600;text-decoration:none;">Try it free →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-label">Books tracked</div>
+      <div class="section-title" style="font-size:22px;">One dashboard. Every book.</div>
+      <div class="books-row">
+        <div class="book-pill">DraftKings</div>
+        <div class="book-pill">FanDuel</div>
+        <div class="book-pill">BetMGM</div>
+        <div class="book-pill">Caesars</div>
+        <div class="book-pill">PointsBet</div>
+        <div class="book-pill" style="font-style:italic;color:var(--text-hint);">+ more coming</div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="section-label">Pricing</div>
+      <div class="section-title">Simple, honest pricing</div>
+      <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:1.25rem;line-height:1.65;">Still on the fence? One better line pays for a year of Pro.</p>
+      <div style="background:var(--amber-light);border:2px solid var(--amber);border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:1.5rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <span style="font-size:28px;">🦫</span>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:15px;font-weight:700;color:var(--amber-dark);">Founding member pricing — locked in forever</div>
+          <div style="font-size:13px;color:var(--amber-dark);opacity:0.85;margin-top:2px;">First 50 users get this price for life. Goes up when spots fill.</div>
+        </div>
+        <div style="background:var(--amber);color:#fff;font-family:'DM Mono',monospace;font-size:15px;font-weight:700;padding:8px 16px;border-radius:6px;white-space:nowrap;">⚡ <span id="founding-spots">47</span> spots left</div>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="plan-name">Free</div>
+          <div class="plan-price"><sup>$</sup>0</div>
+          <div class="plan-period">forever</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Everything a sharp bettor needs. No credit card ever.</p>
+          <ul class="plan-features">
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>3 sports, 3 books</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Odds every 5 minutes</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Top 3 best bets daily</li>
+          </ul>
+          <a href="#signup" class="btn btn-outline" style="width:100%;text-align:center;">Get started free</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="plan-badge">Most popular</div>
+          <div class="plan-name">Pro</div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <div class="plan-price"><sup>$</sup>7</div>
+            <div style="font-size:14px;color:var(--text-muted);text-decoration:line-through;margin-bottom:2px;">$19</div>
+          </div>
+          <div class="plan-period">per month · founding rate · 7-day free trial</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Let Capy do the thinking. Best bets served up daily — just bet and win.</p>
+          <ul class="plan-features">
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>All sports + all 5 books</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Live odds, 60-sec refresh</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Unlimited best bets</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Line movement alerts</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Email + SMS alerts</li>
+          </ul>
+          <a href="#signup" class="btn btn-primary" style="width:100%;text-align:center;padding:12px;">Claim founding rate</a>
+          <div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:8px;">Price locks in forever when you claim. Goes to $19/mo after.</div>
+        </div>
+        <div class="pricing-card">
+          <div class="plan-name">Sharp</div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <div class="plan-price"><sup>$</sup>19</div>
+            <div style="font-size:14px;color:var(--text-muted);text-decoration:line-through;margin-bottom:2px;">$49</div>
+          </div>
+          <div class="plan-period">per month · founding rate</div>
+          <ul class="plan-features">
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Everything in Pro</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>AI deep analysis</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>CLV tracking</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>API access</li>
+          </ul>
+          <a href="#signup" class="btn btn-outline" style="width:100%;text-align:center;">Get in touch</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="stats-banner-new fade-in">
+        <div class="stats-banner-new-item">
+          <div class="stats-banner-new-num"><span class="count-up" data-target="2400" data-suffix="+">2,400+</span></div>
+          <div class="stats-banner-new-label">bettors on the waitlist</div>
+        </div>
+        <div class="stats-banner-new-item">
+          <div class="stats-banner-new-num">5</div>
+          <div class="stats-banner-new-label">books tracked simultaneously</div>
+        </div>
+        <div class="stats-banner-new-item">
+          <div class="stats-banner-new-num">60s</div>
+          <div class="stats-banner-new-label">updated every 60 seconds</div>
+        </div>
+        <div class="stats-banner-new-item">
+          <div class="stats-banner-new-num">+2.3 pts</div>
+          <div class="stats-banner-new-label">avg edge found per game ⚠️</div>
+          <div class="stats-banner-new-flag">⚠ placeholder — verify before launch</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <section style="background:var(--surface-2);border-top:0.5px solid var(--border);padding:3rem 0;">
+    <div class="container">
+      <div class="section-label">Our partners</div>
+      <div class="section-title" style="font-size:22px;margin-bottom:0.5rem;">Ready to bet? Get the best bonuses.</div>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:2rem;">We've partnered with the top sportsbooks so you can sign up and claim your bonus in one click.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">BetOnline</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">50% Welcome Bonus up to $1,000</div>
+          <a href="https://record.betonlineaffiliates.ag/_otQU8R9fzqnYJMJFEJBL7mNd7ZgqdRLk/1/" target="_blank" rel="noopener" style="display:block;background:var(--amber);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:6px;text-decoration:none;" onmouseover="this.style.opacity=0.88" onmouseout="this.style.opacity=1">Claim Bonus →</a>
+        </div>
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">SportsBetting.ag</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">50% Welcome Bonus up to $1,000</div>
+          <a href="https://record.sportsbettingaffiliates.ag/_otQU8R9fzqmh_7RUBh20pWNd7ZgqdRLk/1/" target="_blank" rel="noopener" style="display:block;background:var(--amber);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:6px;text-decoration:none;" onmouseover="this.style.opacity=0.88" onmouseout="this.style.opacity=1">Claim Bonus →</a>
+        </div>
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">TigerGaming</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">100% First Deposit Bonus up to $1,000</div>
+          <a href="https://record.tigergamingaffiliates.com/_otQU8R9fzqklN6TbhFfl5GNd7ZgqdRLk/1/" target="_blank" rel="noopener" style="display:block;background:var(--amber);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:6px;text-decoration:none;" onmouseover="this.style.opacity=0.88" onmouseout="this.style.opacity=1">Claim Bonus →</a>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-hint);margin-top:1.25rem;">Must be 21+. Gambling problem? Call 1-800-GAMBLER. Bonus offers subject to change.</p>
+    </div>
+  </section>
+
+  <div class="signup-section" id="signup">
+    <div class="container">
+      <div class="section-title">Every bet you place without Capy is a bet you could have made better.</div>
+      <p class="section-sub">Free to start. No credit card. Takes 30 seconds.</p>
+      <div style="max-width:560px;margin:0 auto;display:flex;justify-content:center;align-items:center;">
+        <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+        <iframe src="https://subscribe-forms.beehiiv.com/83454881-489e-475f-a24d-62413f0a9e2b" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width:100%;height:291px;margin:0 auto;display:block;border-radius:12px!important;background-color:transparent;box-shadow:0 0 #0000;max-width:100%;"></iframe>
+      </div>
+      <div class="signup-sub">No spam. Unsubscribe anytime.</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="#" class="footer-logo"><span>🐾</span> Capy</a>
+      <div class="footer-copy">© 2026 Capy. Must be 21+ to bet. Please gamble responsibly.</div>
+    </div>
+  </footer>
+
+  <script>
+    async function loadTicker() {
+      try {
+        const sports = [
+          'basketball_nba',
+          'americanfootball_nfl',
+          'baseball_mlb',
+          'icehockey_nhl'
+        ];
+        const sport = sports[Math.floor(Math.random() * sports.length)];
+        const res = await fetch(`/api/odds?sport=${sport}`);
+        const games = await res.json();
+
+        if (!Array.isArray(games) || !games.length) {
+          loadFallbackTicker();
+          return;
+        }
+
+        const items = [];
+        games.slice(0, 8).forEach(game => {
+          const home = game.home_team;
+          const away = game.away_team;
+          const bookmakers = game.bookmakers;
+          if (!bookmakers || !bookmakers.length) return;
+
+          bookmakers.slice(0, 2).forEach(book => {
+            const h2h = book.markets?.find(m => m.key === 'h2h');
+            const spreads = book.markets?.find(m => m.key === 'spreads');
+
+            if (h2h) {
+              const homeOdds = h2h.outcomes?.find(o => o.name === home);
+              if (homeOdds) {
+                const odds = homeOdds.price > 0 ? '+' + homeOdds.price : homeOdds.price;
+                const cls = homeOdds.price > 0 ? 't-up' : 't-down';
+                items.push(`<div class="ticker-item"><span>${away} @ ${home}</span><span class="${cls}">ML ${odds} at ${book.title}</span></div>`);
+              }
+            }
+            if (spreads) {
+              const homeSpread = spreads.outcomes?.find(o => o.name === home);
+              if (homeSpread) {
+                const point = homeSpread.point > 0 ? '+' + homeSpread.point : homeSpread.point;
+                items.push(`<div class="ticker-item"><span>${home} ${point}</span><span class="t-up">${book.title}</span></div>`);
+              }
+            }
+          });
+        });
+
+        if (!items.length) { loadFallbackTicker(); return; }
+
+        const doubled = [...items, ...items];
+        document.getElementById('ticker-inner').innerHTML = doubled.join('');
+      } catch(e) {
+        loadFallbackTicker();
+      }
+    }
+
+    function loadFallbackTicker() {
+      const fallback = [
+        '<div class="ticker-item"><span>Lakers +5.5</span><span class="t-up">Best at PointsBet</span></div>',
+        '<div class="ticker-item"><span>Chiefs -3</span><span class="t-down">Moved from -3.5</span></div>',
+        '<div class="ticker-item"><span>Celtics/Heat o228.5</span><span class="t-up">Sharp Over action</span></div>',
+        '<div class="ticker-item"><span>Dodgers ML -130</span><span class="t-up">Best at FanDuel</span></div>',
+        '<div class="ticker-item"><span>Warriors -2.5</span><span class="t-up">Value vs consensus</span></div>',
+      ];
+      const doubled = [...fallback, ...fallback];
+      document.getElementById('ticker-inner').innerHTML = doubled.join('');
+    }
+
+    loadTicker();
+    setInterval(loadTicker, 300000);
+
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // ── Scroll fade-in ────────────────────────────────────────────────
+    const fadeEls = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // Stagger sibling cards
+          const siblings = entry.target.parentElement?.querySelectorAll('.fade-in');
+          let delay = 0;
+          if (siblings) {
+            siblings.forEach((s, idx) => { if (s === entry.target) delay = idx * 80; });
+          }
+          setTimeout(() => entry.target.classList.add('visible'), delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    fadeEls.forEach(el => observer.observe(el));
+
+    // ── Count-up animation ─────────────────────────────────────────────
+    function countUp(el) {
+      const target = parseInt(el.dataset.target, 10);
+      const suffix = el.dataset.suffix || '';
+      const duration = 1200;
+      const step = 16;
+      const steps = duration / step;
+      let current = 0;
+      const increment = target / steps;
+      const timer = setInterval(() => {
+        current = Math.min(current + increment, target);
+        el.textContent = Math.floor(current).toLocaleString() + suffix;
+        if (current >= target) clearInterval(timer);
+      }, step);
+    }
+
+    const countObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.count-up').forEach(countUp);
+          countObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.stats-banner-new').forEach(el => countObserver.observe(el));
+
+    // ── Founding member countdown ─────────────────────────────────────────
+    (function() {
+      const today = new Date().toISOString().split('T')[0];
+      let data = JSON.parse(localStorage.getItem('capy_spots') || 'null');
+      if (!data) {
+        data = { startCount: 47, startDate: today };
+        localStorage.setItem('capy_spots', JSON.stringify(data));
+      }
+      const start = new Date(data.startDate);
+      const now = new Date(today);
+      const days = Math.floor((now - start) / 86400000);
+      const count = Math.max(1, data.startCount - days);
+      const el = document.getElementById('founding-spots');
+      if (el) el.textContent = count;
+    })();
+
+    // ── Theme toggle ──────────────────────────────────────────────────────
+    function toggleTheme() {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('capy_theme', next);
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = next === 'dark' ? '☀️' : '🌙';
+    }
+    (function() {
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    })();
+  </script>
+
+</body>
+</html>
