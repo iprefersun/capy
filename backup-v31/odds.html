@@ -299,18 +299,6 @@
     .pick-bet-btn { display: block; background: var(--amber); color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 16px; border-radius: 8px; text-decoration: none; text-align: center; transition: opacity 0.15s; margin-top: 8px; }
     .pick-bet-btn:hover { opacity: 0.88; }
 
-    /* LONGSHOT SECTION */
-    .longshot-section .picks-title { color: var(--amber-dark); }
-    .longshot-card { background: var(--amber-light); border: 1.5px solid var(--amber); border-radius: var(--radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 8px; position: relative; max-width: 480px; }
-    .longshot-payout-num { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: var(--amber-dark); line-height: 1; }
-    .longshot-payout-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--amber); }
-    .longshot-neg-ev { display: inline-block; font-size: 11px; font-weight: 700; background: #f5c26b; color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; }
-    .longshot-disclaimer { font-size: 12px; color: var(--amber-dark); line-height: 1.55; margin-top: 4px; }
-    .longshot-bet-btn { display: block; background: var(--amber); color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 16px; border-radius: 8px; text-decoration: none; text-align: center; transition: opacity 0.15s; margin-top: 4px; width: fit-content; }
-    .longshot-bet-btn:hover { opacity: 0.88; }
-    .longshot-legs { display: flex; flex-direction: column; gap: 6px; margin: 4px 0; }
-    .longshot-leg { font-size: 13px; font-weight: 600; color: var(--amber-dark); }
-
     @media (max-width: 700px) {
       .picks-scroll { grid-template-columns: none; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
       .picks-scroll::-webkit-scrollbar { height: 3px; }
@@ -597,26 +585,15 @@
       </div>
     </div>
 
-    <!-- CAPY'S SMART PICKS -->
-    <div class="picks-section" id="smart-picks-section" style="display:none;">
+    <!-- CAPY'S PICKS -->
+    <div class="picks-section" id="picks-section" style="display:none;">
       <div class="picks-header">
         <div>
-          <div class="picks-title">🎯 Smart Picks — Best EV vs Pinnacle</div>
-          <div class="picks-sub">Top 3 mathematically sound bets — comparing every book against Pinnacle's sharp line to find real pricing gaps.</div>
+          <div class="picks-title">🦫 Capy's Picks — Market Inefficiencies vs Sharp Line</div>
+          <div class="picks-sub">Comparing all books against Pinnacle (sharp market) to find genuine pricing gaps.</div>
         </div>
       </div>
       <div class="picks-scroll" id="picks-container"></div>
-    </div>
-
-    <!-- HIGH UPSIDE LONG SHOT -->
-    <div class="picks-section longshot-section" id="longshot-section" style="display:none;">
-      <div class="picks-header">
-        <div>
-          <div class="picks-title">🎰 High Upside Play — Today's Long Shot</div>
-          <div class="picks-sub">Maximum potential payout. Negative EV — entertainment only, not a smart bet.</div>
-        </div>
-      </div>
-      <div id="longshot-container"></div>
     </div>
 
     <div class="method-banner">
@@ -1375,7 +1352,7 @@
     }
 
     function renderPicks() {
-      const section = document.getElementById('smart-picks-section');
+      const section = document.getElementById('picks-section');
       const container = document.getElementById('picks-container');
       if (!allGames.length) { section.style.display = 'none'; return; }
 
@@ -1445,7 +1422,7 @@
       container.innerHTML = cards;
 
       // Append unlock banner after the grid
-      const section2 = document.getElementById('smart-picks-section');
+      const section2 = document.getElementById('picks-section');
       let existingBanner = section2.querySelector('.picks-unlock-banner');
       if (existingBanner) existingBanner.remove();
       if (unlockBanner) section2.insertAdjacentHTML('beforeend', unlockBanner);
@@ -1473,104 +1450,6 @@
         };
       }).filter(Boolean);
       saveCappyPicksToSupabase(pickPayload);
-
-      // Render the longshot section alongside smart picks
-      renderLongshot();
-    }
-
-    function renderLongshot() {
-      const lsSection = document.getElementById('longshot-section');
-      const lsContainer = document.getElementById('longshot-container');
-      if (!allGames.length) { lsSection.style.display = 'none'; return; }
-
-      // Collect all h2h outcomes from all books across all games
-      const allOdds = [];
-      allGames.forEach(game => {
-        game.bookmakers?.forEach(bk => {
-          const h2h = bk.markets?.find(m => m.key === 'h2h');
-          if (!h2h) return;
-          h2h.outcomes?.forEach(outcome => {
-            allOdds.push({ game, side: outcome.name, price: outcome.price, bookKey: bk.key, bookName: bk.title });
-          });
-        });
-      });
-
-      // Try: single big underdog +300 or higher
-      const bigDogs = allOdds
-        .filter(o => o.price >= 300)
-        .sort((a, b) => b.price - a.price);
-
-      if (bigDogs.length > 0) {
-        // Pick the single biggest underdog
-        const dog = bigDogs[0];
-        const bookUrl = BOOK_URLS[dog.bookKey] || '#';
-        const oddsStr = `+${dog.price}`;
-        const decimal = 1 + dog.price / 100;
-        const payout10 = ((decimal - 1) * 10).toFixed(2);
-        const sportEmoji = SPORT_EMOJIS[dog.game.sport_key] || '🎯';
-        const sportLabel = SPORT_LABELS[dog.game.sport_key] || dog.game.sport_key;
-
-        lsSection.style.display = 'block';
-        lsContainer.innerHTML = `
-          <div class="longshot-card">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-              <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;background:#f5c26b;color:var(--amber-dark);padding:2px 7px;border-radius:10px;">${sportEmoji} ${sportLabel}</span>
-              <span class="longshot-neg-ev">⚠️ Negative EV — entertainment only</span>
-            </div>
-            <div style="font-size:14px;font-weight:700;color:var(--amber-dark);">${dog.game.away_team} vs ${dog.game.home_team}</div>
-            <div style="font-size:15px;font-weight:700;color:var(--amber-dark);margin-top:4px;">Take ${dog.side} ML <span style="font-family:'DM Mono',monospace;">${oddsStr}</span> at ${dog.bookName}</div>
-            <div style="margin-top:8px;">
-              <div class="longshot-payout-label">$10 bet pays</div>
-              <div class="longshot-payout-num">$${payout10}</div>
-            </div>
-            <div class="longshot-disclaimer">This is a long shot — not a smart bet. But if it hits... 🤑</div>
-            <a href="${bookUrl}" target="_blank" rel="noopener" class="longshot-bet-btn">Bet at ${dog.bookName} →</a>
-          </div>`;
-        return;
-      }
-
-      // Fallback: build a 3-leg parlay with the biggest underdogs (one per game)
-      const seenGames = new Set();
-      const parlayLegs = [];
-      [...allOdds]
-        .sort((a, b) => b.price - a.price)
-        .forEach(o => {
-          if (seenGames.has(o.game.id) || parlayLegs.length >= 3) return;
-          seenGames.add(o.game.id);
-          parlayLegs.push(o);
-        });
-
-      if (parlayLegs.length < 2) { lsSection.style.display = 'none'; return; }
-
-      const combinedDecimal = parlayLegs.reduce((acc, l) => {
-        const d = l.price > 0 ? 1 + l.price / 100 : 1 + 100 / Math.abs(l.price);
-        return acc * d;
-      }, 1);
-      const combinedAm = combinedDecimal >= 2 ? Math.round((combinedDecimal - 1) * 100) : Math.round(-100 / (combinedDecimal - 1));
-      const payout10 = ((combinedDecimal - 1) * 10).toFixed(2);
-      const oddsDisplay = combinedAm > 0 ? `+${combinedAm}` : `${combinedAm}`;
-
-      const legsHtml = parlayLegs.map(l => {
-        const p = l.price > 0 ? `+${l.price}` : `${l.price}`;
-        const sportEmoji = SPORT_EMOJIS[l.game.sport_key] || '🎯';
-        return `<div class="longshot-leg">${sportEmoji} ${l.side} ML <span style="font-family:'DM Mono',monospace;">${p}</span> — ${l.game.away_team} vs ${l.game.home_team}</div>`;
-      }).join('');
-
-      lsSection.style.display = 'block';
-      lsContainer.innerHTML = `
-        <div class="longshot-card">
-          <span class="longshot-neg-ev">⚠️ Negative EV — entertainment only</span>
-          <div style="font-size:14px;font-weight:700;color:var(--amber-dark);margin-top:4px;">${parlayLegs.length}-Leg Long Shot Parlay</div>
-          <div class="longshot-legs">${legsHtml}</div>
-          <div style="margin-top:4px;">
-            <div class="longshot-payout-label">Combined odds · $10 bet pays</div>
-            <div style="display:flex;align-items:baseline;gap:10px;">
-              <div class="longshot-payout-num">$${payout10}</div>
-              <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--amber);">${oddsDisplay}</div>
-            </div>
-          </div>
-          <div class="longshot-disclaimer">This is a long shot — not a smart bet. But if it hits... 🤑</div>
-        </div>`;
     }
 
     async function saveCappyPicksToSupabase(picks) {

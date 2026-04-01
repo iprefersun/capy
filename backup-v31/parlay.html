@@ -113,23 +113,6 @@
     .btn-bet-suggested { flex: 1; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 9px; border-radius: 6px; border: none; background: #22c48a; color: #fff; cursor: pointer; text-decoration: none; display: block; text-align: center; transition: opacity 0.12s; }
     .btn-bet-suggested:hover { opacity: 0.88; }
 
-    /* SHARP vs HIGH UPSIDE card variants */
-    .suggested-card--sharp { border-left: 3px solid #22c48a; }
-    .suggested-card--highupside { background: #1c1508; border-left: 3px solid #EF9F27; }
-    .suggested-card--highupside .suggested-label { color: rgba(239,159,39,0.7); }
-    .suggested-card--highupside .suggested-title { color: #f5c26b; }
-    .suggested-card--highupside .suggested-conf { color: rgba(245,194,107,0.7); }
-    .suggested-card--highupside .suggested-odds-num { color: #EF9F27; }
-    .suggested-card--highupside .suggested-leg { background: rgba(239,159,39,0.1); }
-    .suggested-card--highupside .suggested-leg-pick { color: #EF9F27; }
-    .suggested-card--highupside .suggested-leg-teams { color: #f5c26b; }
-    .suggested-card--highupside .suggested-leg-book { color: rgba(245,194,107,0.5); }
-    .suggested-card--highupside .btn-copy-parlay { border-color: rgba(239,159,39,0.4); color: #f5c26b; }
-    .suggested-card--highupside .btn-copy-parlay:hover { background: rgba(239,159,39,0.1); }
-    .suggested-card--highupside .btn-bet-suggested { background: #EF9F27; }
-    .highupside-neg-ev-badge { display: inline-block; font-size: 11px; font-weight: 700; background: rgba(239,159,39,0.2); color: #EF9F27; border: 1px solid rgba(239,159,39,0.3); padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; }
-    [data-theme="dark"] .suggested-card--highupside { background: #201708; border: 0.5px solid rgba(239,159,39,0.2); border-left: 3px solid #EF9F27; }
-
     /* CUSTOM SUMMARY CARD */
     .summary-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
     .summary-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 900; color: var(--text); margin-bottom: 12px; }
@@ -301,7 +284,6 @@
     [data-theme="dark"] body { background: #0f1117; }
     [data-theme="dark"] nav { background: #161920; border-color: rgba(255,255,255,0.07); }
     [data-theme="dark"] .suggested-card { background: #1a1d27; border: 0.5px solid rgba(255,255,255,0.08); }
-    [data-theme="dark"] .suggested-card--sharp { border-left: 3px solid #22c48a; }
     [data-theme="dark"] .suggested-leg { background: rgba(255,255,255,0.04); }
     [data-theme="dark"] .mobile-parlay-bar { background: #13151f; }
 
@@ -396,17 +378,10 @@
     <!-- RIGHT: SUGGESTED + SUMMARY -->
     <div class="parlay-right">
 
-      <!-- CAPY'S SHARP PARLAY -->
-      <div class="suggested-card suggested-card--sharp" id="suggested-card">
+      <!-- CAPY'S SUGGESTED PARLAY -->
+      <div class="suggested-card" id="suggested-card">
         <div class="suggested-label">🦫 Capy's Pick — Updated every 60 seconds</div>
         <div class="suggested-title">Building your parlay...</div>
-        <div class="suggested-conf"></div>
-      </div>
-
-      <!-- HIGH UPSIDE PARLAY -->
-      <div class="suggested-card suggested-card--highupside" id="highupside-card">
-        <div class="suggested-label">🎰 High Upside Parlay</div>
-        <div class="suggested-title">Loading...</div>
         <div class="suggested-conf"></div>
       </div>
 
@@ -939,109 +914,6 @@
         spreadStr,
       };
     });
-  }
-
-  function buildHighUpsideParlay() {
-    // Collect all h2h outcomes across all games; pick 3-4 biggest underdogs (one per game)
-    const allOdds = [];
-    allGamesData.filter(g => g.bookmakers?.length > 0).forEach(game => {
-      const emoji = SPORT_EMOJIS[game.sport_key] || '🎯';
-      game.bookmakers.forEach(bk => {
-        const h2h = bk.markets?.find(m => m.key === 'h2h');
-        if (!h2h) return;
-        h2h.outcomes?.forEach(outcome => {
-          allOdds.push({ game, emoji, side: outcome.name, price: outcome.price, bookKey: bk.key, bookName: bk.title, bookUrl: BOOK_URLS[bk.key] || '#' });
-        });
-      });
-    });
-
-    // Sort by highest odds (biggest underdogs), one per game
-    allOdds.sort((a, b) => b.price - a.price);
-    const seenGames = new Set();
-    const selected = [];
-    for (const o of allOdds) {
-      if (seenGames.has(o.game.id)) continue;
-      seenGames.add(o.game.id);
-      selected.push(o);
-      if (selected.length >= 4) break;
-    }
-    if (selected.length < 2) return [];
-
-    return selected.map(o => ({
-      gameId: o.game.id,
-      homeTeam: o.game.home_team,
-      awayTeam: o.game.away_team,
-      sportKey: o.game.sport_key,
-      commenceTime: o.game.commence_time,
-      side: o.side,
-      sideType: o.side === o.game.home_team ? 'home_ml' : 'away_ml',
-      market: 'h2h',
-      odds: o.price,
-      point: null,
-      spreadStr: '',
-      bookName: o.bookName,
-      bookUrl: o.bookUrl,
-      otherSideOdds: null,
-      edge: 0,
-      emoji: o.emoji,
-      teamsLabel: `${o.emoji} ${o.game.away_team} @ ${o.game.home_team}`,
-    }));
-  }
-
-  function renderHighUpside(legs) {
-    const card = document.getElementById('highupside-card');
-    if (!legs || !legs.length) {
-      card.innerHTML = `<div class="suggested-label">🎰 High Upside Parlay</div><div class="suggested-title" style="color:#f5c26b;">No games available</div><div class="suggested-conf">Check back when more games are live.</div>`;
-      return;
-    }
-
-    const combinedDecimal = legs.reduce((acc, l) => acc * amToDecimal(l.odds), 1);
-    const combinedAm = decimalToAm(combinedDecimal);
-    const payout10 = ((combinedDecimal - 1) * 10).toFixed(2);
-
-    const legItems = legs.map(l => {
-      const oddsStr = fmtAm(l.odds);
-      const sideShort = l.side.split(' ').pop();
-      return `<div class="suggested-leg">
-        <div class="suggested-leg-teams">${l.teamsLabel}</div>
-        <div class="suggested-leg-pick">${sideShort} ML ${oddsStr}</div>
-        <div class="suggested-leg-book">Best at ${l.bookName}</div>
-      </div>`;
-    }).join('');
-
-    card.innerHTML = `
-      <div class="highupside-neg-ev-badge">⚠️ Negative EV — entertainment only</div>
-      <div class="suggested-label">🎰 High Upside Parlay — Updated every 60 seconds</div>
-      <div class="suggested-title">Today's Long Shot Parlay</div>
-      <div class="suggested-conf">${legs.length}-leg parlay · Biggest underdogs today</div>
-      <div class="suggested-odds-block">
-        <div class="suggested-odds-label">Combined odds · $10 pays</div>
-        <div class="suggested-odds-num">${fmtAm(combinedAm)}</div>
-        <div style="font-size:13px;font-weight:700;color:#EF9F27;margin-top:4px;">$${payout10} profit</div>
-      </div>
-      <div class="suggested-legs-list">${legItems}</div>
-      <div style="font-size:12px;color:rgba(239,159,39,0.6);margin-bottom:10px;line-height:1.5;">This is a long shot — not a smart bet. But if it hits... 🤑</div>
-      <div class="suggested-btns">
-        <button class="btn-copy-parlay" onclick="copyHighUpsideParlay()">Copy to builder</button>
-        <a href="${BETONLINE_URL}" target="_blank" rel="noopener" class="btn-bet-suggested">Bet this parlay →</a>
-      </div>`;
-
-    card._highUpsideLegs = legs;
-  }
-
-  function copyHighUpsideParlay() {
-    const card = document.getElementById('highupside-card');
-    const legs = card._highUpsideLegs;
-    if (!legs) return;
-    parlayLegs = legs.map(l => ({
-      gameId: l.gameId, sideType: l.sideType, side: l.side,
-      market: l.market, odds: l.odds, point: null,
-      homeTeam: l.homeTeam, awayTeam: l.awayTeam,
-      sportKey: l.sportKey, commenceTime: l.commenceTime,
-      bookName: l.bookName, otherSideOdds: l.otherSideOdds,
-    }));
-    saveLegs(parlayLegs);
-    renderAll();
   }
 
   function renderSuggested(suggested) {
@@ -1728,10 +1600,8 @@
     }
 
     const suggested = buildSuggestedParlay();
-    const highUpside = buildHighUpsideParlay();
     // Async: try to add best prop leg to suggested parlay
     loadBestPropForSuggested(suggested).then(withProp => renderSuggested(withProp));
-    renderHighUpside(highUpside);
     renderAll();
 
     // Auto-refresh every 60 seconds
@@ -1740,7 +1610,6 @@
       catch (e) { return; }
       const s = buildSuggestedParlay();
       renderSuggested(s);
-      renderHighUpside(buildHighUpsideParlay());
       renderGameSelector();
     }, 60000);
   }
