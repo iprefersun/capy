@@ -1090,39 +1090,75 @@
       return null;
     }
 
-    // Use Pinnacle as sharp reference if available, otherwise fall back to reference book
+    // Returns Pinnacle sharp reference for a game, or null if Pinnacle not available.
+    // Never falls back to US books — EV is only meaningful vs a vig-free sharp line.
     function getSharpRef(game) {
       const sport = game.sport_key;
       const pk = pinnacleCache[sport] || {};
-      const pinnacleGame = pk[`${game.home_team}|${game.away_team}`];
-      if (pinnacleGame) {
-        const h2h = pinnacleGame.bookmakers?.[0]?.markets?.find(m => m.key === 'h2h');
-        if (h2h) {
-          const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
-          const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
-          if (homeO?.price != null && awayO?.price != null) {
-            return { homePrice: homeO.price, awayPrice: awayO.price, bookName: 'Pinnacle', source: 'Pinnacle' };
-          }
-        }
+      // Primary lookup by game.id (avoids team name mismatch), fallback to name key
+      const pinnacleGame = (game.id && pk[game.id]) || pk[`${game.home_team}|${game.away_team}`];
+      if (!pinnacleGame) return null;
+      const h2h = pinnacleGame.bookmakers?.[0]?.markets?.find(m => m.key === 'h2h');
+      if (!h2h) return null;
+      const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
+      const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
+      if (homeO?.price != null && awayO?.price != null) {
+        return { homePrice: homeO.price, awayPrice: awayO.price, bookName: 'Pinnacle', source: 'Pinnacle' };
       }
-      const ref = getRefBook(game);
-      if (ref) return { ...ref, source: 'Market' };
       return null;
     }
 
-    // Returns { home, away } each: { ev, fairProb, bestOdds, bestBook } or null
+    /**
+     * Canonical EV calculation — no-vig method using Pinnacle as the sharp reference.
+     *
+     * Method:
+     *   1. Convert both sides of Pinnacle line to implied probabilities
+     *   2. Sum them and divide each by the sum to remove the vig (no-vig normalization)
+     *   3. The de-vigged probability is the fair true probability for that side
+     *   4. EV% = (fairProb × decimal − 1) × 100
+     *
+     * @param {number} bookOdds         American odds from the US book being evaluated
+     * @param {number} pinnacleHomeOdds Pinnacle American odds for the home team
+     * @param {number} pinnacleAwayOdds Pinnacle American odds for the away team
+     * @param {boolean} isHome          Whether bookOdds is for the home team
+     * @returns {{ ev, fairProb, fairOdds }} or null if inputs are invalid
+     */
+    function calculateEV(bookOdds, pinnacleHomeOdds, pinnacleAwayOdds, isHome) {
+      if (bookOdds == null || pinnacleHomeOdds == null || pinnacleAwayOdds == null) return null;
+      const impH = amToImpliedProb(pinnacleHomeOdds);
+      const impA = amToImpliedProb(pinnacleAwayOdds);
+      const total = impH + impA;
+      if (total <= 0) return null;
+      const fairH = impH / total;
+      const fairA = impA / total;
+      const fairProb = isHome ? fairH : fairA;
+      const decimal = amToDecimal(bookOdds);
+      const ev = parseFloat(((fairProb * decimal - 1) * 100).toFixed(2));
+      const fairOdds = fairProbToAm(fairProb);
+      return { ev, fairProb, fairOdds };
+    }
+
+    // Returns { home, away, pinnacleRef, refSource, suspicious } or null.
+    // Requires Pinnacle — never falls back to US books. Games without a Pinnacle line show no EV.
     function calcGameEV(game) {
-      // Step 1: derive fair probs from sharp reference (Pinnacle if available, else DK/FD)
       const ref = getSharpRef(game);
       if (!ref) return null;
 
-      const impH = amToImpliedProb(ref.homePrice);
-      const impA = amToImpliedProb(ref.awayPrice);
-      const total = impH + impA;
-      const fairH = impH / total;
-      const fairA = impA / total;
+      // Large underdog guard: if Pinnacle prices a side at +400 or worse, require fresh data (<10 min)
+      const maxUnderdogPrice = Math.max(ref.homePrice, ref.awayPrice);
+      if (maxUnderdogPrice >= 400) {
+        const fetchedAt = oddsFetchedAt[game.sport_key] || 0;
+        const ageMin = (Date.now() - fetchedAt) / 60000;
+        if (ageMin > 10) {
+          console.warn('[Capy EV] Skipping +400 underdog — Pinnacle data is stale (' + ageMin.toFixed(1) + ' min). Refresh to recalculate.', {
+            game: `${game.away_team} @ ${game.home_team}`,
+            pinnacleHome: ref.homePrice, pinnacleAway: ref.awayPrice,
+          });
+          return null;
+        }
+      }
 
-      // Step 2: find best available price per side across ALL books
+      // Find best available moneyline price per side across all tracked books
       let bestHome = null, bestAway = null;
       BOOK_KEYS.forEach((k, i) => {
         const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
@@ -1139,48 +1175,40 @@
       });
       if (!bestHome || !bestAway) return null;
 
-      // Debug: log Suns/Magic if present, otherwise first game only
-      const isSunsMagic = game.home_team.includes('Magic') || game.away_team.includes('Suns') ||
-                          game.home_team.includes('Suns') || game.away_team.includes('Magic');
-      if (isSunsMagic || !calcGameEV._logged) {
-        if (!isSunsMagic) calcGameEV._logged = true;
-        console.log('[Capy EV Debug]', game.away_team, '@', game.home_team);
-        console.log('  Reference book:', ref.bookName, '| Home:', ref.homePrice, '| Away:', ref.awayPrice);
-        console.log('  Implied home:', impH.toFixed(4), '| Implied away:', impA.toFixed(4));
-        console.log('  Sum (pre-norm):', total.toFixed(4), '→ vig:', ((total - 1) * 100).toFixed(2) + '%');
-        console.log('  Fair prob home:', fairH.toFixed(4), '| Fair prob away:', fairA.toFixed(4));
-        console.log('  Best home:', bestHome.price, 'at', bestHome.bookName, '| Best away:', bestAway.price, 'at', bestAway.bookName);
-        console.log('  EV home:', calcEVFromOdds(bestHome.price, fairH).toFixed(1) + '%', '| EV away:', calcEVFromOdds(bestAway.price, fairA).toFixed(1) + '%');
-      }
+      const homeResult = calculateEV(bestHome.price, ref.homePrice, ref.awayPrice, true);
+      const awayResult = calculateEV(bestAway.price, ref.homePrice, ref.awayPrice, false);
+      if (!homeResult || !awayResult) return null;
 
-      const homeEV = calcEVFromOdds(bestHome.price, fairH);
-      const awayEV = calcEVFromOdds(bestAway.price, fairA);
-      const maxEV = Math.max(homeEV, awayEV);
+      const maxEV = Math.max(homeResult.ev, awayResult.ev);
 
-      // Sanity check: EV above 30% almost certainly indicates bad/stale reference data
-      if (maxEV > 30) {
-        console.warn('[Capy EV] Discarding result — EV too high, likely data error.', {
+      // Discard: >15% EV vs Pinnacle is almost certainly a data artifact (stale/mismatched line)
+      if (maxEV > 15) {
+        console.warn('[Capy EV] Discarding — EV implausibly high vs Pinnacle. Likely stale or mismatched line.', {
           game: `${game.away_team} @ ${game.home_team}`,
-          homeEV: homeEV.toFixed(1) + '%', awayEV: awayEV.toFixed(1) + '%',
-          ref: ref.bookName, refHome: ref.homePrice, refAway: ref.awayPrice,
-          bestHome: bestHome.price, bestAway: bestAway.price,
+          sport: game.sport_key,
+          bookOddsHome: bestHome.price, bookOddsAway: bestAway.price,
+          pinnacleHome: ref.homePrice, pinnacleAway: ref.awayPrice,
+          fairProbHome: homeResult.fairProb.toFixed(4), fairProbAway: awayResult.fairProb.toFixed(4),
+          calculatedEV: { home: homeResult.ev.toFixed(1) + '%', away: awayResult.ev.toFixed(1) + '%' },
+          filtered: true,
         });
         return null;
       }
 
-      const suspicious = maxEV > 15;
+      // Verify badge: 10-15% EV is unusual — flag for manual review before betting
+      const suspicious = maxEV > 10;
       if (suspicious) {
-        console.warn('[Capy EV] Suspicious EV — flagging for manual review.', {
+        console.warn('[Capy EV] Suspicious EV (10-15%) — verify odds before betting.', {
           game: `${game.away_team} @ ${game.home_team}`,
-          homeEV: homeEV.toFixed(1) + '%', awayEV: awayEV.toFixed(1) + '%',
-          ref: ref.bookName,
+          homeEV: homeResult.ev.toFixed(1) + '%', awayEV: awayResult.ev.toFixed(1) + '%',
         });
       }
 
       return {
-        home: { ev: homeEV, fairProb: fairH, bestOdds: bestHome.price, bestBook: bestHome.bookName },
-        away: { ev: awayEV, fairProb: fairA, bestOdds: bestAway.price, bestBook: bestAway.bookName },
-        refSource: ref.source || 'Market',
+        home: { ev: homeResult.ev, fairProb: homeResult.fairProb, fairOdds: homeResult.fairOdds, bestOdds: bestHome.price, bestBook: bestHome.bookName },
+        away: { ev: awayResult.ev, fairProb: awayResult.fairProb, fairOdds: awayResult.fairOdds, bestOdds: bestAway.price, bestBook: bestAway.bookName },
+        pinnacleRef: { homePrice: ref.homePrice, awayPrice: ref.awayPrice },
+        refSource: 'Pinnacle',
         suspicious,
       };
     }
@@ -1280,13 +1308,14 @@
       const games = usGames.filter(g => g && g.bookmakers?.length);
       oddsCache[key] = games;
       oddsFetchedAt[key] = Date.now();
-      // Cache Pinnacle data keyed by "home|away"
+      // Cache Pinnacle data — keyed by game.id (primary) and "home|away" (fallback)
       if (Array.isArray(data.pinnacleOdds) && data.pinnacleOdds.length) {
         if (!pinnacleCache[key]) pinnacleCache[key] = {};
         data.pinnacleOdds.forEach(g => {
           pinnacleCache[key][`${g.home_team}|${g.away_team}`] = g;
+          if (g.id) pinnacleCache[key][g.id] = g;
         });
-        console.log('[Capy] Using Pinnacle as sharp reference');
+        console.log('[Capy] Pinnacle lines cached for', data.pinnacleOdds.length, 'games');
       }
       return games;
     }
@@ -1396,8 +1425,19 @@
 
       // Verify badge
       const suspiciousHtml = ev.suspicious
-        ? `<span class="ev-verify-badge" title="EV over 15% — verify odds before betting">⚠️ Verify odds</span>`
+        ? `<span class="ev-verify-badge" title="EV 10-15% — verify odds are live before betting">⚠️ Verify odds</span>`
         : '';
+
+      // EV breakdown tooltip (ⓘ)
+      const pinnRef = ev.pinnacleRef || {};
+      const tipLines = [
+        `Book odds: ${fmtAm(bestSide.bestOdds)} (${bestSide.bestBook})`,
+        `Pinnacle home: ${fmtAm(pinnRef.homePrice || 0)} / away: ${fmtAm(pinnRef.awayPrice || 0)}`,
+        `No-vig fair prob: ${(bestSide.fairProb * 100).toFixed(1)}%`,
+        `Fair odds: ${fmtAm(bestSide.fairOdds)}`,
+        `EV: ${evStr}`,
+      ].join(' | ');
+      const evInfoBtn = `<span class="ev-tip" data-tip="${tipLines}" style="margin-left:4px;">i</span>`;
 
       // Bet link
       const betUrl = getBookUrl(bestSide.bestBook);
@@ -1432,7 +1472,7 @@
             </div>
             <div class="ev-badge-center ${isPositive ? '' : 'ev-neg-bg'}">
               <div class="ev-badge-pct ${isPositive ? '' : 'ev-neg-pct'}">${evStr}</div>
-              <div class="ev-badge-lbl ${isPositive ? '' : 'ev-neg-lbl'}">EV</div>
+              <div class="ev-badge-lbl ${isPositive ? '' : 'ev-neg-lbl'}">EV ${evInfoBtn}</div>
             </div>
             <div class="ev-card-sharp-col">
               <div class="ev-compare-label">Sharp Line</div>
@@ -2462,17 +2502,13 @@
       const sides = market === 'totals' ? ['Over','Under'] : [game.away_team, game.home_team];
       if (!sides[0]) return '';
 
-      // Pre-compute fair probs for EV (h2h only) — use reference book, not average
+      // Pre-compute fair probs for EV cell badges (h2h only) — Pinnacle-only, no US book fallback
       const fairProbs = {};
       if (market === 'h2h') {
-        const ref = getRefBook(game);
-        if (ref) {
-          const imp0 = amToImpliedProb(ref.homePrice);
-          const imp1 = amToImpliedProb(ref.awayPrice);
-          const tot = imp0 + imp1;
-          // sides = [away_team, home_team], ref has homePrice/awayPrice
-          fairProbs[game.home_team] = imp0 / tot;
-          fairProbs[game.away_team] = imp1 / tot;
+        const gameEVData = calcGameEV(game);
+        if (gameEVData) {
+          fairProbs[game.home_team] = gameEVData.home.fairProb;
+          fairProbs[game.away_team] = gameEVData.away.fairProb;
         }
       }
 
