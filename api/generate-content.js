@@ -3,12 +3,27 @@
 //   GROQ_API_KEY
 //   RESEND_API_KEY
 //   OWNER_EMAIL
+//
+// Supabase tables used:
+//   picks           — columns: pick, home_team, away_team, sport, odds, book, ev_percent, created_at
+//   generated_content — columns: id, created_at, content_json (jsonb), picks_summary (text)
+//     CREATE TABLE generated_content (
+//       id bigint generated always as identity primary key,
+//       created_at timestamptz default now(),
+//       content_json jsonb,
+//       picks_summary text
+//     );
 
 const { createClient } = require('@supabase/supabase-js');
 
 module.exports = async (req, res) => {
   try {
-    // ── 1. Supabase: fetch today's picks ────────────────────────────────
+    // ── 0. Read optional params — works for both GET (cron) and POST (admin) ─
+    const body = req.method === 'POST' ? (req.body || {}) : {};
+    const customPromptHint = req.query.customPromptHint || body.customPromptHint || null;
+    const followUp = req.query.followUp === 'true' || body.followUp === true;
+
+    // ── 1. Supabase: fetch today's picks ────────────────────────────────────
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_KEY
@@ -27,7 +42,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ message: 'No picks found for today' });
     }
 
-    // ── 2. Format picks into readable text ──────────────────────────────
+    // ── 2. Format picks into readable text ──────────────────────────────────
     const todayDate = new Date().toLocaleDateString('en-US', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
@@ -39,27 +54,61 @@ module.exports = async (req, res) => {
     }));
 
     const picksText = sanitizedPicks.map((p, i) => {
-      const ev = p.ev_percent != null ? `${p.ev_percent > 0 ? '+' : ''}${parseFloat(p.ev_percent).toFixed(1)}% EV` : 'EV unknown';
+      const ev = p.ev_percent != null
+        ? `${p.ev_percent > 0 ? '+' : ''}${parseFloat(p.ev_percent).toFixed(1)}% EV`
+        : 'EV unknown';
       const odds = p.odds > 0 ? `+${p.odds}` : `${p.odds}`;
-      return `${i + 1}. ${p.pick} (${p.home_team} vs ${p.away_team}) — ${odds} at ${p.book} — ${ev}`;
+      const sport = p.sport || 'unknown sport';
+      return `${i + 1}. ${p.pick} (${p.home_team} vs ${p.away_team}) [${sport}] — ${odds} at ${p.book} — ${ev}`;
     }).join('\n');
 
-    // ── 3. Call Groq API ─────────────────────────────────────────────────
+    // ── 3. Part 3 — Pull previous content for follow-up mode ────────────────
+    let followUpContext = '';
+    if (followUp) {
+      try {
+        const { data: prevRows } = await supabase
+          .from('generated_content')
+          .select('content_json, picks_summary, created_at')
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (prevRows && prevRows.length > 0) {
+          const prev = prevRows[0];
+          const prevDate = new Date(prev.created_at).toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric'
+          });
+          const prevTweet = prev.content_json?.twitter?.[0] || '';
+          const prevPicks = prev.picks_summary || '';
+          followUpContext = `\n\nPREVIOUS POST CONTEXT (for follow-up narrative):\nDate: ${prevDate}\nPrevious picks: ${prevPicks}\nPrevious tweet: ${prevTweet}\nInstruction: Reference what we called previously, mention whether those picks hit or missed (use the narrative "yesterday we called X — here's what happened"), and connect today's picks to that story.`;
+        } else {
+          console.log('[generate-content] followUp=true but no previous content found — using default generation');
+        }
+      } catch (prevErr) {
+        console.warn('[generate-content] Could not fetch previous content:', prevErr.message);
+      }
+    }
+
+    // ── 4. Build custom hint injection ──────────────────────────────────────
+    const hintLine = customPromptHint
+      ? `\n\nCUSTOM INSTRUCTION FROM OPERATOR: ${customPromptHint}`
+      : '';
+
+    // ── 5. Call Groq API ─────────────────────────────────────────────────────
     const prompt = `You are the social media voice for Capy, a sports betting analytics tool at getcapy.co. Capy is a capybara who finds value in betting markets using expected value (EV) calculations vs Pinnacle's sharp line. Tone: confident, data-driven, fun, never guarantee wins, always note these are mathematical edges not certainties.
 
 Today's top picks (${todayDate}):
-${picksText}
+${picksText}${followUpContext}${hintLine}
 
 Generate a JSON object (no markdown, no backticks, raw JSON only) with this exact structure:
 {
   "twitter": [
-    "tweet 1 text (max 280 chars, include real numbers, end with getcapy.co)",
-    "tweet 2 text (angle: the math/EV angle, different from tweet 1)",
+    "tweet 1 text (max 280 chars, include real team names and numbers, end with getcapy.co)",
+    "tweet 2 text (angle: the math/EV angle, reference the specific sport, different from tweet 1)",
     "tweet 3 text (angle: entertainment/excitement, include potential payout feel)"
   ],
   "reddit": {
     "title": "post title for r/sportsbook or r/sportsbetting (no spam, genuine value share)",
-    "body": "post body (2-4 paragraphs, explain the EV methodology, share the picks with context, mention getcapy.co naturally)"
+    "body": "post body (2-4 paragraphs, explain the EV methodology, share the picks with real team names and context, mention getcapy.co naturally)"
   },
   "tiktok": {
     "hook": "opening line to say on camera (attention-grabbing, max 10 words)",
@@ -67,7 +116,7 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
     "caption": "TikTok caption with hashtags"
   },
   "instagram": {
-    "caption": "Instagram caption (engaging, 3-5 sentences, storytelling tone, real numbers from picks)",
+    "caption": "Instagram caption (engaging, 3-5 sentences, storytelling tone, real team names and numbers from today's picks)",
     "hashtags": "#sportsbetting #expectedvalue #capybara #getcapy #sharpbetting #valuebets #nba #nfl #mlb #nhl #sportspicks"
   }
 }`;
@@ -105,10 +154,10 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
       throw new Error('Groq returned no content');
     }
 
-    // ── 4. Parse JSON — strip backticks and control characters ──────────
+    // ── 6. Parse JSON — strip backticks and control characters ───────────────
     const cleaned = rawContent
       .replace(/```json|```/g, '')
-      .replace(/[\x00-\x1F\x7F]/g, ' ') // remove control characters
+      .replace(/[\x00-\x1F\x7F]/g, ' ')
       .trim();
     let content;
     try {
@@ -117,7 +166,17 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
       throw new Error(`Failed to parse Groq JSON: ${parseErr.message}\nRaw: ${rawContent.slice(0, 500)}`);
     }
 
-    // ── 5. Build HTML email ──────────────────────────────────────────────
+    // ── 7. Save generated content for follow-up use ──────────────────────────
+    try {
+      await supabase
+        .from('generated_content')
+        .insert({ content_json: content, picks_summary: picksText });
+    } catch (saveErr) {
+      // Non-fatal — log and continue
+      console.warn('[generate-content] Could not save to generated_content table:', saveErr.message);
+    }
+
+    // ── 8. Build HTML email ──────────────────────────────────────────────────
     const section = (emoji, title, color, html) => `
       <div style="margin-bottom:28px;border-radius:10px;border:1.5px solid ${color};overflow:hidden;">
         <div style="background:${color};padding:10px 18px;">
@@ -153,16 +212,24 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
       <div style="color:#888;font-size:12px;">${content.instagram?.hashtags || ''}</div>`;
 
     const picksHtml = picks.map(p => {
-      const ev = p.ev_percent != null ? `${p.ev_percent > 0 ? '+' : ''}${p.ev_percent.toFixed(1)}%` : '—';
+      const ev = p.ev_percent != null ? `${p.ev_percent > 0 ? '+' : ''}${p.ev_percent.toFixed ? p.ev_percent.toFixed(1) : p.ev_percent}%` : '—';
       const odds = p.odds > 0 ? `+${p.odds}` : `${p.odds}`;
       return `<tr>
         <td style="padding:6px 10px;border-bottom:1px solid #eee;">${p.pick}</td>
         <td style="padding:6px 10px;border-bottom:1px solid #eee;color:#666;font-size:12px;">${p.home_team} vs ${p.away_team}</td>
+        <td style="padding:6px 10px;border-bottom:1px solid #eee;font-size:11px;color:#888;">${p.sport || '—'}</td>
         <td style="padding:6px 10px;border-bottom:1px solid #eee;font-family:monospace;">${odds}</td>
         <td style="padding:6px 10px;border-bottom:1px solid #eee;font-weight:700;color:${p.ev_percent > 0 ? '#1D9E75' : '#888'};">${ev}</td>
         <td style="padding:6px 10px;border-bottom:1px solid #eee;color:#666;font-size:12px;">${p.book}</td>
       </tr>`;
     }).join('');
+
+    const modeBadge = followUp
+      ? `<div style="margin-bottom:10px;display:inline-block;padding:4px 12px;background:#EFF6FF;color:#1D4ED8;border-radius:20px;font-size:11px;font-weight:700;">🔁 Follow-up mode</div>`
+      : '';
+    const hintBadge = customPromptHint
+      ? `<div style="margin-bottom:10px;display:inline-block;padding:4px 12px;background:#FEF9C3;color:#A16207;border-radius:20px;font-size:11px;font-weight:700;">💡 Hint: ${customPromptHint}</div>`
+      : '';
 
     const emailHtml = `
 <!DOCTYPE html>
@@ -173,6 +240,7 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
     <div style="font-size:32px;">🦫</div>
     <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:900;margin:8px 0 4px;">Capy Daily Content</h1>
     <div style="font-size:13px;color:#888;">${todayDate}</div>
+    <div style="margin-top:8px;">${modeBadge}${hintBadge}</div>
   </div>
 
   <div style="margin-bottom:28px;border-radius:10px;border:1.5px solid #e0e0e0;overflow:hidden;">
@@ -183,6 +251,7 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
       <thead><tr style="background:#f5f5f5;">
         <th style="padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;">Pick</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;">Game</th>
+        <th style="padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;">Sport</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;">Odds</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;">EV</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#888;">Book</th>
@@ -202,7 +271,7 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
 </body>
 </html>`;
 
-    // ── 6. Send via Resend ───────────────────────────────────────────────
+    // ── 9. Send via Resend ────────────────────────────────────────────────────
     const emailRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -212,7 +281,7 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
       body: JSON.stringify({
         from: 'Capy Content <onboarding@resend.dev>',
         to: process.env.OWNER_EMAIL,
-        subject: `🦫 Capy Daily Content — ${todayDate}`,
+        subject: `🦫 Capy Daily Content — ${todayDate}${followUp ? ' (Follow-up)' : ''}${customPromptHint ? ` — ${customPromptHint.slice(0, 40)}` : ''}`,
         html: emailHtml
       })
     });
@@ -226,7 +295,9 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
       success: true,
       picksUsed: picks.length,
       emailId: emailData.id,
-      platforms: ['twitter', 'reddit', 'tiktok', 'instagram']
+      platforms: ['twitter', 'reddit', 'tiktok', 'instagram'],
+      followUp,
+      customPromptHint: customPromptHint || null
     });
 
   } catch (err) {

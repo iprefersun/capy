@@ -93,6 +93,17 @@
     .toast.show { opacity: 1; }
     .refresh-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; }
     .refresh-btn:hover { border-color: var(--amber); color: var(--amber); }
+    /* CONTENT GENERATOR */
+    .content-panel { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; }
+    .content-panel-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-hint); margin-bottom: 12px; }
+    .content-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .hint-input { font-family: 'Inter', sans-serif; font-size: 13px; padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--border-mid); background: var(--surface-2); color: var(--text); width: 260px; outline: none; }
+    .hint-input:focus { border-color: var(--amber); }
+    .hint-input::placeholder { color: var(--text-hint); }
+    .followup-label { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; user-select: none; }
+    .generate-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; padding: 6px 16px; border-radius: 6px; border: none; background: var(--green); color: #fff; cursor: pointer; transition: opacity 0.15s; }
+    .generate-btn:hover { opacity: 0.88; }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -128,6 +139,26 @@
     <div class="main">
       <div class="page-title">🦫 Capy Admin — Pick Tracker</div>
       <div class="page-sub" id="admin-sub">Loading...</div>
+
+      <!-- CONTENT GENERATOR PANEL -->
+      <div class="content-panel">
+        <div class="content-panel-title">🤖 Generate Social Content</div>
+        <div class="content-controls">
+          <input
+            id="hint-input"
+            class="hint-input"
+            type="text"
+            placeholder="Optional hint (e.g. focus on NBA underdog angle)"
+            maxlength="200"
+          />
+          <label class="followup-label">
+            <input type="checkbox" id="followup-checkbox" />
+            Follow-up mode
+          </label>
+          <button class="generate-btn" id="generate-btn" onclick="triggerGenerateContent()">▶ Generate Content</button>
+        </div>
+        <div id="generate-status" style="margin-top:8px;font-size:12px;color:var(--text-hint);display:none;"></div>
+      </div>
 
       <div class="tabs">
         <button class="tab active" onclick="switchTab('pending', this)">Pending Picks</button>
@@ -278,6 +309,43 @@
         loadAllData();
       } catch (err) {
         showToast('Score check failed');
+      }
+    }
+
+    async function triggerGenerateContent() {
+      const btn = document.getElementById('generate-btn');
+      const statusEl = document.getElementById('generate-status');
+      const hint = document.getElementById('hint-input').value.trim();
+      const followUp = document.getElementById('followup-checkbox').checked;
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Generating...';
+      statusEl.style.display = 'block';
+      statusEl.textContent = 'Calling Groq and building email...';
+
+      try {
+        const res = await fetch('/api/generate-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customPromptHint: hint || undefined,
+            followUp
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          statusEl.textContent = `Error: ${data.error || res.status}`;
+          showToast('Content generation failed');
+        } else {
+          statusEl.textContent = `✅ Done — email sent (${data.picksUsed} picks, ${data.platforms?.length || 4} platforms)`;
+          showToast('Content generated and emailed ✅');
+        }
+      } catch (err) {
+        statusEl.textContent = `Error: ${err.message}`;
+        showToast('Content generation failed');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '▶ Generate Content';
       }
     }
 
