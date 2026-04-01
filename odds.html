@@ -1112,29 +1112,39 @@
       return null;
     }
 
-    /**
-     * Canonical EV calculation — no-vig method using Pinnacle as the sharp reference.
-     *
-     * Method:
-     *   1. Convert both sides of Pinnacle line to implied probabilities
-     *   2. Sum them and divide each by the sum to remove the vig (no-vig normalization)
-     *   3. The de-vigged probability is the fair true probability for that side
-     *   4. EV% = (fairProb × decimal − 1) × 100
-     *
-     * @param {number} bookOdds         American odds from the US book being evaluated
-     * @param {number} pinnacleHomeOdds Pinnacle American odds for the home team
-     * @param {number} pinnacleAwayOdds Pinnacle American odds for the away team
-     * @param {boolean} isHome          Whether bookOdds is for the home team
-     * @returns {{ ev, fairProb, fairOdds }} or null if inputs are invalid
-     */
+    // No-vig fair odds method
+    // Requires BOTH sides of Pinnacle market
+    // p1 = implied(pinnacleA), p2 = implied(pinnacleB)
+    // fair_prob = p1 / (p1 + p2)
+    // DO NOT calculate EV with only one side — results in inflated EV on underdogs
+    // because a small error in implied probability amplifies through the large
+    // decimal multiplier (e.g. 1% error × 11.0 decimal = 11% EV inflation).
+    //
+    // @param {number} bookOdds         American odds from the US book being evaluated
+    // @param {number} pinnacleHomeOdds Pinnacle American odds for the home team  ← REQUIRED
+    // @param {number} pinnacleAwayOdds Pinnacle American odds for the away team  ← REQUIRED
+    // @param {boolean} isHome          Whether bookOdds is for the home team
+    // @returns {{ ev, fairProb, fairOdds }} or null if either Pinnacle side is missing
     function calculateEV(bookOdds, pinnacleHomeOdds, pinnacleAwayOdds, isHome) {
-      if (bookOdds == null || pinnacleHomeOdds == null || pinnacleAwayOdds == null) return null;
+      // Hard requirement: both sides of Pinnacle market must be present
+      if (bookOdds == null || pinnacleHomeOdds == null || pinnacleAwayOdds == null) {
+        if (pinnacleHomeOdds == null || pinnacleAwayOdds == null) {
+          console.warn('[Capy EV] calculateEV called with missing Pinnacle side — refusing to calculate.', {
+            pinnacleHomeOdds, pinnacleAwayOdds,
+          });
+        }
+        return null;
+      }
       const impH = amToImpliedProb(pinnacleHomeOdds);
       const impA = amToImpliedProb(pinnacleAwayOdds);
       const total = impH + impA;
-      if (total <= 0) return null;
-      const fairH = impH / total;
-      const fairA = impA / total;
+      // Sanity check: vig total should be slightly above 1.0 for a real market
+      if (total <= 0 || total < 0.9 || total > 1.2) {
+        console.warn('[Capy EV] calculateEV: abnormal vig total', total.toFixed(4), '— skipping.', { pinnacleHomeOdds, pinnacleAwayOdds });
+        return null;
+      }
+      const fairH = impH / total;  // home fair probability (vig removed)
+      const fairA = impA / total;  // away fair probability (vig removed)
       const fairProb = isHome ? fairH : fairA;
       const decimal = amToDecimal(bookOdds);
       const ev = parseFloat(((fairProb * decimal - 1) * 100).toFixed(2));
@@ -1185,26 +1195,47 @@
 
       const maxEV = Math.max(homeResult.ev, awayResult.ev);
 
-      // Discard: >15% EV vs Pinnacle is almost certainly a data artifact (stale/mismatched line)
-      if (maxEV > 15) {
-        console.warn('[Capy EV] Discarding — EV implausibly high vs Pinnacle. Likely stale or mismatched line.', {
+      // Part 4 — Large underdog (+500) detailed breakdown log
+      // Underdogs amplify any remaining error in fair prob through the large decimal multiplier,
+      // so we log the full breakdown to make it easy to spot if the math is still off.
+      const isLargeUnderdog = Math.max(ref.homePrice, ref.awayPrice) >= 500;
+      if (isLargeUnderdog) {
+        const impH = amToImpliedProb(ref.homePrice);
+        const impA = amToImpliedProb(ref.awayPrice);
+        console.log('[Capy EV] +500 underdog breakdown:', {
+          game: `${game.away_team} @ ${game.home_team}`,
+          pinnacleA: ref.homePrice, pinnacleB: ref.awayPrice,
+          p1: impH.toFixed(4), p2: impA.toFixed(4),
+          vigTotal: (impH + impA).toFixed(4),
+          fairProbHome: homeResult.fairProb.toFixed(4), fairOddsHome: homeResult.fairOdds,
+          fairProbAway: awayResult.fairProb.toFixed(4), fairOddsAway: awayResult.fairOdds,
+          bookOddsHome: bestHome.price, bookOddsAway: bestAway.price,
+          evHome: homeResult.ev.toFixed(2) + '%', evAway: awayResult.ev.toFixed(2) + '%',
+          finalEV: maxEV.toFixed(2) + '%',
+        });
+      }
+
+      // Discard: >5% EV vs Pinnacle after two-sided de-vig is almost certainly stale/mismatched data.
+      // Real market inefficiencies rarely exceed 4% — anything above 5% filters out.
+      if (maxEV > 5) {
+        console.warn('[Capy EV] Discarding — EV > 5% vs Pinnacle. Likely stale or mismatched line.', {
           game: `${game.away_team} @ ${game.home_team}`,
           sport: game.sport_key,
           bookOddsHome: bestHome.price, bookOddsAway: bestAway.price,
           pinnacleHome: ref.homePrice, pinnacleAway: ref.awayPrice,
           fairProbHome: homeResult.fairProb.toFixed(4), fairProbAway: awayResult.fairProb.toFixed(4),
-          calculatedEV: { home: homeResult.ev.toFixed(1) + '%', away: awayResult.ev.toFixed(1) + '%' },
+          calculatedEV: { home: homeResult.ev.toFixed(2) + '%', away: awayResult.ev.toFixed(2) + '%' },
           filtered: true,
         });
         return null;
       }
 
-      // Verify badge: 10-15% EV is unusual — flag for manual review before betting
-      const suspicious = maxEV > 10;
+      // Verify badge: 4-5% EV is unusual even with clean data — flag for manual review
+      const suspicious = maxEV > 4;
       if (suspicious) {
-        console.warn('[Capy EV] Suspicious EV (10-15%) — verify odds before betting.', {
+        console.warn('[Capy EV] Suspicious EV (4-5%) — verify odds are live before betting.', {
           game: `${game.away_team} @ ${game.home_team}`,
-          homeEV: homeResult.ev.toFixed(1) + '%', awayEV: awayResult.ev.toFixed(1) + '%',
+          homeEV: homeResult.ev.toFixed(2) + '%', awayEV: awayResult.ev.toFixed(2) + '%',
         });
       }
 

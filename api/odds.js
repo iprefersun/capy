@@ -1,3 +1,22 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// No-vig fair odds method (applied client-side in odds.html → calculateEV)
+// Requires BOTH sides of the Pinnacle market — never calculate with one side only.
+//
+//   p1 = implied_prob(pinnacleOddsA)   e.g. home team
+//   p2 = implied_prob(pinnacleOddsB)   e.g. away team
+//   fair_prob_A = p1 / (p1 + p2)
+//   fair_prob_B = p2 / (p1 + p2)
+//   EV% = (fair_prob × decimal_book_odds − 1) × 100
+//
+// DO NOT calculate EV with only one side — small errors in implied probability
+// amplify dramatically through the large decimal multiplier on big underdogs.
+// Example: a 1% error in fair prob on a +1000 underdog (decimal 11×) inflates
+// EV by ~11 percentage points.
+//
+// This API returns raw Pinnacle lines in pinnacleOdds[].bookmakers[0].markets[h2h].
+// The consumer MUST use BOTH outcomes from the h2h market for de-vigging.
+// ─────────────────────────────────────────────────────────────────────────────
+
 const ALL_SPORTS = [
   'basketball_nba',
   'americanfootball_nfl',
