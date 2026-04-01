@@ -770,6 +770,7 @@
     };
 
     let allGames = [];
+    let allSportsGames = []; // always NBA+MLB+NHL regardless of sidebar filter
     let currentSport = 'all';
     let oddsCache = {};
     let pinnacleCache = {}; // keyed by sport, then "home|away"
@@ -1041,6 +1042,7 @@
           ? await Promise.all(ALL_SPORTS.map(s => fetchForSport(s)))
           : [await fetchForSport(sport)];
         allGames = results.flat();
+        if (sport === 'all') allSportsGames = [...allGames];
         lastUpdatedTime = Date.now();
         renderGames();
         updateStats();
@@ -1427,9 +1429,8 @@
     function renderPicks() {
       const section = document.getElementById('smart-picks-section');
       const container = document.getElementById('picks-container');
-      // Same data source as game cards — allGames holds all fetched games across all sports
-      const sourceGames = allGames;
-      console.log('[Picks] Total games available:', sourceGames.length, 'Sports:', [...new Set(sourceGames.map(g => g.sport_key))]);
+      // Use allSportsGames (NBA+MLB+NHL) when available so picks are always cross-sport
+      const sourceGames = allSportsGames.length ? allSportsGames : allGames;
       if (!sourceGames.length) { section.style.display = 'none'; return; }
 
       const getBestEV = g => { const ev = calcGameEV(g); return ev ? Math.max(ev.home.ev, ev.away.ev) : -Infinity; };
