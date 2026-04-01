@@ -1089,13 +1089,11 @@
       </div>`;
     }).join('');
 
-    // 3-tier label: all +EV = Sharp, mixed = Best Available, all -EV = High Upside
+    // 2-tier label: all +EV = Sharp, otherwise Best Available (High Upside has its own card)
     const nonPropLegs = suggested.filter(l => !l.isProp);
     const confLabel = posEvLegCount === nonPropLegs.length && nonPropLegs.length > 0
       ? '🔥 Sharp Parlay'
-      : posEvLegCount > 0
-      ? '⚡ Best Available Parlay'
-      : '🎰 High Upside Parlay (Negative EV — entertainment play)';
+      : '⚡ Best Available Parlay';
 
     const combinedEvDisplay = hasAllEV && suggested.length > 0
       ? (() => { const e = classifyEV(combinedEvPct); return `<div style="font-size:12px;margin-top:8px;color:rgba(255,255,255,0.6);">Combined EV: <span class="${e.cls}" style="font-weight:700;">${e.emoji} ${e.label} vs Pinnacle</span></div>`; })()
