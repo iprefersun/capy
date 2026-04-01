@@ -770,7 +770,6 @@
     };
 
     let allGames = [];
-    let allSportsGames = []; // always NBA+MLB+NHL regardless of sidebar filter
     let currentSport = 'all';
     let oddsCache = {};
     let pinnacleCache = {}; // keyed by sport, then "home|away"
@@ -1042,7 +1041,6 @@
           ? await Promise.all(ALL_SPORTS.map(s => fetchForSport(s)))
           : [await fetchForSport(sport)];
         allGames = results.flat();
-        if (sport === 'all') allSportsGames = [...allGames];
         lastUpdatedTime = Date.now();
         renderGames();
         updateStats();
@@ -1398,14 +1396,12 @@
     }
 
     // ── Capy's Picks ─────────────────────────────────────────────────────
-    function getPickConfidence(edge, pickEV, isEvPick) {
-      if (isEvPick) {
-        if (pickEV > 3) return { label: '🔥 Strong +EV vs Pinnacle', cls: 'pick-conf-strong' };
-        return             { label: '✅ +EV vs Pinnacle',             cls: 'pick-conf-good' };
+    function getPickConfidence(edge, pickEV) {
+      if (pickEV > 0) {
+        if (edge > 6)  return { label: '🔥 Strong Pick', cls: 'pick-conf-strong' };
+        if (edge >= 3) return { label: '✅ Good Value',   cls: 'pick-conf-good' };
       }
-      if (edge > 5)  return { label: '⚡ Strong Edge', cls: 'pick-conf-strong' };
-      if (edge >= 2) return { label: '✅ Good Edge',   cls: 'pick-conf-good' };
-      return                 { label: '📊 Best Available', cls: 'pick-conf-look' };
+      return { label: '📊 Best Available Line', cls: 'pick-conf-look' };
     }
 
     function getBestBookForGame(game) {
@@ -1429,25 +1425,13 @@
     function renderPicks() {
       const section = document.getElementById('smart-picks-section');
       const container = document.getElementById('picks-container');
-      // Use allSportsGames (NBA+MLB+NHL) when available so picks are always cross-sport
-      const sourceGames = allSportsGames.length ? allSportsGames : allGames;
-      if (!sourceGames.length) { section.style.display = 'none'; return; }
+      if (!allGames.length) { section.style.display = 'none'; return; }
 
+      // Sort all games by best-side EV (highest first), show top 3 regardless of EV sign
       const getBestEV = g => { const ev = calcGameEV(g); return ev ? Math.max(ev.home.ev, ev.away.ev) : -Infinity; };
-
-      // Partition: positive EV first, then fill with highest edge score
-      const posEvGames = [...sourceGames]
-        .filter(g => getBestEV(g) > 0)
-        .sort((a, b) => getBestEV(b) - getBestEV(a));
-      const edgeGames = [...sourceGames]
-        .filter(g => getBestEV(g) <= 0)
-        .sort((a, b) => calcEdge(b) - calcEdge(a));
-
-      // Take up to 3 total: positive EV first, then edge fallbacks
-      const evSlots = posEvGames.slice(0, 3);
-      const fillNeeded = 3 - evSlots.length;
-      const top3 = [...evSlots, ...edgeGames.slice(0, fillNeeded)];
-      const evSet = new Set(evSlots.map(g => g.id));
+      const top3 = [...allGames]
+        .sort((a, b) => getBestEV(b) - getBestEV(a))
+        .slice(0, 3);
 
       if (!top3.length) { section.style.display = 'none'; return; }
 
@@ -1461,8 +1445,7 @@
         if (!bestBook) return '';
         const gameEVData = calcGameEV(game);
         const pickEV = gameEVData ? Math.max(gameEVData.home.ev, gameEVData.away.ev) : -Infinity;
-        const isEvPick = evSet.has(game.id);
-        const conf = getPickConfidence(edge, pickEV, isEvPick);
+        const conf = getPickConfidence(edge, pickEV);
         const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
         const label = SPORT_LABELS[game.sport_key] || game.sport_key;
         const oddsStr = bestBook.price > 0 ? `+${bestBook.price}` : `${bestBook.price}`;
