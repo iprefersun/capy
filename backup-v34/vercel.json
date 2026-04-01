@@ -14,8 +14,8 @@
   ],
   "crons": [
     {
-      "path": "/api/daily-jobs",
-      "schedule": "0 14 * * *"
+      "path": "/api/check-results",
+      "schedule": "0 23 * * *"
     }
   ]
 }
