@@ -1054,10 +1054,6 @@
       if (american > 0) return 100 / (american + 100);
       return Math.abs(american) / (Math.abs(american) + 100);
     }
-    function amToDecimal(american) {
-      if (american > 0) return american / 100 + 1;
-      return 100 / Math.abs(american) + 1;
-    }
     function classifyEV(evPct) {
       const sign = evPct > 0 ? '+' : '';
       const label = `${sign}${evPct.toFixed(1)}%`;
@@ -1742,12 +1738,9 @@
 
     function renderGames() {
       const container = document.getElementById('games-container');
-      if (!container) { console.error('[Capy] renderGames: #games-container not found'); return; }
-      console.log('[Capy] renderGames — allGames:', allGames.length, '| viewMode:', viewMode, '| sortMode:', sortMode);
       renderPicks();
       renderEvSection();
       if (!allGames.length) {
-        // Empty state only fires when the API returned zero games — not when EV is unavailable
         container.innerHTML = `
           <div class="empty">
             <span class="empty-icon">🦫</span>
@@ -1758,22 +1751,15 @@
         return;
       }
       const sorted = getSortedGames();
-      console.log('[Capy] renderGames — sorted games to render:', sorted.length);
-      try {
-        if (viewMode === 'grid2') {
-          container.className = 'games grid-2';
-          container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
-        } else if (viewMode === 'grid4') {
-          container.className = 'games grid-4';
-          container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
-        } else {
-          container.className = 'games';
-          container.innerHTML = sorted.map((game, idx) => buildGameCard(game, idx)).join('');
-        }
-        console.log('[Capy] renderGames — DOM updated, cards in container:', container.children.length);
-      } catch (err) {
-        console.error('[Capy] renderGames — card build threw:', err);
-        container.innerHTML = `<div class="error-state"><span class="error-icon">🦫</span><div class="error-title">Render error</div><div class="error-sub">${err.message}</div><button class="retry-btn" onclick="oddsCache={}; loadSport(currentSport)">Retry</button></div>`;
+      if (viewMode === 'grid2') {
+        container.className = 'games grid-2';
+        container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
+      } else if (viewMode === 'grid4') {
+        container.className = 'games grid-4';
+        container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
+      } else {
+        container.className = 'games';
+        container.innerHTML = sorted.map((game, idx) => buildGameCard(game, idx)).join('');
       }
       updateViewToggleUI();
     }
@@ -1860,16 +1846,13 @@
       let gridEvBadge = '';
       let gridVerifyBadge = '';
       if (gridGameEV) {
-        // Game has Pinnacle line — show EV badge
         const bestEV = gridGameEV.home.ev >= gridGameEV.away.ev ? gridGameEV.home : gridGameEV.away;
         const evInfo = classifyEV(bestEV.ev);
-        gridEvBadge = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line beats the true probability.">${evInfo.emoji} ${evInfo.label} 📍</span>`;
+        const refLbl = gridGameEV.refSource === 'Pinnacle' ? ' 📍' : '';
+        gridEvBadge = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line beats the true probability.">${evInfo.emoji} ${evInfo.label}${refLbl}</span>`;
         if (gridGameEV.suspicious) {
-          gridVerifyBadge = `<span class="ev-verify-badge" title="EV 10-15% — verify odds before betting">⚠️ Verify odds</span>`;
+          gridVerifyBadge = `<span class="ev-verify-badge" title="EV over 15% — verify odds before betting">⚠️ Verify odds</span>`;
         }
-      } else {
-        // No Pinnacle line — flag clearly so users know EV is unavailable
-        gridEvBadge = `<span style="font-size:10px;color:var(--text-hint);font-family:'Outfit',sans-serif;">No sharp line</span>`;
       }
       const gridFreshness = fmtFreshness(game.sport_key);
       const gridPinnacleRow = buildPinnacleRow(game, gridGameEV);
@@ -2361,22 +2344,19 @@
       let evRowHtml = '';
       let verifyBadge = '';
       if (gameEV) {
-        // Game has a Pinnacle line — show full EV breakdown per side
         const hEV = classifyEV(gameEV.home.ev);
         const aEV = classifyEV(gameEV.away.ev);
         const homeShort = game.home_team.split(' ').pop();
         const awayShort = game.away_team.split(' ').pop();
+        const refLabel = gameEV.refSource === 'Pinnacle' ? '📍 vs Pinnacle' : '📍 vs Market';
         evRowHtml = `<div class="ev-game-row">
           <span class="ev-game-item"><span class="ev-badge ${hEV.cls}">${hEV.emoji} ${hEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${homeShort} ML at ${gameEV.home.bestBook}</span><span class="ev-tip" data-tip="${evTipText}">?</span></span>
           <span class="ev-game-item"><span class="ev-badge ${aEV.cls}">${aEV.emoji} ${aEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${awayShort} ML at ${gameEV.away.bestBook}</span></span>
-          <span style="font-size:10px;color:var(--text-hint);font-style:italic;">📍 vs Pinnacle</span>
+          <span style="font-size:10px;color:var(--text-hint);font-style:italic;">${refLabel}</span>
         </div>`;
         if (gameEV.suspicious) {
-          verifyBadge = `<span class="ev-verify-badge" title="EV 10-15% — verify odds before betting">⚠️ Verify odds</span>`;
+          verifyBadge = `<span class="ev-verify-badge" title="EV over 15% — verify odds before betting">⚠️ Verify odds</span>`;
         }
-      } else {
-        // No Pinnacle line available for this game — EV cannot be calculated
-        evRowHtml = `<div style="font-size:10px;color:var(--text-hint);padding:2px 18px 6px;font-family:'Outfit',sans-serif;">No sharp line — EV unavailable</div>`;
       }
       const freshness = fmtFreshness(game.sport_key);
       const pinnacleRow = buildPinnacleRow(game, gameEV);
