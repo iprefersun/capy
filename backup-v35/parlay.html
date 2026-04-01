@@ -550,19 +550,6 @@
 <script>
   const BETONLINE_URL = 'https://record.betonlineaffiliates.ag/_otQU8R9fzqnYJMJFEJBL7mNd7ZgqdRLk/1/';
 
-  function fmtGameDate(isoString) {
-    const gameDate = new Date(isoString);
-    const now = new Date();
-    const todayStr = now.toDateString();
-    const tomorrowDate = new Date(now); tomorrowDate.setDate(now.getDate() + 1);
-    const tomorrowStr = tomorrowDate.toDateString();
-    const timeStr = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    if (gameDate.toDateString() === todayStr) return `Today, ${timeStr}`;
-    if (gameDate.toDateString() === tomorrowStr) return `Tomorrow, ${timeStr}`;
-    const datePart = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    return `${datePart}, ${timeStr}`;
-  }
-
   const BOOKS = ['FanDuel','DraftKings','BetMGM','BetRivers','BetOnline.ag'];
   const BOOK_KEYS = ['fanduel','draftkings','betmgm','betrivers','betonlineag'];
   const BOOK_URLS = {
@@ -787,7 +774,7 @@
   function buildSelectorCard(game) {
     const sport = game.sport_key;
     const emoji = SPORT_EMOJIS[sport] || '🎯';
-    const time = fmtGameDate(game.commence_time);
+    const time = new Date(game.commence_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     const edge = calcEdgeForGame(game);
     const edgeBadge = edge > 0 ? `<span class="selector-edge">+${edge} pts</span>` : '';
     const selected = isLegSelected(game.id);
@@ -1015,11 +1002,10 @@
     const legItems = legs.map(l => {
       const oddsStr = fmtAm(l.odds);
       const sideShort = l.side.split(' ').pop();
-      const legDateStr = l.commenceTime ? fmtGameDate(l.commenceTime) : '';
       return `<div class="suggested-leg">
         <div class="suggested-leg-teams">${l.teamsLabel}</div>
         <div class="suggested-leg-pick">${sideShort} ML ${oddsStr}</div>
-        <div class="suggested-leg-book">Best at ${l.bookName}${legDateStr ? ` · ${legDateStr}` : ''}</div>
+        <div class="suggested-leg-book">Best at ${l.bookName}</div>
       </div>`;
     }).join('');
 
@@ -1074,12 +1060,11 @@
     let posEvLegCount = 0;
     const legItems = suggested.map(l => {
       const oddsStr = fmtAm(l.odds);
-      const legDateStr = l.commenceTime ? fmtGameDate(l.commenceTime) : '';
       if (l.isProp) {
         return `<div class="suggested-leg">
           <div class="suggested-leg-teams">${l.teamsLabel || ''}</div>
           <div class="suggested-leg-pick">🎯 ${l.propLabel}</div>
-          <div class="suggested-leg-book">Best at ${l.bookName}${legDateStr ? ` · ${legDateStr}` : ''}</div>
+          <div class="suggested-leg-book">Best at ${l.bookName}</div>
         </div>`;
       }
       const sideShort = l.side.split(' ').pop();
@@ -1100,7 +1085,7 @@
         <div class="suggested-leg-teams">${l.teamsLabel}</div>
         <div class="suggested-leg-pick">${pickLine}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">${evHtml}${kellyHtml}</div>
-        <div class="suggested-leg-book">Best at ${l.bookName}${legDateStr ? ` · ${legDateStr}` : ''}</div>
+        <div class="suggested-leg-book">Best at ${l.bookName}</div>
       </div>`;
     }).join('');
 
@@ -1197,10 +1182,9 @@
       // Prop legs display differently
       if (leg.isProp) {
         const sportEmoji = SPORT_EMOJIS[leg.sportKey] || '🎯';
-        const legDate = leg.commenceTime ? fmtGameDate(leg.commenceTime) : '';
         return `<div class="summary-leg">
           <div class="summary-leg-left">
-            <div class="summary-leg-teams">${sportEmoji} ${leg.awayTeam?.split(' ').pop() || ''} @ ${leg.homeTeam?.split(' ').pop() || ''}${legDate ? ` · <span style="color:var(--text-hint)">${legDate}</span>` : ''}</div>
+            <div class="summary-leg-teams">${sportEmoji} ${leg.awayTeam?.split(' ').pop() || ''} @ ${leg.homeTeam?.split(' ').pop() || ''}</div>
             <div class="summary-leg-pick">${leg.propLabel || leg.player}</div>
             <div class="summary-leg-meta"><span class="summary-leg-book">${leg.bookName}</span></div>
           </div>
@@ -1213,8 +1197,7 @@
       const sideShort = leg.side.split(' ').pop();
       const spreadStr = leg.point != null ? ` (${leg.point >= 0 ? '+' : ''}${leg.point})` : '';
       const pickStr = leg.market === 'spreads' ? `${sideShort}${spreadStr}` : `${sideShort} ML`;
-      const legDate = leg.commenceTime ? fmtGameDate(leg.commenceTime) : '';
-      const teamsStr = `${leg.awayTeam.split(' ').pop()} @ ${leg.homeTeam.split(' ').pop()}${legDate ? ` · <span style="color:var(--text-hint);font-weight:400;">${legDate}</span>` : ''}`;
+      const teamsStr = `${leg.awayTeam.split(' ').pop()} @ ${leg.homeTeam.split(' ').pop()}`;
 
       let evHtml = '', kellyHtml = '', warnHtml = '';
       if (leg.market === 'h2h' && leg.otherSideOdds) {

@@ -688,19 +688,6 @@
       'betrivers': 'https://betrivers.com',
       'betonlineag': 'https://record.betonlineaffiliates.ag/_otQU8R9fzqnYJMJFEJBL7mNd7ZgqdRLk/1/',
     };
-    function fmtGameDate(isoString) {
-      const gameDate = new Date(isoString);
-      const now = new Date();
-      const todayStr = now.toDateString();
-      const tomorrowDate = new Date(now); tomorrowDate.setDate(now.getDate() + 1);
-      const tomorrowStr = tomorrowDate.toDateString();
-      const timeStr = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-      if (gameDate.toDateString() === todayStr) return `Today, ${timeStr}`;
-      if (gameDate.toDateString() === tomorrowStr) return `Tomorrow, ${timeStr}`;
-      const datePart = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-      return `${datePart}, ${timeStr}`;
-    }
-
     const ALL_SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
     const SPORT_EMOJIS = {
       basketball_nba:'🏀', basketball_ncaab:'🏀', basketball_wncaab:'🏀', basketball_euroleague:'🏀',
@@ -1264,7 +1251,7 @@
       const tagClass = 'tag-' + tagKey;
       const label = SPORT_LABELS[sport] || sport;
       const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
-      const time = fmtGameDate(game.commence_time);
+      const time = new Date(game.commence_time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
       const edgeInfo = calcEdgeInfo(game);
       const edge = edgeInfo.value;
       const isFirst = idx === 0;
@@ -1420,7 +1407,6 @@
           ? `${bestBook.bookName} has this spread ${edge} pts better than the worst available line — that's real money on the table.`
           : `${bestBook.bookName} has the best moneyline on this game — ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books.`;
         const isLocked = !hasAccess && idx > 0;
-        const gameDateTime = fmtGameDate(game.commence_time);
 
         return `
           <div class="pick-card${isLocked ? ' locked-card' : ''}">
@@ -1429,7 +1415,6 @@
                 <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;background:var(--surface-2);color:var(--text-hint);padding:2px 7px;border-radius:10px;">${sportEmoji} ${label}</span>
               </div>
               <div class="pick-game">${game.away_team} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">vs</span> ${game.home_team}</div>
-              <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);margin-top:2px;">${gameDateTime}</div>
               <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
                 <span class="pick-confidence ${conf.cls}">${conf.label}</span>
                 <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${edgeTypeLabel}</span>
@@ -1607,7 +1592,7 @@
       const tagClass = 'tag-' + tagKey;
       const label = SPORT_LABELS[sport] || sport;
       const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
-      const time = fmtGameDate(game.commence_time);
+      const time = new Date(game.commence_time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
       const edgeInfo = calcEdgeInfo(game);
       const edge = edgeInfo.value;
       const isTopEdge = idx < 3 && edge > 0;
