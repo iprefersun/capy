@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capy Admin — Pick Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,900;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --amber: #BA7517; --amber-light: #FAEEDA; --amber-dark: #633806;
+      --green: #1D9E75; --green-light: #EAF3DE; --green-dark: #27500A;
+      --red: #D85A30; --red-light: #FAECE7;
+      --text: #1a1a1a; --text-muted: #6b6b6b; --text-hint: #9b9b9b;
+      --border: rgba(0,0,0,0.08); --border-mid: rgba(0,0,0,0.15);
+      --surface: #fff; --surface-2: #f7f6f3;
+      --radius: 12px; --radius-sm: 8px;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: #f5f4f1; line-height: 1.5; }
+
+    /* AUTH GATE */
+    .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f4f1; }
+    .auth-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 2.5rem; width: 340px; text-align: center; }
+    .auth-icon { font-size: 36px; margin-bottom: 12px; }
+    .auth-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+    .auth-sub { font-size: 13px; color: var(--text-hint); margin-bottom: 20px; }
+    .auth-input { width: 100%; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 14px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text); margin-bottom: 12px; }
+    .auth-input:focus { outline: none; border-color: var(--amber); }
+    .auth-btn { width: 100%; padding: 10px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; background: var(--amber); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; }
+    .auth-btn:hover { opacity: 0.88; }
+    .auth-error { font-size: 13px; color: var(--red); margin-top: 10px; }
+
+    /* NAV */
+    nav { background: var(--surface); border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1300px; margin: 0 auto; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
+    .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .admin-badge { font-size: 11px; font-weight: 700; background: var(--red-light); color: var(--red); padding: 3px 10px; border-radius: 20px; }
+
+    /* MAIN */
+    .main { max-width: 1300px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .page-title { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; margin-bottom: 4px; }
+    .page-sub { font-size: 13px; color: var(--text-hint); margin-bottom: 1.5rem; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: var(--radius-sm); margin-bottom: 1.5rem; width: fit-content; }
+    .tab { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+    /* TABLE */
+    .table-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-hint); padding: 10px 14px; text-align: left; background: var(--surface-2); border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+    td { font-size: 13px; padding: 10px 14px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    .mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+    .outcome-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+    .outcome-win  { background: var(--green-light); color: var(--green-dark); }
+    .outcome-loss { background: var(--red-light); color: var(--red); }
+    .outcome-push { background: var(--surface-2); color: var(--text-muted); }
+    .outcome-pending { background: var(--amber-light); color: var(--amber-dark); }
+    .sport-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--surface-2); color: var(--text-hint); }
+
+    /* ACTION BUTTONS */
+    .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+    .btn-override { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 5px; border: none; cursor: pointer; transition: opacity 0.12s; }
+    .btn-win  { background: var(--green-light); color: var(--green-dark); }
+    .btn-loss { background: var(--red-light); color: var(--red); }
+    .btn-push { background: var(--surface-2); color: var(--text-muted); border: 0.5px solid var(--border-mid); }
+    .btn-delete { background: var(--red); color: #fff; }
+    .btn-override:hover { opacity: 0.75; }
+
+    /* STATS TAB */
+    .stats-section { display: flex; flex-direction: column; gap: 1.25rem; }
+    .stats-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+    .stats-card-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-hint); margin-bottom: 12px; }
+    .stats-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .mini-stat { background: var(--surface-2); border-radius: var(--radius-sm); padding: 12px 14px; }
+    .mini-stat-label { font-size: 11px; color: var(--text-hint); margin-bottom: 4px; }
+    .mini-stat-value { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; }
+    .mini-stat-value.green { color: var(--green); }
+    .mini-stat-value.red { color: var(--red); }
+    .breakdown-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-label { color: var(--text-muted); }
+    .breakdown-value { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; }
+
+    /* MISC */
+    .empty-msg { padding: 2rem; text-align: center; color: var(--text-hint); font-size: 14px; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .refresh-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; }
+    .refresh-btn:hover { border-color: var(--amber); color: var(--amber); }
+  </style>
+</head>
+<body>
+
+  <!-- AUTH GATE -->
+  <div class="auth-gate" id="auth-gate">
+    <div class="auth-box">
+      <div class="auth-icon">🦫</div>
+      <div class="auth-title">Capy Admin</div>
+      <div class="auth-sub">Enter your admin password to continue</div>
+      <input type="password" class="auth-input" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPassword()" />
+      <button class="auth-btn" onclick="checkPassword()">Continue →</button>
+      <div class="auth-error" id="auth-error" style="display:none;">Incorrect password. Try again.</div>
+    </div>
+  </div>
+
+  <!-- ADMIN UI (hidden until authed) -->
+  <div id="admin-ui" style="display:none;">
+    <nav>
+      <div class="nav-inner">
+        <a href="/" class="nav-logo">
+          <div class="logo-mark">🦫</div>
+          Capy
+        </a>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="admin-badge">🔒 Admin</span>
+          <button class="refresh-btn" onclick="loadAllData()">↻ Refresh</button>
+          <button class="refresh-btn" onclick="triggerCheckResults()">▶ Run score check</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main">
+      <div class="page-title">🦫 Capy Admin — Pick Tracker</div>
+      <div class="page-sub" id="admin-sub">Loading...</div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('pending', this)">Pending Picks</button>
+        <button class="tab" onclick="switchTab('completed', this)">Completed</button>
+        <button class="tab" onclick="switchTab('stats', this)">Stats</button>
+      </div>
+
+      <!-- PENDING TAB -->
+      <div id="tab-pending">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sport</th>
+                <th>Game</th>
+                <th>Pick</th>
+                <th>Odds</th>
+                <th>EV%</th>
+                <th>Book</th>
+                <th>Game Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pending-tbody">
+              <tr><td colspan="9" class="empty-msg">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- COMPLETED TAB -->
+      <div id="tab-completed" style="display:none;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sport</th>
+                <th>Pick</th>
+                <th>Odds</th>
+                <th>EV%</th>
+                <th>Result</th>
+                <th>Score</th>
+                <th>CLV</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="completed-tbody">
+              <tr><td colspan="9" class="empty-msg">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- STATS TAB -->
+      <div id="tab-stats" style="display:none;">
+        <div class="stats-section" id="stats-section">
+          <div class="empty-msg">Loading stats...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let adminPassword = '';
+    let allResults = [];
+    let allPending = [];
+
+    const SPORT_LABELS = {
+      basketball_nba: 'NBA', americanfootball_nfl: 'NFL',
+      baseball_mlb: 'MLB', icehockey_nhl: 'NHL'
+    };
+
+    // ── Auth ──────────────────────────────────────────────────────────────
+    function checkPassword() {
+      const pw = document.getElementById('pw-input').value;
+      // Store and validate via API — we use a simple client-side check from sessionStorage
+      // The real validation happens server-side on every admin action
+      const stored = sessionStorage.getItem('capy_admin_pw');
+      if (stored) {
+        adminPassword = stored;
+        showAdmin();
+        return;
+      }
+      // Try it — if it works (admin-override returns 200), save it
+      fetch('/api/admin-override', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw, action: 'ping' })
+      }).then(r => {
+        if (r.status === 403) {
+          document.getElementById('auth-error').style.display = 'block';
+        } else {
+          adminPassword = pw;
+          sessionStorage.setItem('capy_admin_pw', pw);
+          showAdmin();
+        }
+      }).catch(() => {
+        // If endpoint errors on 'ping' action (400), it still means auth passed
+        adminPassword = pw;
+        sessionStorage.setItem('capy_admin_pw', pw);
+        showAdmin();
+      });
+    }
+
+    function showAdmin() {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('admin-ui').style.display = 'block';
+      loadAllData();
+    }
+
+    // Check if already authenticated
+    (function() {
+      const stored = sessionStorage.getItem('capy_admin_pw');
+      if (stored) {
+        adminPassword = stored;
+        showAdmin();
+      }
+    })();
+
+    // ── Data loading ──────────────────────────────────────────────────────
+    async function loadAllData() {
+      document.getElementById('admin-sub').textContent = 'Loading...';
+      try {
+        const res = await fetch('/api/get-record');
+        const { picks, stats } = await res.json();
+        allResults = picks || [];
+        renderStats(stats || {});
+        renderPendingTab();
+        renderCompletedTab();
+        const total = stats.total || 0;
+        document.getElementById('admin-sub').textContent =
+          `${total} completed picks · ${allPending.length} pending · Last refresh: ${new Date().toLocaleTimeString()}`;
+      } catch (err) {
+        document.getElementById('admin-sub').textContent = 'Error loading data. Try refreshing.';
+      }
+    }
+
+    async function triggerCheckResults() {
+      showToast('Running score check...');
+      try {
+        const res = await fetch('/api/check-results');
+        const data = await res.json();
+        showToast(`Done: checked ${data.checked}, resolved ${data.resolved}`);
+        loadAllData();
+      } catch (err) {
+        showToast('Score check failed');
+      }
+    }
+
+    // ── Tabs ──────────────────────────────────────────────────────────────
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-pending').style.display = name === 'pending' ? 'block' : 'none';
+      document.getElementById('tab-completed').style.display = name === 'completed' ? 'block' : 'none';
+      document.getElementById('tab-stats').style.display = name === 'stats' ? 'block' : 'none';
+    }
+
+    // ── Pending tab ───────────────────────────────────────────────────────
+    function renderPendingTab() {
+      // Pending = picks not in allResults (no resolved result)
+      // Since get-record only returns resolved results, pending would require a separate query
+      // For now, show a message directing to check-results
+      const tbody = document.getElementById('pending-tbody');
+      tbody.innerHTML = `<tr><td colspan="9" class="empty-msg">
+        Pending picks are those awaiting score resolution.<br/>
+        Click "Run score check" above to process pending results.
+      </td></tr>`;
+    }
+
+    // ── Completed tab ─────────────────────────────────────────────────────
+    function renderCompletedTab() {
+      const tbody = document.getElementById('completed-tbody');
+      if (!allResults.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-msg">No completed picks yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = allResults.map(r => {
+        const p = r.picks || {};
+        const date = r.recorded_at
+          ? new Date(r.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+          : '—';
+        const sport = SPORT_LABELS[p.sport] || p.sport || '—';
+        const pick = p.pick ? `${p.pick} ML` : '—';
+        const game = p.home_team ? `${(p.away_team||'').split(' ').pop()} @ ${(p.home_team||'').split(' ').pop()}` : '—';
+        const odds = p.odds != null ? (p.odds > 0 ? `+${p.odds}` : `${p.odds}`) : '—';
+        const ev = p.ev_percent != null ? `${parseFloat(p.ev_percent).toFixed(1)}%` : '—';
+        const score = (r.score_home != null && r.score_away != null)
+          ? `${r.score_home}–${r.score_away}` : '—';
+        const clv = r.closing_line != null && p.odds != null
+          ? (() => { const d = r.closing_line - p.odds; return `${d > 0 ? '+' : ''}${d}`; })()
+          : '—';
+        const outcomeCls = r.outcome === 'win' ? 'outcome-win' : r.outcome === 'loss' ? 'outcome-loss' : 'outcome-push';
+        const outcomeLabel = r.outcome === 'win' ? '✅ Win' : r.outcome === 'loss' ? '❌ Loss' : '➖ Push';
+
+        return `<tr>
+          <td class="mono">${date}</td>
+          <td><span class="sport-tag">${sport}</span></td>
+          <td style="font-size:12px;">${pick}<br/><span style="color:var(--text-hint);font-size:11px;">${game}</span></td>
+          <td class="mono">${odds}</td>
+          <td class="mono">${ev}</td>
+          <td><span class="outcome-badge ${outcomeCls}">${outcomeLabel}</span></td>
+          <td class="mono">${score}</td>
+          <td class="mono">${clv}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-override btn-win"  onclick="override('${r.pick_id}','win')">W</button>
+              <button class="btn-override btn-loss" onclick="override('${r.pick_id}','loss')">L</button>
+              <button class="btn-override btn-push" onclick="override('${r.pick_id}','push')">P</button>
+              <button class="btn-override btn-delete" onclick="deletePick('${r.pick_id}')">✕</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ── Stats tab ─────────────────────────────────────────────────────────
+    function renderStats(stats) {
+      const section = document.getElementById('stats-section');
+      if (!stats.total) {
+        section.innerHTML = '<div class="empty-msg">No picks tracked yet.</div>';
+        return;
+      }
+
+      // Sport breakdown from allResults
+      const bySport = {};
+      allResults.forEach(r => {
+        const sport = SPORT_LABELS[r.picks?.sport] || r.picks?.sport || 'Unknown';
+        if (!bySport[sport]) bySport[sport] = { wins: 0, losses: 0, pushes: 0 };
+        if (r.outcome === 'win') bySport[sport].wins++;
+        else if (r.outcome === 'loss') bySport[sport].losses++;
+        else if (r.outcome === 'push') bySport[sport].pushes++;
+      });
+
+      const roiVal = parseFloat(stats.roi || 0);
+      const roiCls = roiVal >= 0 ? 'green' : 'red';
+
+      section.innerHTML = `
+        <div class="stats-card">
+          <div class="stats-card-title">Overall Performance</div>
+          <div class="stats-grid-3">
+            <div class="mini-stat"><div class="mini-stat-label">Win Rate</div><div class="mini-stat-value green">${stats.winRate || 0}%</div></div>
+            <div class="mini-stat"><div class="mini-stat-label">ROI (flat $100)</div><div class="mini-stat-value ${roiCls}">${roiVal >= 0 ? '+' : ''}$${roiVal.toFixed(0)}</div></div>
+            <div class="mini-stat"><div class="mini-stat-label">Total Picks</div><div class="mini-stat-value">${stats.total}</div></div>
+            <div class="mini-stat"><div class="mini-stat-label">Wins</div><div class="mini-stat-value green">${stats.wins}</div></div>
+            <div class="mini-stat"><div class="mini-stat-label">Losses</div><div class="mini-stat-value red">${stats.losses}</div></div>
+            <div class="mini-stat"><div class="mini-stat-label">Pushes</div><div class="mini-stat-value">${stats.pushes}</div></div>
+          </div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-card-title">Breakdown by Sport</div>
+          ${Object.entries(bySport).map(([sport, s]) => {
+            const t = s.wins + s.losses;
+            const wr = t > 0 ? ((s.wins / t) * 100).toFixed(0) : 0;
+            return `<div class="breakdown-row">
+              <span class="breakdown-label">${sport}</span>
+              <span class="breakdown-value">${s.wins}W–${s.losses}L–${s.pushes}P &nbsp;·&nbsp; ${wr}% WR</span>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="stats-card">
+          <div class="stats-card-title">Pick Quality</div>
+          <div class="breakdown-row"><span class="breakdown-label">Avg EV at time of pick</span><span class="breakdown-value">${stats.avgEV != null ? stats.avgEV + '%' : '—'}</span></div>
+          <div class="breakdown-row"><span class="breakdown-label">Pick type</span><span class="breakdown-value">ML only (spread coming soon)</span></div>
+        </div>`;
+    }
+
+    // ── Override / Delete ─────────────────────────────────────────────────
+    async function override(pickId, outcome) {
+      try {
+        const res = await fetch('/api/admin-override', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: adminPassword, pick_id: pickId, outcome, action: 'override' })
+        });
+        if (res.status === 403) { showToast('Auth failed — re-enter password'); sessionStorage.removeItem('capy_admin_pw'); return; }
+        const data = await res.json();
+        if (data.success) { showToast(`Marked as ${outcome}`); loadAllData(); }
+        else showToast('Error: ' + data.error);
+      } catch (err) { showToast('Request failed'); }
+    }
+
+    async function deletePick(pickId) {
+      if (!confirm('Delete this pick? This cannot be undone.')) return;
+      try {
+        const res = await fetch('/api/admin-override', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: adminPassword, pick_id: pickId, action: 'delete' })
+        });
+        if (res.status === 403) { showToast('Auth failed'); return; }
+        const data = await res.json();
+        if (data.success) { showToast('Pick deleted'); loadAllData(); }
+        else showToast('Error: ' + data.error);
+      } catch (err) { showToast('Request failed'); }
+    }
+
+    // ── Toast ─────────────────────────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>

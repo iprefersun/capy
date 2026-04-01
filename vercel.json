@@ -11,5 +11,11 @@
         { "key": "Content-Type", "value": "text/html; charset=utf-8" }
       ]
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/check-results",
+      "schedule": "0 6,23 * * *"
+    }
   ]
 }

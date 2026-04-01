@@ -432,7 +432,6 @@
       </a>
       <div class="nav-right">
         <a href="/parlay.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">Parlay</a>
-        <a href="/record.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">Record</a>
         <a href="/stats.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f3'" onmouseout="this.style.background='none'">Stats</a>
         <span style="font-size:12px;color:var(--text-muted);"><span class="live-dot"></span>Live odds</span>
         <a href="/parlay.html" id="parlay-nav-count" style="display:none;font-size:12px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:4px 10px;border-radius:20px;text-decoration:none;">🎰 Parlay (<span id="parlay-count">0</span>)</a>
@@ -1410,42 +1409,6 @@
       let existingBanner = section2.querySelector('.picks-unlock-banner');
       if (existingBanner) existingBanner.remove();
       if (unlockBanner) section2.insertAdjacentHTML('beforeend', unlockBanner);
-
-      // Auto-save picks to Supabase (silent — never affects UI)
-      const pickPayload = top3.map(game => {
-        const bestBook = getBestBookForGame(game);
-        const gameEVData = calcGameEV(game);
-        const pickEV = gameEVData ? Math.max(gameEVData.home.ev, gameEVData.away.ev) : null;
-        const edgeInfo = calcEdgeInfo(game);
-        if (!bestBook) return null;
-        return {
-          game_id: game.id,
-          sport: game.sport_key,
-          home_team: game.home_team,
-          away_team: game.away_team,
-          pick: bestBook.side,
-          pick_type: 'ml',
-          line: null,
-          odds: bestBook.price,
-          book: bestBook.bookName,
-          ev_percent: pickEV,
-          edge: edgeInfo.value,
-          game_time: game.commence_time
-        };
-      }).filter(Boolean);
-      saveCappyPicksToSupabase(pickPayload);
-    }
-
-    async function saveCappyPicksToSupabase(picks) {
-      try {
-        await fetch('/api/save-picks', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ picks })
-        });
-      } catch (err) {
-        console.log('[Capy] Could not save picks to database:', err.message);
-      }
     }
 
     function buildGameCard(game, idx) {
