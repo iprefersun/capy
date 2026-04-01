@@ -124,10 +124,30 @@
     .summary-leg-pick { font-size: 13px; font-weight: 700; color: var(--text); }
     .summary-leg-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
     .summary-leg-book { font-size: 11px; color: var(--text-hint); }
-    .ev-badge { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 10px; cursor: default; }
-    .ev-badge.pos { background: var(--green-light); color: var(--green-dark); }
-    .ev-badge.neg { background: var(--red-light); color: var(--red); }
-    .ev-badge[title] { cursor: help; }
+    .ev-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; cursor: help; white-space: nowrap; }
+    .ev-strong { background: var(--green-light); color: var(--green-dark); }
+    .ev-pos    { background: var(--green-light); color: var(--green); }
+    .ev-neutral{ background: var(--surface-2); color: var(--text-muted); }
+    .ev-neg    { background: var(--red-light); color: var(--red); }
+    .kelly-line { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .ev-warning { font-size: 11px; font-weight: 600; color: var(--red); background: var(--red-light); padding: 6px 10px; border-radius: 6px; margin-top: 6px; }
+    .combined-ev { font-size: 13px; font-weight: 700; margin-top: 6px; }
+    /* EV explanation section */
+    .ev-explainer { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); margin-top: 1rem; overflow: hidden; }
+    .ev-explainer-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); background: none; border: none; cursor: pointer; text-align: left; }
+    .ev-explainer-toggle:hover { background: var(--surface-2); }
+    .ev-explainer-body { padding: 0 18px 18px; display: none; }
+    .ev-explainer-body.open { display: block; }
+    .ev-scale { display: flex; height: 20px; border-radius: 6px; overflow: hidden; margin: 12px 0 4px; }
+    .ev-scale-pos { flex: 1; background: var(--green); }
+    .ev-scale-neg { flex: 1; background: var(--red-light); }
+    .ev-scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-hint); margin-bottom: 12px; }
+    .ev-faq { margin-top: 14px; }
+    .ev-faq-item { border-top: 0.5px solid var(--border); }
+    .ev-faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px 0; font-size: 13px; font-weight: 600; color: var(--text); background: none; border: none; cursor: pointer; text-align: left; }
+    .ev-faq-a { font-size: 13px; color: var(--text-muted); padding-bottom: 10px; line-height: 1.55; display: none; }
+    .ev-faq-a.open { display: block; }
+    .ev-disclaimer { font-size: 11px; color: var(--text-hint); font-style: italic; margin-top: 1rem; line-height: 1.5; }
     .summary-leg-right { text-align: right; flex-shrink: 0; }
     .summary-leg-odds { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--green); }
     .remove-leg-btn { font-size: 16px; color: var(--text-hint); background: none; border: none; cursor: pointer; padding: 0; line-height: 1; margin-top: 1px; }
@@ -162,6 +182,37 @@
 
     /* EMPTY / LOADING */
     .selector-empty { text-align: center; padding: 2rem; font-size: 14px; color: var(--text-muted); }
+
+    /* LEFT COLUMN TABS */
+    .left-tabs { display: flex; gap: 0; margin-bottom: 1rem; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border-mid); }
+    .left-tab { flex: 1; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 12px; background: var(--surface-2); color: var(--text-muted); border: none; cursor: pointer; transition: all 0.12s; text-align: center; }
+    .left-tab.active { background: var(--green); color: #fff; }
+    .left-tab:first-child { border-right: 1.5px solid var(--border-mid); }
+
+    /* PROPS TAB */
+    .props-tab-content { display: none; }
+    .props-tab-content.active { display: block; }
+    .games-tab-content { display: block; }
+    .games-tab-content.hidden { display: none; }
+    .props-search { width: 100%; padding: 8px 12px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 13px; background: var(--surface); color: var(--text); margin-bottom: 10px; }
+    .props-sport-tabs { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+    .props-sport-tab { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
+    .props-sport-tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .props-game-group { margin-bottom: 1rem; }
+    .props-game-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-hint); margin-bottom: 6px; padding: 4px 0; border-bottom: 0.5px solid var(--border); }
+    .prop-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .prop-card-info { flex: 1; min-width: 0; }
+    .prop-card-player { font-size: 13px; font-weight: 600; color: var(--text); }
+    .prop-card-type { font-size: 11px; color: var(--text-hint); }
+    .prop-card-line { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    .prop-card-odds { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .prop-ou-toggle { display: flex; border-radius: 6px; overflow: hidden; border: 0.5px solid var(--border-mid); }
+    .prop-ou-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 9px; background: var(--surface-2); color: var(--text-muted); border: none; cursor: pointer; transition: background 0.12s; }
+    .prop-ou-btn.active { background: var(--green); color: #fff; }
+    .prop-add-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; padding: 5px 10px; background: var(--green-light); color: var(--green-dark); border: none; border-radius: 6px; cursor: pointer; transition: background 0.12s; white-space: nowrap; }
+    .prop-add-btn:hover { background: var(--green); color: #fff; }
+    .props-empty-msg { font-size: 13px; color: var(--text-hint); text-align: center; padding: 2rem; }
+    .props-loading { font-size: 13px; color: var(--text-hint); padding: 1rem 0; }
 
     /* DARK MODE */
     body, nav, .selector-card, .summary-card, .leg-btn, .sport-tab, .payout-input,
@@ -226,24 +277,47 @@
 
     <!-- LEFT: GAME SELECTOR -->
     <div class="parlay-left">
-      <div class="section-label">Today's games</div>
-      <div class="sport-tabs" id="sport-tabs">
-        <button class="sport-tab active" onclick="filterSport('all')">All</button>
-        <button class="sport-tab" onclick="filterSport('basketball_nba')">🏀 NBA</button>
-        <button class="sport-tab" onclick="filterSport('americanfootball_nfl')">🏈 NFL</button>
-        <button class="sport-tab" onclick="filterSport('baseball_mlb')">⚾ MLB</button>
-        <button class="sport-tab" onclick="filterSport('icehockey_nhl')">🏒 NHL</button>
+      <div class="left-tabs">
+        <button class="left-tab active" id="tab-games" onclick="switchTab('games')">🎮 Games</button>
+        <button class="left-tab" id="tab-props" onclick="switchTab('props')">🎯 Player Props</button>
       </div>
-      <div class="left-header">
-        <span id="game-count-note" class="leg-count-note"></span>
-        <span class="leg-count-note" id="legs-count-note"></span>
-      </div>
-      <div id="game-selector">
-        <div class="skeleton-row"><div class="skeleton-line" style="width:60%"></div><div class="skeleton-line" style="width:40%"></div></div>
-        <div class="skeleton-row"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:35%"></div></div>
-        <div class="skeleton-row"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:45%"></div></div>
-      </div>
-    </div>
+
+      <!-- GAMES TAB -->
+      <div class="games-tab-content" id="games-tab-content">
+        <div class="section-label">Today's games</div>
+        <div class="sport-tabs" id="sport-tabs">
+          <button class="sport-tab active" onclick="filterSport('all')">All</button>
+          <button class="sport-tab" onclick="filterSport('basketball_nba')">🏀 NBA</button>
+          <button class="sport-tab" onclick="filterSport('americanfootball_nfl')">🏈 NFL</button>
+          <button class="sport-tab" onclick="filterSport('baseball_mlb')">⚾ MLB</button>
+          <button class="sport-tab" onclick="filterSport('icehockey_nhl')">🏒 NHL</button>
+        </div>
+        <div class="left-header">
+          <span id="game-count-note" class="leg-count-note"></span>
+          <span class="leg-count-note" id="legs-count-note"></span>
+        </div>
+        <div id="game-selector">
+          <div class="skeleton-row"><div class="skeleton-line" style="width:60%"></div><div class="skeleton-line" style="width:40%"></div></div>
+          <div class="skeleton-row"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:35%"></div></div>
+          <div class="skeleton-row"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:45%"></div></div>
+        </div>
+      </div><!-- end games-tab-content -->
+
+      <!-- PROPS TAB -->
+      <div class="props-tab-content" id="props-tab-content">
+        <div class="props-sport-tabs" id="props-sport-tabs">
+          <button class="props-sport-tab active" onclick="filterPropsSport('basketball_nba',this)">🏀 NBA</button>
+          <button class="props-sport-tab" onclick="filterPropsSport('americanfootball_nfl',this)">🏈 NFL</button>
+          <button class="props-sport-tab" onclick="filterPropsSport('baseball_mlb',this)">⚾ MLB</button>
+          <button class="props-sport-tab" onclick="filterPropsSport('icehockey_nhl',this)">🏒 NHL</button>
+        </div>
+        <input type="text" class="props-search" id="props-search" placeholder="Search player name..." oninput="filterPropsSearch(this.value)" />
+        <div id="props-list">
+          <div class="props-loading">Loading props...</div>
+        </div>
+      </div><!-- end props-tab-content -->
+
+    </div><!-- end parlay-left -->
 
     <!-- RIGHT: SUGGESTED + SUMMARY -->
     <div class="parlay-right">
@@ -265,6 +339,50 @@
 
     </div>
   </div>
+
+  <!-- EV EXPLAINER -->
+  <div class="ev-explainer" style="margin-top:1.5rem;">
+    <button class="ev-explainer-toggle" onclick="toggleEvExplainer(this)">
+      <span>What is Expected Value and why does it matter?</span>
+      <span class="ev-explainer-icon">▼</span>
+    </button>
+    <div class="ev-explainer-body">
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">Expected Value (EV) is the single most important concept in sports betting. It answers one question: is this bet mathematically profitable over the long run?</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">A bet is +EV when the odds you're getting are better than the true probability of the outcome. Sportsbooks build in a margin (called the 'vig' or 'juice') so most bets are actually -EV by default. Capy strips out the vig to find the true probability, then checks whether the best available line across all books beats it.</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:12px;">Example: If the true probability of the Lakers winning is 60%, but FanDuel is offering odds that imply only 55% — you're getting a better price than the market thinks is fair. That's +EV. Bet enough +EV spots and you'll be profitable long term.</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.65;">The Kelly Criterion takes this further — it tells you exactly how much of your bankroll to risk on each +EV bet to maximize long-term growth without going broke.</p>
+
+      <div style="margin-top:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">True probability vs. Implied probability from odds</div>
+        <div class="ev-scale">
+          <div class="ev-scale-pos" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">+EV (implied &lt; true)</div>
+          <div class="ev-scale-neg" style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--red);">-EV (implied &gt; true)</div>
+        </div>
+        <div class="ev-scale-labels">
+          <span>You're getting better price than market</span>
+          <span>Market is pricing you out</span>
+        </div>
+      </div>
+
+      <div class="ev-faq">
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>Why do I need to remove the vig?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Books price both sides so they profit regardless of outcome. The vig inflates implied probabilities. Removing it reveals the true market price.</div>
+        </div>
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>What EV % should I look for?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Anything above +2% is strong. Even +1% adds up over hundreds of bets. Avoid -EV bets.</div>
+        </div>
+        <div class="ev-faq-item">
+          <button class="ev-faq-q" onclick="toggleFaq(this)"><span>Is Kelly Criterion safe to use?</span><span class="faq-icon">+</span></button>
+          <div class="ev-faq-a">Kelly maximizes long-term growth but can suggest large bets on high-confidence edges. Many bettors use Half-Kelly (half the suggested %) to be more conservative.</div>
+        </div>
+      </div>
+
+      <p class="ev-disclaimer">EV calculations are estimates based on market-implied probabilities. Past performance does not guarantee future results. Bet responsibly.</p>
+    </div>
+  </div>
+
 </div>
 
 <!-- MOBILE FIXED BAR -->
@@ -318,13 +436,30 @@
     if (!legs.length) return 1;
     return legs.reduce((acc, l) => acc * amToDecimal(l.odds), 1);
   }
-  function calcEV(selectedOdds, otherSideOdds) {
+  function amToImpliedProb(american) {
+    if (american > 0) return 100 / (american + 100);
+    return Math.abs(american) / (Math.abs(american) + 100);
+  }
+  // Returns { evPct, fairProb, kelly } for a leg (needs otherSideOdds for fair prob calc)
+  function calcLegEV(selectedOdds, otherSideOdds) {
     if (!otherSideOdds) return null;
-    const d1 = amToDecimal(selectedOdds);
-    const d2 = amToDecimal(otherSideOdds);
-    const total = 1/d1 + 1/d2;
-    const fairDecimal = total / (1/d1);
-    return d1 >= fairDecimal; // true = +EV
+    const imp1 = amToImpliedProb(selectedOdds);
+    const imp2 = amToImpliedProb(otherSideOdds);
+    const total = imp1 + imp2;
+    const fairProb = imp1 / total;
+    const decimal = amToDecimal(selectedOdds);
+    const evPct = parseFloat((((fairProb * (decimal - 1)) - (1 - fairProb)) * 100).toFixed(1));
+    const kellyRaw = (fairProb * (decimal - 1) - (1 - fairProb)) / (decimal - 1);
+    const kelly = parseFloat((Math.min(kellyRaw * 100, 25)).toFixed(1));
+    return { evPct, fairProb, kelly };
+  }
+  function classifyEV(evPct) {
+    const sign = evPct > 0 ? '+' : '';
+    const label = `${sign}${evPct.toFixed(1)}%`;
+    if (evPct > 3)  return { label, cls: 'ev-strong', emoji: '🔥', full: '🔥 Strong +EV' };
+    if (evPct >= 1) return { label, cls: 'ev-pos',    emoji: '✅', full: '✅ +EV' };
+    if (evPct >= -1)return { label, cls: 'ev-neutral', emoji: '➖', full: '➖ Neutral' };
+    return           { label, cls: 'ev-neg',    emoji: '⚠️', full: '⚠️ -EV' };
   }
 
   // ── Edge calc ──────────────────────────────────────────────────────────
@@ -445,9 +580,11 @@
     );
     const games = [];
     results.forEach((r, i) => {
-      if (r.status === 'fulfilled' && Array.isArray(r.value)) {
-        r.value.forEach(g => { if (!g.sport_key) g.sport_key = sports[i]; games.push(g); });
-      }
+      if (r.status !== 'fulfilled') return;
+      const data = r.value;
+      // Handle both new { usOdds, pinnacleOdds } and legacy array format
+      const arr = Array.isArray(data.usOdds) ? data.usOdds : (Array.isArray(data) ? data : []);
+      arr.forEach(g => { if (!g.sport_key) g.sport_key = sports[i]; games.push(g); });
     });
     return games;
   }
@@ -608,15 +745,38 @@
     const avgEdge = suggested.reduce((a, l) => a + l.edge, 0) / suggested.length;
     const confLabel = avgEdge >= 4 ? '🔥 Strong Parlay' : '✅ Good Value Parlay';
 
+    // Compute combined EV for suggested parlay
+    let combinedEvPct = 0;
+    let hasAllEV = true;
     const legItems = suggested.map(l => {
       const oddsStr = fmtAm(l.odds);
+      if (l.isProp) {
+        return `<div class="suggested-leg">
+          <div class="suggested-leg-teams">${l.teamsLabel || ''}</div>
+          <div class="suggested-leg-pick">🎯 ${l.propLabel}</div>
+          <div class="suggested-leg-book">Best at ${l.bookName}</div>
+        </div>`;
+      }
       const sideShort = l.side.split(' ').pop();
+      const evData = l.otherSideOdds ? calcLegEV(l.odds, l.otherSideOdds) : null;
+      let evHtml = '', kellyHtml = '';
+      if (evData) {
+        const evInfo = classifyEV(evData.evPct);
+        evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg">${evInfo.emoji} ${evInfo.label}</span>`;
+        kellyHtml = evData.kelly > 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;">Kelly: ${evData.kelly}%</span>` : '';
+        combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
+      } else { hasAllEV = false; }
       return `<div class="suggested-leg">
         <div class="suggested-leg-teams">${l.teamsLabel}</div>
         <div class="suggested-leg-pick">${sideShort} ML ${oddsStr}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">${evHtml}${kellyHtml}</div>
         <div class="suggested-leg-book">Best at ${l.bookName}</div>
       </div>`;
     }).join('');
+
+    const combinedEvDisplay = hasAllEV && suggested.length > 0
+      ? (() => { const e = classifyEV(combinedEvPct); return `<div style="font-size:12px;margin-top:8px;color:rgba(255,255,255,0.6);">Combined EV: <span class="${e.cls}" style="font-weight:700;">${e.emoji} ${e.label}</span></div>`; })()
+      : '';
 
     card.innerHTML = `
       <div class="suggested-label">🦫 Capy's Pick — Updated every 60 seconds</div>
@@ -625,6 +785,7 @@
       <div class="suggested-odds-block">
         <div class="suggested-odds-label">Combined odds</div>
         <div class="suggested-odds-num">${fmtAm(combinedAm)}</div>
+        ${combinedEvDisplay}
       </div>
       <div class="suggested-legs-list">${legItems}</div>
       <div class="suggested-btns">
@@ -651,6 +812,37 @@
     renderAll();
   }
 
+  // ── Load best prop for suggested parlay ────────────────────────────────
+  async function loadBestPropForSuggested(suggested) {
+    // Only for NBA, only add 1 prop leg max
+    const nbaGames = allGamesData.filter(g => g.sport_key === 'basketball_nba').slice(0, 3);
+    if (!nbaGames.length) return suggested;
+    for (const game of nbaGames) {
+      try {
+        const res = await fetch(`/api/props?sport=basketball_nba&eventId=${game.id}`);
+        if (!res.ok) continue;
+        const data = await res.json();
+        const props = parseParlayProps(data).filter(p => p.over !== null);
+        if (!props.length) continue;
+        // Pick best prop (highest over odds)
+        const best = props.sort((a, b) => b.over - a.over)[0];
+        const propLeg = {
+          gameId: `${game.id}_prop_best`,
+          isProp: true,
+          player: best.player, market: best.market, marketKey: best.marketKey, line: best.line,
+          propSide: 'over', side: best.player, sideType: 'prop_over', odds: parseInt(best.over),
+          bookName: best.overBook || '—', homeTeam: game.home_team, awayTeam: game.away_team,
+          sportKey: 'basketball_nba', commenceTime: game.commence_time, otherSideOdds: null,
+          propLabel: `${best.player} — Over ${best.line} ${best.market}`,
+          teamsLabel: `🏀 ${game.away_team} @ ${game.home_team}`,
+          edge: 0,
+        };
+        return [...suggested, propLeg];
+      } catch(e) { continue; }
+    }
+    return suggested;
+  }
+
   // ── Render custom parlay summary (right column bottom) ────────────────
   function renderSummary() {
     const body = document.getElementById('parlay-summary-body');
@@ -660,20 +852,48 @@
       return;
     }
 
+    let combinedEvPct = 0;
+    let hasAllEV = true;
+    let combinedFairProb = 1;
+
     const legItems = parlayLegs.map(leg => {
-      const sideShort = leg.side.split(' ').pop();
       const oddsStr = fmtAm(leg.odds);
+      // Prop legs display differently
+      if (leg.isProp) {
+        const sportEmoji = SPORT_EMOJIS[leg.sportKey] || '🎯';
+        return `<div class="summary-leg">
+          <div class="summary-leg-left">
+            <div class="summary-leg-teams">${sportEmoji} ${leg.awayTeam?.split(' ').pop() || ''} @ ${leg.homeTeam?.split(' ').pop() || ''}</div>
+            <div class="summary-leg-pick">${leg.propLabel || leg.player}</div>
+            <div class="summary-leg-meta"><span class="summary-leg-book">${leg.bookName}</span></div>
+          </div>
+          <div class="summary-leg-right">
+            <div class="summary-leg-odds">${oddsStr}</div>
+            <button class="remove-leg-btn" onclick="removeLeg('${leg.gameId}')" title="Remove leg">×</button>
+          </div>
+        </div>`;
+      }
+      const sideShort = leg.side.split(' ').pop();
       const spreadStr = leg.point != null ? ` (${leg.point >= 0 ? '+' : ''}${leg.point})` : '';
       const pickStr = leg.market === 'spreads' ? `${sideShort}${spreadStr}` : `${sideShort} ML`;
       const teamsStr = `${leg.awayTeam.split(' ').pop()} @ ${leg.homeTeam.split(' ').pop()}`;
 
-      let evHtml = '';
+      let evHtml = '', kellyHtml = '', warnHtml = '';
       if (leg.market === 'h2h' && leg.otherSideOdds) {
-        const isPos = calcEV(leg.odds, leg.otherSideOdds);
-        const evLabel = isPos ? '+EV ✅' : '-EV ⚠️';
-        const evCls = isPos ? 'ev-badge pos' : 'ev-badge neg';
-        evHtml = `<span class="${evCls}" title="EV = Expected Value. +EV means this line is mathematically profitable long term based on the market's implied probability.">${evLabel}</span>`;
-      }
+        const evData = calcLegEV(leg.odds, leg.otherSideOdds);
+        if (evData) {
+          const evInfo = classifyEV(evData.evPct);
+          evHtml = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line is mathematically profitable long term.">${evInfo.emoji} ${evInfo.label}</span>`;
+          if (evData.kelly > 0) {
+            kellyHtml = `<div class="kelly-line">Kelly: ${evData.kelly}% of bankroll</div>`;
+          }
+          if (evData.evPct < -1) {
+            warnHtml = `<div class="ev-warning">⚠️ This leg has negative expected value — it reduces your overall edge</div>`;
+          }
+          combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
+          combinedFairProb *= evData.fairProb;
+        } else { hasAllEV = false; }
+      } else { hasAllEV = false; }
 
       return `<div class="summary-leg">
         <div class="summary-leg-left">
@@ -683,6 +903,8 @@
             <span class="summary-leg-book">${leg.bookName}</span>
             ${evHtml}
           </div>
+          ${kellyHtml}
+          ${warnHtml}
         </div>
         <div class="summary-leg-right">
           <div class="summary-leg-odds">${oddsStr}</div>
@@ -696,12 +918,28 @@
     const payout = (betAmount * combinedDecimal).toFixed(2);
     const profit = ((betAmount * combinedDecimal) - betAmount).toFixed(2);
 
+    // Combined EV and Kelly for the whole parlay
+    let combinedEvBlock = '';
+    if (hasAllEV && parlayLegs.length > 0) {
+      const evInfo = classifyEV(combinedEvPct);
+      const kellyRaw = (combinedFairProb * (combinedDecimal - 1) - (1 - combinedFairProb)) / (combinedDecimal - 1);
+      const parlayKelly = Math.min(parseFloat((kellyRaw * 100).toFixed(1)), 25);
+      const kellyMsg = parlayKelly > 0
+        ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Kelly suggests: ${parlayKelly}% of bankroll for this parlay</div>`
+        : `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">No edge — skip this bet</div>`;
+      combinedEvBlock = `
+        <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">Combined EV: <span class="ev-badge ${evInfo.cls}" style="font-size:11px;">${evInfo.emoji} ${evInfo.label}</span></div>
+        ${kellyMsg}
+        <div style="font-size:10px;color:var(--text-hint);margin-top:3px;font-style:italic;">Parlay EV compounds — each leg must be +EV for the parlay to be +EV overall</div>`;
+    }
+
     body.innerHTML = `
       <div class="summary-legs">${legItems}</div>
       <div class="combined-block">
         <div class="combined-label">Combined parlay odds</div>
         <div class="combined-odds">${fmtAm(combinedAm)}</div>
         <div class="combined-decimal">${combinedDecimal.toFixed(2)}x decimal</div>
+        ${combinedEvBlock}
       </div>
       <div class="payout-row">
         <span class="payout-label">Bet $</span>
@@ -759,6 +997,186 @@
     if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
   })();
 
+  // ── EV Explainer toggles ──────────────────────────────────────────────
+  function toggleEvExplainer(btn) {
+    const body = btn.closest('.ev-explainer').querySelector('.ev-explainer-body');
+    const icon = btn.querySelector('.ev-explainer-icon');
+    const isOpen = body.classList.toggle('open');
+    if (icon) icon.textContent = isOpen ? '▲' : '▼';
+  }
+  function toggleFaq(btn) {
+    const item = btn.closest('.ev-faq-item');
+    const ans = item.querySelector('.ev-faq-a');
+    const icon = btn.querySelector('.faq-icon');
+    const isOpen = ans.classList.toggle('open');
+    if (icon) icon.textContent = isOpen ? '−' : '+';
+  }
+
+  // ── Props Tab ──────────────────────────────────────────────────────────
+  let propsSport = 'basketball_nba';
+  let allPropsData = {}; // keyed by sport, value: { games: [{game, props}], ts }
+  let propsSideState = {}; // keyed by propKey
+  const PROPS_TTL = 5 * 60 * 1000;
+
+  const MARKET_LABELS_P = {
+    player_points: 'Points', player_rebounds: 'Rebounds', player_assists: 'Assists',
+    player_threes: '3-Pointers', player_blocks: 'Blocks', player_steals: 'Steals',
+    player_pass_tds: 'Pass TDs', player_pass_yards: 'Pass Yards', player_rush_yards: 'Rush Yards',
+    player_reception_yards: 'Rec Yards', player_receptions: 'Receptions',
+    player_hits: 'Hits', player_home_runs: 'Home Runs', player_rbis: 'RBIs',
+    player_strikeouts_thrown: 'Strikeouts', player_goals: 'Goals',
+  };
+
+  function switchTab(tab) {
+    const gamesContent = document.getElementById('games-tab-content');
+    const propsContent = document.getElementById('props-tab-content');
+    const gamesBtn = document.getElementById('tab-games');
+    const propsBtn = document.getElementById('tab-props');
+    if (tab === 'games') {
+      gamesContent.classList.remove('hidden');
+      propsContent.classList.remove('active');
+      gamesBtn.classList.add('active');
+      propsBtn.classList.remove('active');
+    } else {
+      gamesContent.classList.add('hidden');
+      propsContent.classList.add('active');
+      gamesBtn.classList.remove('active');
+      propsBtn.classList.add('active');
+      loadAllProps(propsSport);
+    }
+  }
+
+  function filterPropsSport(sport, btn) {
+    propsSport = sport;
+    document.querySelectorAll('.props-sport-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadAllProps(sport);
+  }
+
+  function filterPropsSearch(query) {
+    renderPropsTab(query.toLowerCase());
+  }
+
+  async function loadAllProps(sport) {
+    const cached = allPropsData[sport];
+    if (cached && Date.now() - cached.ts < PROPS_TTL) { renderPropsTab(); return; }
+
+    document.getElementById('props-list').innerHTML = '<div class="props-loading">Loading props...</div>';
+    const games = allGamesData.filter(g => g.sport_key === sport);
+    if (!games.length) {
+      document.getElementById('props-list').innerHTML = '<div class="props-empty-msg">No games available for this sport right now.</div>';
+      return;
+    }
+
+    const results = await Promise.allSettled(
+      games.map(g => fetch(`/api/props?sport=${sport}&eventId=${g.id}`).then(r => r.json()).then(data => ({ game: g, data })))
+    );
+
+    const gameProps = [];
+    results.forEach(r => {
+      if (r.status !== 'fulfilled') return;
+      const { game, data } = r.value;
+      const props = parseParlayProps(data);
+      if (props.length) gameProps.push({ game, props });
+    });
+
+    allPropsData[sport] = { games: gameProps, ts: Date.now() };
+    renderPropsTab();
+  }
+
+  function parseParlayProps(apiData) {
+    if (!apiData?.bookmakers?.length) return [];
+    const propMap = {};
+    apiData.bookmakers.forEach(book => {
+      book.markets?.forEach(mkt => {
+        const mktLabel = MARKET_LABELS_P[mkt.key] || mkt.key;
+        mkt.outcomes?.forEach(o => {
+          const isOver = (o.description || '').toLowerCase() === 'over';
+          const isUnder = (o.description || '').toLowerCase() === 'under';
+          if (!isOver && !isUnder) return;
+          const key = `${o.name}|${mkt.key}|${o.point}`;
+          if (!propMap[key]) propMap[key] = { player: o.name, market: mktLabel, marketKey: mkt.key, line: o.point, over: null, under: null, overBook: null, underBook: null };
+          if (isOver && (propMap[key].over === null || o.price > propMap[key].over)) { propMap[key].over = o.price; propMap[key].overBook = book.title; }
+          if (isUnder && (propMap[key].under === null || o.price > propMap[key].under)) { propMap[key].under = o.price; propMap[key].underBook = book.title; }
+        });
+      });
+    });
+    return Object.values(propMap).filter(p => p.over !== null || p.under !== null);
+  }
+
+  function renderPropsTab(searchQuery = '') {
+    const cached = allPropsData[propsSport];
+    const container = document.getElementById('props-list');
+    if (!cached?.games?.length) {
+      container.innerHTML = '<div class="props-empty-msg">No props available for this sport right now. Check back closer to game time.</div>';
+      return;
+    }
+    const fmtOdds = o => o == null ? '—' : (o > 0 ? `+${o}` : `${o}`);
+    const html = cached.games.map(({ game, props }) => {
+      const filtered = searchQuery ? props.filter(p => p.player.toLowerCase().includes(searchQuery)) : props;
+      if (!filtered.length) return '';
+      return `<div class="props-game-group">
+        <div class="props-game-label">${SPORT_EMOJIS[game.sport_key] || '🎯'} ${game.away_team} @ ${game.home_team}</div>
+        ${filtered.map(p => {
+          const pk = `${game.id}|${p.player}|${p.marketKey}|${p.line}`;
+          const side = propsSideState[pk] || 'over';
+          return `<div class="prop-card">
+            <div class="prop-card-info">
+              <div class="prop-card-player">${p.player}</div>
+              <div class="prop-card-type">${p.market}</div>
+            </div>
+            <div class="prop-card-line">O/U ${p.line}</div>
+            <div class="prop-card-odds">${side === 'over' ? fmtOdds(p.over) : fmtOdds(p.under)}<br><span style="font-size:10px;color:var(--text-hint);">${side === 'over' ? (p.overBook||'') : (p.underBook||'')}</span></div>
+            <div class="prop-ou-toggle">
+              <button class="prop-ou-btn${side==='over'?' active':''}" onclick="selectPropSide('${pk}','over',this)">O</button>
+              <button class="prop-ou-btn${side==='under'?' active':''}" onclick="selectPropSide('${pk}','under',this)">U</button>
+            </div>
+            <button class="prop-add-btn" onclick="addPropLeg('${game.id}','${p.player.replace(/'/g,"\\'")}','${p.market}','${p.marketKey}',${p.line},${p.over},${p.under},'${p.overBook}','${p.underBook}','${game.home_team.replace(/'/g,"\\'")}','${game.away_team.replace(/'/g,"\\'")}','${game.sport_key}','${game.commence_time}','${pk}')">➕ Add</button>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('');
+    container.innerHTML = html || '<div class="props-empty-msg">No props match your search.</div>';
+  }
+
+  function selectPropSide(pk, side, btn) {
+    propsSideState[pk] = side;
+    const toggle = btn.closest('.prop-ou-toggle');
+    toggle.querySelectorAll('.prop-ou-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Update the odds display
+    renderPropsTab(document.getElementById('props-search')?.value?.toLowerCase() || '');
+  }
+
+  function addPropLeg(gameId, player, market, marketKey, line, overOdds, underOdds, overBook, underBook, homeTeam, awayTeam, sportKey, commenceTime, pk) {
+    const side = propsSideState[pk] || 'over';
+    const odds = side === 'over' ? overOdds : underOdds;
+    const bookName = side === 'over' ? overBook : underBook;
+    if (odds == null || odds === 'null') return;
+
+    const propId = `${gameId}_prop_${player}_${marketKey}_${line}`;
+    const leg = {
+      gameId: propId,
+      isProp: true,
+      player, market, marketKey, line: parseFloat(line),
+      propSide: side,
+      side: player,
+      sideType: `prop_${side}`,
+      odds: parseInt(odds),
+      bookName: bookName || '—',
+      homeTeam, awayTeam,
+      sportKey, commenceTime,
+      otherSideOdds: null,
+      propLabel: `${player} — ${side === 'over' ? 'Over' : 'Under'} ${line} ${market}`,
+    };
+
+    parlayLegs = parlayLegs.filter(l => l.gameId !== propId);
+    if (parlayLegs.length >= 10) { alert('Maximum 10 legs per parlay.'); return; }
+    parlayLegs.push(leg);
+    saveLegs(parlayLegs);
+    renderAll();
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────
   async function init() {
     parlayLegs = loadLegs();
@@ -770,7 +1188,8 @@
     }
 
     const suggested = buildSuggestedParlay();
-    renderSuggested(suggested);
+    // Async: try to add best prop leg to suggested parlay
+    loadBestPropForSuggested(suggested).then(withProp => renderSuggested(withProp));
     renderAll();
 
     // Auto-refresh every 60 seconds

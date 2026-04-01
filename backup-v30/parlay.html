@@ -183,6 +183,92 @@
     /* EMPTY / LOADING */
     .selector-empty { text-align: center; padding: 2rem; font-size: 14px; color: var(--text-muted); }
 
+    /* LEFT COLUMN TABS */
+    .left-tabs { display: flex; gap: 0; margin-bottom: 1rem; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border-mid); }
+    .left-tab { flex: 1; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 12px; background: var(--surface-2); color: var(--text-muted); border: none; cursor: pointer; transition: all 0.12s; text-align: center; }
+    .left-tab.active { background: var(--green); color: #fff; }
+    .left-tab:first-child { border-right: 1.5px solid var(--border-mid); }
+
+    /* PROPS TAB */
+    .props-tab-content { display: none; }
+    .props-tab-content.active { display: block; }
+    .games-tab-content { display: block; }
+    .games-tab-content.hidden { display: none; }
+    .props-search { width: 100%; padding: 8px 12px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 13px; background: var(--surface); color: var(--text); margin-bottom: 10px; }
+    .props-sport-tabs { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+    .props-sport-tab { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
+    .props-sport-tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .props-game-group { margin-bottom: 1rem; }
+    .props-game-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-hint); margin-bottom: 6px; padding: 4px 0; border-bottom: 0.5px solid var(--border); }
+    .prop-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .prop-card-info { flex: 1; min-width: 0; }
+    .prop-card-player { font-size: 13px; font-weight: 600; color: var(--text); }
+    .prop-card-type { font-size: 11px; color: var(--text-hint); }
+    .prop-card-line { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    .prop-card-odds { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .prop-ou-toggle { display: flex; border-radius: 6px; overflow: hidden; border: 0.5px solid var(--border-mid); }
+    .prop-ou-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 9px; background: var(--surface-2); color: var(--text-muted); border: none; cursor: pointer; transition: background 0.12s; }
+    .prop-ou-btn.active { background: var(--green); color: #fff; }
+    .prop-add-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; padding: 5px 10px; background: var(--green-light); color: var(--green-dark); border: none; border-radius: 6px; cursor: pointer; transition: background 0.12s; white-space: nowrap; }
+    .prop-add-btn:hover { background: var(--green); color: #fff; }
+    .props-empty-msg { font-size: 13px; color: var(--text-hint); text-align: center; padding: 2rem; }
+    .props-loading { font-size: 13px; color: var(--text-hint); padding: 1rem 0; }
+
+    /* PROTECT SHORTCUT */
+    .protect-shortcut { font-size: 12px; font-weight: 700; color: var(--green-dark); background: var(--green-light); padding: 3px 10px; border-radius: 20px; text-decoration: none; white-space: nowrap; }
+    .protect-shortcut:hover { background: var(--green); color: #fff; }
+    /* MOBILE HEDGE BAR */
+    .mobile-hedge-bar { display: none; position: fixed; bottom: 56px; left: 0; right: 0; z-index: 199; padding: 0 16px 8px; pointer-events: none; }
+    .mobile-hedge-btn { display: block; width: 100%; pointer-events: all; text-align: center; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; color: #fff; background: var(--green); border-radius: 8px; padding: 10px; text-decoration: none; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+    @media (max-width: 900px) { .mobile-hedge-bar { display: block; } }
+    /* HEDGE STATUS */
+    .hedge-status { background: var(--surface-2); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 12px; text-align: center; }
+    .hedge-live-label { font-size: 12px; font-weight: 700; color: var(--green-dark); background: var(--green-light); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 8px; }
+    /* HEDGE CALCULATOR */
+    .hedge-section { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .hedge-toggle { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; }
+    .hedge-toggle:hover { background: var(--surface-2); }
+    .hedge-toggle-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .hedge-toggle-sub { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+    .hedge-toggle-icon { font-size: 18px; transition: transform 0.2s; flex-shrink: 0; }
+    .hedge-toggle-icon.open { transform: rotate(180deg); }
+    .hedge-body { display: none; padding: 0 18px 18px; border-top: 0.5px solid var(--border); }
+    .hedge-body.open { display: block; }
+    .hedge-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .hedge-label { font-size: 12px; font-weight: 600; color: var(--text-muted); white-space: nowrap; min-width: 90px; }
+    .hedge-input { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; padding: 7px 12px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); width: 120px; background: var(--surface-2); color: var(--text); }
+    .hedge-input:focus { outline: none; border-color: var(--amber); }
+    .hedge-legs-list { margin-top: 14px; }
+    .hedge-leg-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+    .hedge-leg-item:last-child { border-bottom: none; }
+    .hedge-leg-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
+    .hedge-leg-label { font-size: 12px; color: var(--text); flex: 1; }
+    .hedge-leg-odds { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .hedge-slider-wrap { margin-top: 16px; }
+    .hedge-slider-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .hedge-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--green) 0%, var(--green) var(--pct, 100%), var(--border-mid) var(--pct, 100%)); outline: none; cursor: pointer; touch-action: manipulation; }
+    .hedge-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--green); cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .hedge-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--green); cursor: pointer; border: none; }
+    .hedge-results { margin-top: 16px; background: var(--surface-2); border-radius: var(--radius-sm); padding: 14px; }
+    .hedge-result-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 0.5px solid var(--border); }
+    .hedge-result-row:last-child { border-bottom: none; }
+    .hedge-result-label { font-size: 12px; color: var(--text-muted); }
+    .hedge-result-value { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text); }
+    .hedge-result-value.green { color: var(--green); }
+    .hedge-result-value.amber { color: var(--amber); }
+    .hedge-best-line { margin-top: 12px; padding: 10px 12px; background: var(--green-light); border-radius: var(--radius-sm); border: 0.5px solid var(--green); font-size: 12px; color: var(--green-dark); }
+    .hedge-disclaimer { font-size: 10px; color: var(--text-hint); margin-top: 10px; font-style: italic; }
+    .hedge-explainer { margin-top: 14px; border-top: 0.5px solid var(--border); padding-top: 12px; }
+    .hedge-explainer-toggle { font-size: 11px; font-weight: 600; color: var(--text-hint); cursor: pointer; background: none; border: none; padding: 0; text-decoration: underline; }
+    .hedge-explainer-body { display: none; font-size: 11px; color: var(--text-muted); line-height: 1.6; margin-top: 8px; }
+    .hedge-explainer-body.open { display: block; }
+    /* CLV TEASER */
+    .clv-teaser { background: var(--surface-2); border: 1.5px dashed var(--border-mid); border-radius: var(--radius-sm); padding: 14px 18px; display: flex; align-items: center; gap: 12px; opacity: 0.85; }
+    .clv-teaser-icon { font-size: 22px; flex-shrink: 0; }
+    .clv-teaser-body { flex: 1; }
+    .clv-teaser-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; }
+    .clv-teaser-desc { font-size: 11px; color: var(--text-hint); line-height: 1.4; }
+    .clv-teaser-link { font-size: 11px; font-weight: 600; color: var(--amber); text-decoration: none; }
     /* DARK MODE */
     body, nav, .selector-card, .summary-card, .leg-btn, .sport-tab, .payout-input,
     .combined-block { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
@@ -227,6 +313,7 @@
     <div class="nav-right">
       <a href="/odds" class="nav-link">Live odds</a>
       <a href="/parlay.html" class="nav-link active">Parlay</a>
+      <a href="/record.html" class="nav-link">Record</a>
       <a href="/stats.html" class="nav-link">Stats</a>
       <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
       <a href="/#signup" class="btn-small">Go Pro</a>
@@ -239,31 +326,54 @@
 
   <div class="parlay-page-header">
     <div class="parlay-page-title">🦫 Capy Parlay Builder</div>
-    <div class="parlay-page-sub">We find the edges. You build the parlay.</div>
+    <div class="parlay-page-sub">Build parlays from genuine market inefficiencies — not just good-looking lines.</div>
   </div>
 
   <div class="parlay-layout">
 
     <!-- LEFT: GAME SELECTOR -->
     <div class="parlay-left">
-      <div class="section-label">Today's games</div>
-      <div class="sport-tabs" id="sport-tabs">
-        <button class="sport-tab active" onclick="filterSport('all')">All</button>
-        <button class="sport-tab" onclick="filterSport('basketball_nba')">🏀 NBA</button>
-        <button class="sport-tab" onclick="filterSport('americanfootball_nfl')">🏈 NFL</button>
-        <button class="sport-tab" onclick="filterSport('baseball_mlb')">⚾ MLB</button>
-        <button class="sport-tab" onclick="filterSport('icehockey_nhl')">🏒 NHL</button>
+      <div class="left-tabs">
+        <button class="left-tab active" id="tab-games" onclick="switchTab('games')">🎮 Games</button>
+        <button class="left-tab" id="tab-props" onclick="switchTab('props')">🎯 Player Props</button>
       </div>
-      <div class="left-header">
-        <span id="game-count-note" class="leg-count-note"></span>
-        <span class="leg-count-note" id="legs-count-note"></span>
-      </div>
-      <div id="game-selector">
-        <div class="skeleton-row"><div class="skeleton-line" style="width:60%"></div><div class="skeleton-line" style="width:40%"></div></div>
-        <div class="skeleton-row"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:35%"></div></div>
-        <div class="skeleton-row"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:45%"></div></div>
-      </div>
-    </div>
+
+      <!-- GAMES TAB -->
+      <div class="games-tab-content" id="games-tab-content">
+        <div class="section-label">Today's games</div>
+        <div class="sport-tabs" id="sport-tabs">
+          <button class="sport-tab active" onclick="filterSport('all')">All</button>
+          <button class="sport-tab" onclick="filterSport('basketball_nba')">🏀 NBA</button>
+          <button class="sport-tab" onclick="filterSport('americanfootball_nfl')">🏈 NFL</button>
+          <button class="sport-tab" onclick="filterSport('baseball_mlb')">⚾ MLB</button>
+          <button class="sport-tab" onclick="filterSport('icehockey_nhl')">🏒 NHL</button>
+        </div>
+        <div class="left-header">
+          <span id="game-count-note" class="leg-count-note"></span>
+          <span class="leg-count-note" id="legs-count-note"></span>
+        </div>
+        <div id="game-selector">
+          <div class="skeleton-row"><div class="skeleton-line" style="width:60%"></div><div class="skeleton-line" style="width:40%"></div></div>
+          <div class="skeleton-row"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:35%"></div></div>
+          <div class="skeleton-row"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:45%"></div></div>
+        </div>
+      </div><!-- end games-tab-content -->
+
+      <!-- PROPS TAB -->
+      <div class="props-tab-content" id="props-tab-content">
+        <div class="props-sport-tabs" id="props-sport-tabs">
+          <button class="props-sport-tab active" onclick="filterPropsSport('basketball_nba',this)">🏀 NBA</button>
+          <button class="props-sport-tab" onclick="filterPropsSport('americanfootball_nfl',this)">🏈 NFL</button>
+          <button class="props-sport-tab" onclick="filterPropsSport('baseball_mlb',this)">⚾ MLB</button>
+          <button class="props-sport-tab" onclick="filterPropsSport('icehockey_nhl',this)">🏒 NHL</button>
+        </div>
+        <input type="text" class="props-search" id="props-search" placeholder="Search player name..." oninput="filterPropsSearch(this.value)" />
+        <div id="props-list">
+          <div class="props-loading">Loading props...</div>
+        </div>
+      </div><!-- end props-tab-content -->
+
+    </div><!-- end parlay-left -->
 
     <!-- RIGHT: SUGGESTED + SUMMARY -->
     <div class="parlay-right">
@@ -277,9 +387,76 @@
 
       <!-- CUSTOM PARLAY SUMMARY -->
       <div class="summary-card">
-        <div class="summary-title">Your Custom Parlay</div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;">
+          <div class="summary-title" style="margin-bottom:0;">Your Custom Parlay</div>
+          <a href="#hedge-section" class="protect-shortcut" onclick="openHedge()">🛡️ Protect</a>
+        </div>
         <div id="parlay-summary-body">
           <div class="summary-empty">Add games from the left to build your parlay 🦫</div>
+        </div>
+      </div>
+
+      <!-- HEDGE CALCULATOR -->
+      <div class="hedge-section" id="hedge-section">
+        <div class="hedge-toggle" onclick="toggleHedge(this)">
+          <div>
+            <div class="hedge-toggle-title">🛡️ Protect My Parlay</div>
+            <div class="hedge-toggle-sub">Already have a parlay running? Find the optimal hedge to lock profit or cut losses.</div>
+          </div>
+          <div class="hedge-toggle-icon">▼</div>
+        </div>
+        <div class="hedge-body" id="hedge-body">
+          <div class="hedge-status" id="hedge-status" style="display:none;"></div>
+          <div class="hedge-row">
+            <span class="hedge-label">Original stake</span>
+            <input type="number" class="hedge-input" id="hedge-stake" placeholder="100" min="1" value="100" oninput="recalcHedge()" />
+          </div>
+          <div class="hedge-row">
+            <span class="hedge-label">Parlay odds</span>
+            <input type="number" class="hedge-input" id="hedge-odds" placeholder="500" oninput="recalcHedge()" />
+            <span style="font-size:11px;color:var(--text-hint);">(American, e.g. 500 for +500)</span>
+          </div>
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-hint);margin-bottom:6px;">Mark legs as won ✓</div>
+            <div class="hedge-legs-list" id="hedge-legs-list">
+              <div style="font-size:12px;color:var(--text-hint);padding:8px 0;">Add legs to your parlay first, then come back here to hedge.</div>
+            </div>
+          </div>
+          <div class="hedge-slider-wrap">
+            <div class="hedge-slider-label">
+              <span>Protection level</span>
+              <span id="hedge-pct-display">100% (full guarantee)</span>
+            </div>
+            <input type="range" class="hedge-slider" id="hedge-slider" min="0" max="100" value="100" oninput="onHedgeSlider(this.value)" style="--pct:100%;" />
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-hint);margin-top:3px;"><span>No hedge (max upside)</span><span>Full guarantee</span></div>
+          </div>
+          <div class="hedge-results" id="hedge-results" style="display:none;">
+            <div class="hedge-live-label" id="hedge-live-label" style="display:none;"></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Parlay payout if all win</span><span class="hedge-result-value" id="hr-payout">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Remaining parlay odds</span><span class="hedge-result-value" id="hr-remaining-odds">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Recommended hedge bet</span><span class="hedge-result-value amber" id="hr-hedge-bet">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Hedge on (opposite side)</span><span class="hedge-result-value" id="hr-hedge-odds">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Guaranteed profit (if hedged)</span><span class="hedge-result-value" id="hr-guaranteed">—</span></div>
+            <div class="hedge-result-row"><span class="hedge-result-label">Unhedged upside (no hedge)</span><span class="hedge-result-value" id="hr-unhedged">—</span></div>
+            <div class="hedge-best-line" id="hr-best-line" style="display:none;"></div>
+            <div class="hedge-disclaimer" id="hr-disclaimer">⚠️ Hedge calculations are estimates. Always verify odds before placing. Lines move.</div>
+          </div>
+          <div class="hedge-explainer">
+            <button class="hedge-explainer-toggle" onclick="toggleHedgeExplainer(this)">How does hedging work? ▼</button>
+            <div class="hedge-explainer-body" id="hedge-explainer-body">
+              Hedging means betting on the opposite outcome of one or more of your parlay legs. Done correctly, it guarantees you profit regardless of the final result — at the cost of reducing your maximum payout. The key is timing: hedge too early and you sacrifice upside. Hedge at the right moment (when you have 1–2 legs left and the payout is large) and you can lock real money.
+              <br/><br/><strong>Formula:</strong> Hedge amount = Parlay payout ÷ Decimal odds of opposite side. Guaranteed profit = Payout − Hedge amount − Original stake.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLV TEASER -->
+      <div class="clv-teaser">
+        <div class="clv-teaser-icon">📈</div>
+        <div class="clv-teaser-body">
+          <div class="clv-teaser-title">📊 Closing Line Value Tracker <span style="font-size:10px;font-weight:600;background:var(--amber-light);color:var(--amber-dark);padding:2px 7px;border-radius:20px;margin-left:6px;">Coming soon</span></div>
+          <div class="clv-teaser-desc">CLV is how pros measure edge. If your picks consistently close better than where you bet, you're beating the market — even when individual bets lose. <a href="/#pricing" class="clv-teaser-link">Available in Sharp tier →</a></div>
         </div>
       </div>
 
@@ -329,6 +506,11 @@
     </div>
   </div>
 
+</div>
+
+<!-- MOBILE HEDGE BUTTON -->
+<div class="mobile-hedge-bar" id="mobile-hedge-bar" style="display:none;">
+  <a href="#hedge-section" class="mobile-hedge-btn" onclick="openHedge()">🛡️ Protect this parlay</a>
 </div>
 
 <!-- MOBILE FIXED BAR -->
@@ -526,9 +708,11 @@
     );
     const games = [];
     results.forEach((r, i) => {
-      if (r.status === 'fulfilled' && Array.isArray(r.value)) {
-        r.value.forEach(g => { if (!g.sport_key) g.sport_key = sports[i]; games.push(g); });
-      }
+      if (r.status !== 'fulfilled') return;
+      const data = r.value;
+      // Handle both new { usOdds, pinnacleOdds } and legacy array format
+      const arr = Array.isArray(data.usOdds) ? data.usOdds : (Array.isArray(data) ? data : []);
+      arr.forEach(g => { if (!g.sport_key) g.sport_key = sports[i]; games.push(g); });
     });
     return games;
   }
@@ -686,22 +870,26 @@
 
     const combinedDecimal = suggested.reduce((acc, l) => acc * amToDecimal(l.odds), 1);
     const combinedAm = decimalToAm(combinedDecimal);
-    const avgEdge = suggested.reduce((a, l) => a + l.edge, 0) / suggested.length;
-    const confLabel = avgEdge >= 4 ? '🔥 Strong Parlay' : '✅ Good Value Parlay';
 
     // Compute combined EV for suggested parlay
     let combinedEvPct = 0;
     let hasAllEV = true;
     const legItems = suggested.map(l => {
       const oddsStr = fmtAm(l.odds);
+      if (l.isProp) {
+        return `<div class="suggested-leg">
+          <div class="suggested-leg-teams">${l.teamsLabel || ''}</div>
+          <div class="suggested-leg-pick">🎯 ${l.propLabel}</div>
+          <div class="suggested-leg-book">Best at ${l.bookName}</div>
+        </div>`;
+      }
       const sideShort = l.side.split(' ').pop();
       const evData = l.otherSideOdds ? calcLegEV(l.odds, l.otherSideOdds) : null;
       let evHtml = '', kellyHtml = '';
       if (evData) {
         const evInfo = classifyEV(evData.evPct);
-        evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg">${evInfo.emoji} ${evInfo.label}</span>`;
+        evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg vs Pinnacle sharp line">${evInfo.emoji} ${evInfo.label} vs Pinnacle</span>`;
         kellyHtml = evData.kelly > 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;">Kelly: ${evData.kelly}%</span>` : '';
-        const legEVDecimal = (evData.evPct / 100) + 1;
         combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
       } else { hasAllEV = false; }
       return `<div class="suggested-leg">
@@ -712,8 +900,13 @@
       </div>`;
     }).join('');
 
+    // Determine label based on combined EV (not avgEdge)
+    const confLabel = (hasAllEV && combinedEvPct > 0)
+      ? '🔥 Strong Parlay'
+      : '🎰 High Upside Parlay (Negative EV — entertainment play)';
+
     const combinedEvDisplay = hasAllEV && suggested.length > 0
-      ? (() => { const e = classifyEV(combinedEvPct); return `<div style="font-size:12px;margin-top:8px;color:rgba(255,255,255,0.6);">Combined EV: <span class="${e.cls}" style="font-weight:700;">${e.emoji} ${e.label}</span></div>`; })()
+      ? (() => { const e = classifyEV(combinedEvPct); return `<div style="font-size:12px;margin-top:8px;color:rgba(255,255,255,0.6);">Combined EV: <span class="${e.cls}" style="font-weight:700;">${e.emoji} ${e.label} vs Pinnacle</span></div>`; })()
       : '';
 
     card.innerHTML = `
@@ -750,6 +943,37 @@
     renderAll();
   }
 
+  // ── Load best prop for suggested parlay ────────────────────────────────
+  async function loadBestPropForSuggested(suggested) {
+    // Only for NBA, only add 1 prop leg max
+    const nbaGames = allGamesData.filter(g => g.sport_key === 'basketball_nba').slice(0, 3);
+    if (!nbaGames.length) return suggested;
+    for (const game of nbaGames) {
+      try {
+        const res = await fetch(`/api/props?sport=basketball_nba&eventId=${game.id}`);
+        if (!res.ok) continue;
+        const data = await res.json();
+        const props = parseParlayProps(data).filter(p => p.over !== null);
+        if (!props.length) continue;
+        // Pick best prop (highest over odds)
+        const best = props.sort((a, b) => b.over - a.over)[0];
+        const propLeg = {
+          gameId: `${game.id}_prop_best`,
+          isProp: true,
+          player: best.player, market: best.market, marketKey: best.marketKey, line: best.line,
+          propSide: 'over', side: best.player, sideType: 'prop_over', odds: parseInt(best.over),
+          bookName: best.overBook || '—', homeTeam: game.home_team, awayTeam: game.away_team,
+          sportKey: 'basketball_nba', commenceTime: game.commence_time, otherSideOdds: null,
+          propLabel: `${best.player} — Over ${best.line} ${best.market}`,
+          teamsLabel: `🏀 ${game.away_team} @ ${game.home_team}`,
+          edge: 0,
+        };
+        return [...suggested, propLeg];
+      } catch(e) { continue; }
+    }
+    return suggested;
+  }
+
   // ── Render custom parlay summary (right column bottom) ────────────────
   function renderSummary() {
     const body = document.getElementById('parlay-summary-body');
@@ -764,8 +988,23 @@
     let combinedFairProb = 1;
 
     const legItems = parlayLegs.map(leg => {
-      const sideShort = leg.side.split(' ').pop();
       const oddsStr = fmtAm(leg.odds);
+      // Prop legs display differently
+      if (leg.isProp) {
+        const sportEmoji = SPORT_EMOJIS[leg.sportKey] || '🎯';
+        return `<div class="summary-leg">
+          <div class="summary-leg-left">
+            <div class="summary-leg-teams">${sportEmoji} ${leg.awayTeam?.split(' ').pop() || ''} @ ${leg.homeTeam?.split(' ').pop() || ''}</div>
+            <div class="summary-leg-pick">${leg.propLabel || leg.player}</div>
+            <div class="summary-leg-meta"><span class="summary-leg-book">${leg.bookName}</span></div>
+          </div>
+          <div class="summary-leg-right">
+            <div class="summary-leg-odds">${oddsStr}</div>
+            <button class="remove-leg-btn" onclick="removeLeg('${leg.gameId}')" title="Remove leg">×</button>
+          </div>
+        </div>`;
+      }
+      const sideShort = leg.side.split(' ').pop();
       const spreadStr = leg.point != null ? ` (${leg.point >= 0 ? '+' : ''}${leg.point})` : '';
       const pickStr = leg.market === 'spreads' ? `${sideShort}${spreadStr}` : `${sideShort} ML`;
       const teamsStr = `${leg.awayTeam.split(' ').pop()} @ ${leg.homeTeam.split(' ').pop()}`;
@@ -775,7 +1014,7 @@
         const evData = calcLegEV(leg.odds, leg.otherSideOdds);
         if (evData) {
           const evInfo = classifyEV(evData.evPct);
-          evHtml = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line is mathematically profitable long term.">${evInfo.emoji} ${evInfo.label}</span>`;
+          evHtml = `<span class="ev-badge ${evInfo.cls}" title="EV vs Pinnacle sharp line. +EV means this line beats the sharpest market price.">${evInfo.emoji} ${evInfo.label} vs Pinnacle</span>`;
           if (evData.kelly > 0) {
             kellyHtml = `<div class="kelly-line">Kelly: ${evData.kelly}% of bankroll</div>`;
           }
@@ -863,6 +1102,9 @@
     } else {
       document.getElementById('mobile-bar-odds').textContent = '—';
     }
+    // Show/hide mobile hedge button
+    const hedgeBar = document.getElementById('mobile-hedge-bar');
+    if (hedgeBar) hedgeBar.style.display = count > 0 ? 'block' : 'none';
   }
 
   function scrollToSummary() {
@@ -874,6 +1116,10 @@
     renderGameSelector();
     renderSummary();
     updateMobileBar();
+    // Refresh hedge legs if calculator is open
+    if (document.getElementById('hedge-body')?.classList.contains('open')) {
+      populateHedgeLegs(); recalcHedge();
+    }
   }
 
   // ── Dark mode ─────────────────────────────────────────────────────────
@@ -888,6 +1134,216 @@
     const icon = document.getElementById('theme-icon');
     if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
   })();
+
+  // ── Hedge Calculator ──────────────────────────────────────────────────
+  function openHedge() {
+    const body = document.getElementById('hedge-body');
+    const icon = document.querySelector('.hedge-toggle .hedge-toggle-icon');
+    if (!body.classList.contains('open')) {
+      body.classList.add('open');
+      if (icon) icon.classList.add('open');
+      populateHedgeLegs();
+      autoFillHedgeOdds();
+      recalcHedge();
+    }
+  }
+
+  function toggleHedge(el) {
+    const body = document.getElementById('hedge-body');
+    const icon = el.querySelector('.hedge-toggle-icon');
+    const isOpen = body.classList.toggle('open');
+    icon.classList.toggle('open', isOpen);
+    if (isOpen) {
+      populateHedgeLegs();
+      autoFillHedgeOdds();
+      recalcHedge();
+    }
+  }
+
+  // Auto-fill parlay odds input from builder when no value set
+  function autoFillHedgeOdds() {
+    const oddsInput = document.getElementById('hedge-odds');
+    if (!oddsInput || oddsInput.value) return;
+    if (!parlayLegs.length) return;
+    const combined = calcParlayDecimal(parlayLegs);
+    const am = decimalToAm(combined);
+    oddsInput.value = am;
+    // Also sync stake from bet-amount input
+    const stakeInput = document.getElementById('hedge-stake');
+    const betInput = document.getElementById('bet-amount-input');
+    if (stakeInput && betInput && betInput.value) stakeInput.value = betInput.value;
+  }
+
+  function populateHedgeLegs() {
+    const list = document.getElementById('hedge-legs-list');
+    if (!parlayLegs.length) {
+      list.innerHTML = '<div style="font-size:12px;color:var(--text-hint);padding:8px 0;">Add legs to your parlay first, then come back here to hedge.</div>';
+      return;
+    }
+    // Preserve existing checked state by index
+    const prevChecked = parlayLegs.map((_, i) => {
+      const cb = document.getElementById(`hedge-leg-${i}`);
+      return cb ? cb.checked : false;
+    });
+    list.innerHTML = parlayLegs.map((leg, i) => {
+      const label = leg.isProp
+        ? (leg.propLabel || leg.player)
+        : `${leg.side.split(' ').pop()} ML — ${(leg.awayTeam || '').split(' ').pop()} @ ${(leg.homeTeam || '').split(' ').pop()}`;
+      const checked = prevChecked[i] ? 'checked' : '';
+      return `<div class="hedge-leg-item">
+        <input type="checkbox" class="hedge-leg-check" id="hedge-leg-${i}" ${checked} onchange="recalcHedge()" />
+        <label class="hedge-leg-label" for="hedge-leg-${i}">${label}</label>
+        <span class="hedge-leg-odds">${fmtAm(leg.odds)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function onHedgeSlider(val) {
+    const slider = document.getElementById('hedge-slider');
+    slider.style.setProperty('--pct', val + '%');
+    const pctDisplay = document.getElementById('hedge-pct-display');
+    pctDisplay.textContent = val == 100 ? '100% (full guarantee)' : val == 0 ? '0% (no hedge)' : `${val}% hedge`;
+    recalcHedge();
+  }
+
+  function recalcHedge() {
+    const stake = parseFloat(document.getElementById('hedge-stake')?.value) || 0;
+    const parlayOddsInput = parseFloat(document.getElementById('hedge-odds')?.value) || 0;
+    const slider = document.getElementById('hedge-slider');
+    const protectionPct = slider ? parseFloat(slider.value) / 100 : 1;
+    const results = document.getElementById('hedge-results');
+    const statusEl = document.getElementById('hedge-status');
+
+    // Count won / remaining legs
+    let wonCount = 0;
+    let remainingLegs = [];
+    let remainingDecimal = 1;
+    parlayLegs.forEach((leg, i) => {
+      const cb = document.getElementById(`hedge-leg-${i}`);
+      if (cb && cb.checked) {
+        wonCount++;
+      } else {
+        remainingLegs.push(leg);
+        remainingDecimal *= amToDecimal(leg.odds);
+      }
+    });
+
+    // All legs won
+    if (parlayLegs.length > 0 && wonCount === parlayLegs.length) {
+      if (statusEl) { statusEl.textContent = 'All legs won — no hedge needed! 🎉'; statusEl.style.display = 'block'; }
+      if (results) results.style.display = 'none';
+      return;
+    }
+
+    // No legs checked yet — prompt
+    if (parlayLegs.length > 0 && wonCount === 0) {
+      if (statusEl) { statusEl.textContent = 'Check off legs as they win to calculate your live hedge'; statusEl.style.display = 'block'; }
+    } else {
+      if (statusEl) statusEl.style.display = 'none';
+    }
+
+    if (!stake || !parlayOddsInput) {
+      if (results) results.style.display = 'none';
+      return;
+    }
+
+    // FULL parlay payout is always stake × full parlay decimal
+    const parlayDecimal = amToDecimal(parlayOddsInput);
+    const potentialPayout = stake * parlayDecimal; // e.g. $100 × 6.0 = $600
+
+    // Remaining parlay odds (for display — what you still need to win)
+    const remainingAmOdds = remainingLegs.length > 0 ? decimalToAm(remainingDecimal) : null;
+
+    // Find hedge target — the opposite of the last remaining leg (or remaining combined)
+    let hedgeOddsAm = null;
+    let hedgeTeam = 'Opposite';
+
+    if (remainingLegs.length === 0) {
+      // No remaining legs (all checked but not "all won" — edge case, skip)
+      if (results) results.style.display = 'none';
+      return;
+    } else if (remainingLegs.length === 1) {
+      const lastLeg = remainingLegs[0];
+      if (lastLeg.otherSideOdds) {
+        hedgeOddsAm = lastLeg.otherSideOdds;
+        const pickedTeam = lastLeg.side.split(' ').pop();
+        const homeShort = (lastLeg.homeTeam || '').split(' ').pop();
+        const awayShort = (lastLeg.awayTeam || '').split(' ').pop();
+        hedgeTeam = pickedTeam === homeShort ? awayShort : homeShort;
+      } else {
+        // No opposite odds — use last leg's own odds as stand-in
+        hedgeOddsAm = lastLeg.odds;
+        const pickedTeam = lastLeg.side.split(' ').pop();
+        const homeShort = (lastLeg.homeTeam || '').split(' ').pop();
+        const awayShort = (lastLeg.awayTeam || '').split(' ').pop();
+        hedgeTeam = pickedTeam === homeShort ? awayShort : homeShort;
+      }
+    } else {
+      // Multiple remaining legs — hedge on combined remaining odds (approximation)
+      // Use remaining decimal as the "payout multiplier" for hedge vehicle
+      hedgeOddsAm = decimalToAm(remainingDecimal);
+      hedgeTeam = 'Remaining legs (combined)';
+    }
+
+    const hedgeDecimal = amToDecimal(hedgeOddsAm);
+
+    // Hedge math:
+    // fullHedgeAmount × hedgeDecimal = potentialPayout (guarantee same return either way)
+    const fullHedgeAmount = potentialPayout / hedgeDecimal;
+    const hedgeAmount = fullHedgeAmount * protectionPct;
+
+    // Profit in each scenario
+    const ifParlayWins  = potentialPayout - hedgeAmount - stake; // win parlay, lose hedge bet
+    const ifHedgeWins   = hedgeAmount * (hedgeDecimal - 1) - stake; // win hedge, lose parlay stake
+    const guaranteedMin = Math.min(ifParlayWins, ifHedgeWins);
+    const unhedgedProfit = potentialPayout - stake;
+
+    // Render results
+    results.style.display = 'block';
+
+    const liveLabelEl = document.getElementById('hedge-live-label');
+    if (wonCount > 0) {
+      liveLabelEl.textContent = `🔥 ${wonCount} leg${wonCount > 1 ? 's' : ''} already won — ${remainingLegs.length === 1 ? 'lock profit on the final leg' : `${remainingLegs.length} legs remaining`}`;
+      liveLabelEl.style.display = 'block';
+    } else {
+      liveLabelEl.style.display = 'none';
+    }
+
+    document.getElementById('hr-payout').textContent = `$${potentialPayout.toFixed(2)}`;
+    document.getElementById('hr-remaining-odds').textContent = remainingAmOdds !== null ? fmtAm(remainingAmOdds) : 'All won';
+    document.getElementById('hr-hedge-bet').textContent = `$${hedgeAmount.toFixed(2)} on ${hedgeTeam}`;
+    document.getElementById('hr-hedge-odds').textContent = `${hedgeTeam} at ${fmtAm(hedgeOddsAm)}`;
+
+    const hrGuaranteed = document.getElementById('hr-guaranteed');
+    hrGuaranteed.textContent = protectionPct > 0 ? `$${guaranteedMin.toFixed(2)}` : 'No hedge placed';
+    hrGuaranteed.classList.toggle('green', guaranteedMin > 0);
+    hrGuaranteed.classList.toggle('amber', guaranteedMin <= 0 && protectionPct > 0);
+
+    document.getElementById('hr-unhedged').textContent = `$${unhedgedProfit.toFixed(2)} (if parlay hits)`;
+
+    // Best line hint
+    const bestLineEl = document.getElementById('hr-best-line');
+    if (hedgeTeam !== 'Remaining legs (combined)' && hedgeTeam !== 'Opposite') {
+      bestLineEl.style.display = 'block';
+      bestLineEl.innerHTML = `🔍 <strong>Best hedge line:</strong> ${hedgeTeam} at ${fmtAm(hedgeOddsAm)} — verify live odds on FanDuel / DraftKings`;
+    } else {
+      bestLineEl.style.display = 'none';
+    }
+
+    // Disclaimer
+    const disclaimerEl = document.getElementById('hr-disclaimer');
+    if (disclaimerEl) {
+      disclaimerEl.innerHTML = wonCount > 0 && remainingLegs.length === 1
+        ? `🔥 <strong>Hedge the final leg now to guarantee $${guaranteedMin.toFixed(2)} profit.</strong><br/>⚠️ Calculations are estimates. Always verify odds before placing. Lines move.`
+        : '⚠️ Hedge calculations are estimates. Always verify odds before placing. Lines move.';
+    }
+  }
+
+  function toggleHedgeExplainer(btn) {
+    const body = document.getElementById('hedge-explainer-body');
+    const isOpen = body.classList.toggle('open');
+    btn.textContent = isOpen ? 'How does hedging work? ▲' : 'How does hedging work? ▼';
+  }
 
   // ── EV Explainer toggles ──────────────────────────────────────────────
   function toggleEvExplainer(btn) {
@@ -904,6 +1360,171 @@
     if (icon) icon.textContent = isOpen ? '−' : '+';
   }
 
+  // ── Props Tab ──────────────────────────────────────────────────────────
+  let propsSport = 'basketball_nba';
+  let allPropsData = {}; // keyed by sport, value: { games: [{game, props}], ts }
+  let propsSideState = {}; // keyed by propKey
+  const PROPS_TTL = 5 * 60 * 1000;
+
+  const MARKET_LABELS_P = {
+    player_points: 'Points', player_rebounds: 'Rebounds', player_assists: 'Assists',
+    player_threes: '3-Pointers', player_blocks: 'Blocks', player_steals: 'Steals',
+    player_pass_tds: 'Pass TDs', player_pass_yards: 'Pass Yards', player_rush_yards: 'Rush Yards',
+    player_reception_yards: 'Rec Yards', player_receptions: 'Receptions',
+    player_hits: 'Hits', player_home_runs: 'Home Runs', player_rbis: 'RBIs',
+    player_strikeouts_thrown: 'Strikeouts', player_goals: 'Goals',
+  };
+
+  function switchTab(tab) {
+    const gamesContent = document.getElementById('games-tab-content');
+    const propsContent = document.getElementById('props-tab-content');
+    const gamesBtn = document.getElementById('tab-games');
+    const propsBtn = document.getElementById('tab-props');
+    if (tab === 'games') {
+      gamesContent.classList.remove('hidden');
+      propsContent.classList.remove('active');
+      gamesBtn.classList.add('active');
+      propsBtn.classList.remove('active');
+    } else {
+      gamesContent.classList.add('hidden');
+      propsContent.classList.add('active');
+      gamesBtn.classList.remove('active');
+      propsBtn.classList.add('active');
+      loadAllProps(propsSport);
+    }
+  }
+
+  function filterPropsSport(sport, btn) {
+    propsSport = sport;
+    document.querySelectorAll('.props-sport-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadAllProps(sport);
+  }
+
+  function filterPropsSearch(query) {
+    renderPropsTab(query.toLowerCase());
+  }
+
+  async function loadAllProps(sport) {
+    const cached = allPropsData[sport];
+    if (cached && Date.now() - cached.ts < PROPS_TTL) { renderPropsTab(); return; }
+
+    document.getElementById('props-list').innerHTML = '<div class="props-loading">Loading props...</div>';
+    const games = allGamesData.filter(g => g.sport_key === sport);
+    if (!games.length) {
+      document.getElementById('props-list').innerHTML = '<div class="props-empty-msg">No games available for this sport right now.</div>';
+      return;
+    }
+
+    const results = await Promise.allSettled(
+      games.map(g => fetch(`/api/props?sport=${sport}&eventId=${g.id}`).then(r => r.json()).then(data => ({ game: g, data })))
+    );
+
+    const gameProps = [];
+    results.forEach(r => {
+      if (r.status !== 'fulfilled') return;
+      const { game, data } = r.value;
+      const props = parseParlayProps(data);
+      if (props.length) gameProps.push({ game, props });
+    });
+
+    allPropsData[sport] = { games: gameProps, ts: Date.now() };
+    renderPropsTab();
+  }
+
+  function parseParlayProps(apiData) {
+    if (!apiData?.bookmakers?.length) return [];
+    const propMap = {};
+    apiData.bookmakers.forEach(book => {
+      book.markets?.forEach(mkt => {
+        const mktLabel = MARKET_LABELS_P[mkt.key] || mkt.key;
+        mkt.outcomes?.forEach(o => {
+          const isOver = (o.description || '').toLowerCase() === 'over';
+          const isUnder = (o.description || '').toLowerCase() === 'under';
+          if (!isOver && !isUnder) return;
+          const key = `${o.name}|${mkt.key}|${o.point}`;
+          if (!propMap[key]) propMap[key] = { player: o.name, market: mktLabel, marketKey: mkt.key, line: o.point, over: null, under: null, overBook: null, underBook: null };
+          if (isOver && (propMap[key].over === null || o.price > propMap[key].over)) { propMap[key].over = o.price; propMap[key].overBook = book.title; }
+          if (isUnder && (propMap[key].under === null || o.price > propMap[key].under)) { propMap[key].under = o.price; propMap[key].underBook = book.title; }
+        });
+      });
+    });
+    return Object.values(propMap).filter(p => p.over !== null || p.under !== null);
+  }
+
+  function renderPropsTab(searchQuery = '') {
+    const cached = allPropsData[propsSport];
+    const container = document.getElementById('props-list');
+    if (!cached?.games?.length) {
+      container.innerHTML = '<div class="props-empty-msg">No props available for this sport right now. Check back closer to game time.</div>';
+      return;
+    }
+    const fmtOdds = o => o == null ? '—' : (o > 0 ? `+${o}` : `${o}`);
+    const html = cached.games.map(({ game, props }) => {
+      const filtered = searchQuery ? props.filter(p => p.player.toLowerCase().includes(searchQuery)) : props;
+      if (!filtered.length) return '';
+      return `<div class="props-game-group">
+        <div class="props-game-label">${SPORT_EMOJIS[game.sport_key] || '🎯'} ${game.away_team} @ ${game.home_team}</div>
+        ${filtered.map(p => {
+          const pk = `${game.id}|${p.player}|${p.marketKey}|${p.line}`;
+          const side = propsSideState[pk] || 'over';
+          return `<div class="prop-card">
+            <div class="prop-card-info">
+              <div class="prop-card-player">${p.player}</div>
+              <div class="prop-card-type">${p.market}</div>
+            </div>
+            <div class="prop-card-line">O/U ${p.line}</div>
+            <div class="prop-card-odds">${side === 'over' ? fmtOdds(p.over) : fmtOdds(p.under)}<br><span style="font-size:10px;color:var(--text-hint);">${side === 'over' ? (p.overBook||'') : (p.underBook||'')}</span></div>
+            <div class="prop-ou-toggle">
+              <button class="prop-ou-btn${side==='over'?' active':''}" onclick="selectPropSide('${pk}','over',this)">O</button>
+              <button class="prop-ou-btn${side==='under'?' active':''}" onclick="selectPropSide('${pk}','under',this)">U</button>
+            </div>
+            <button class="prop-add-btn" onclick="addPropLeg('${game.id}','${p.player.replace(/'/g,"\\'")}','${p.market}','${p.marketKey}',${p.line},${p.over},${p.under},'${p.overBook}','${p.underBook}','${game.home_team.replace(/'/g,"\\'")}','${game.away_team.replace(/'/g,"\\'")}','${game.sport_key}','${game.commence_time}','${pk}')">➕ Add</button>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('');
+    container.innerHTML = html || '<div class="props-empty-msg">No props match your search.</div>';
+  }
+
+  function selectPropSide(pk, side, btn) {
+    propsSideState[pk] = side;
+    const toggle = btn.closest('.prop-ou-toggle');
+    toggle.querySelectorAll('.prop-ou-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Update the odds display
+    renderPropsTab(document.getElementById('props-search')?.value?.toLowerCase() || '');
+  }
+
+  function addPropLeg(gameId, player, market, marketKey, line, overOdds, underOdds, overBook, underBook, homeTeam, awayTeam, sportKey, commenceTime, pk) {
+    const side = propsSideState[pk] || 'over';
+    const odds = side === 'over' ? overOdds : underOdds;
+    const bookName = side === 'over' ? overBook : underBook;
+    if (odds == null || odds === 'null') return;
+
+    const propId = `${gameId}_prop_${player}_${marketKey}_${line}`;
+    const leg = {
+      gameId: propId,
+      isProp: true,
+      player, market, marketKey, line: parseFloat(line),
+      propSide: side,
+      side: player,
+      sideType: `prop_${side}`,
+      odds: parseInt(odds),
+      bookName: bookName || '—',
+      homeTeam, awayTeam,
+      sportKey, commenceTime,
+      otherSideOdds: null,
+      propLabel: `${player} — ${side === 'over' ? 'Over' : 'Under'} ${line} ${market}`,
+    };
+
+    parlayLegs = parlayLegs.filter(l => l.gameId !== propId);
+    if (parlayLegs.length >= 10) { alert('Maximum 10 legs per parlay.'); return; }
+    parlayLegs.push(leg);
+    saveLegs(parlayLegs);
+    renderAll();
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────
   async function init() {
     parlayLegs = loadLegs();
@@ -915,7 +1536,8 @@
     }
 
     const suggested = buildSuggestedParlay();
-    renderSuggested(suggested);
+    // Async: try to add best prop leg to suggested parlay
+    loadBestPropForSuggested(suggested).then(withProp => renderSuggested(withProp));
     renderAll();
 
     // Auto-refresh every 60 seconds
