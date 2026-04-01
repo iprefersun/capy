@@ -471,7 +471,7 @@
         <div class="filter-group">
           <div class="filter-group-label">&nbsp;</div>
           <div class="filter-group-btns">
-            <button class="filter-btn" onclick="filterSport('all', this)">All</button>
+            <button class="filter-btn active" onclick="filterSport('all', this)">All</button>
           </div>
         </div>
         <div class="filter-group">
@@ -485,7 +485,7 @@
         <div class="filter-group">
           <div class="filter-group-label">Basketball</div>
           <div class="filter-group-btns">
-            <button class="filter-btn active" onclick="filterSport('basketball_nba', this)">NBA</button>
+            <button class="filter-btn" onclick="filterSport('basketball_nba', this)">NBA</button>
             <button class="filter-btn" onclick="filterSport('basketball_ncaab', this)">NCAAB</button>
             <button class="filter-btn" onclick="filterSport('basketball_wncaab', this)">WNCAAB</button>
             <button class="filter-btn" onclick="filterSport('basketball_euroleague', this)">Euroleague</button>
@@ -699,7 +699,7 @@
     };
 
     let allGames = [];
-    let currentSport = 'basketball_nba';
+    let currentSport = 'all';
     let oddsCache = {};
     let pinnacleCache = {}; // keyed by sport, then "home|away"
     let propsCache = {};    // keyed by eventId, value: { data, ts }
@@ -1044,23 +1044,32 @@
 
     async function fetchPropsData(eventId, sport) {
       console.log('[Props] Fetching props for eventId:', eventId, '| sport:', sport);
+      if (!eventId || eventId === 'undefined') {
+        console.error('[Props] Invalid eventId:', eventId);
+        return { fetchError: 'Invalid game ID' };
+      }
       const cached = propsCache[eventId];
       if (cached && Date.now() - cached.ts < PROPS_CACHE_TTL) {
         console.log('[Props] Returning cached data for eventId:', eventId);
         return cached.data;
       }
-      const url = `/api/props?sport=${sport}&eventId=${eventId}`;
-      console.log('[Props] Calling URL:', url);
+      const url = `/api/props?sport=${encodeURIComponent(sport)}&eventId=${encodeURIComponent(eventId)}`;
+      console.log('[Props] Calling:', url);
       try {
         const res = await fetch(url);
         const data = await res.json();
-        console.log('[Props] Response status:', res.status, '| bookmakers:', data?.bookmakers?.length ?? 0, '| error:', data?.error ?? 'none');
-        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        console.log('[Props] Status:', res.status, '| bookmakers:', data?.bookmakers?.length ?? 0, '| error:', data?.error ?? 'none');
+        if (res.status === 404 || data?.error?.toLowerCase().includes('not found')) {
+          return { notFound: true };
+        }
+        if (!res.ok) {
+          return { fetchError: data?.error || `HTTP ${res.status}` };
+        }
         propsCache[eventId] = { data, ts: Date.now() };
         return data;
       } catch (e) {
-        console.error('[Props] Fetch failed for eventId:', eventId, '| error:', e.message);
-        return null;
+        console.error('[Props] Network error for eventId:', eventId, e.message);
+        return { fetchError: e.message };
       }
     }
 
@@ -1128,14 +1137,18 @@
       console.log('[Props] Found game:', game.away_team, '@', game.home_team, '| eventId:', game.id);
 
       const data = await fetchPropsData(gameId, sport);
-      if (!data) {
-        panel.innerHTML = '<div class="props-skeleton">Failed to load props — check the console for details.</div>';
+      if (!data || data.fetchError) {
+        panel.innerHTML = `<div class="props-skeleton">⚠️ Could not load props${data?.fetchError ? `: ${data.fetchError}` : ''}. Check console for details.</div>`;
+        return;
+      }
+      if (data.notFound) {
+        panel.innerHTML = '<div class="props-skeleton">No props available for this game yet.</div>';
         return;
       }
       const props = parsePropsData(data);
 
       if (!props.length) {
-        panel.innerHTML = '<div class="props-skeleton">Props not available for this game yet — check back closer to tip-off.</div>';
+        panel.innerHTML = '<div class="props-skeleton">No props available for this game yet.</div>';
         return;
       }
 
@@ -1375,7 +1388,10 @@
         return `
           <div class="pick-card${isLocked ? ' locked-card' : ''}">
             <div class="pick-game-header">
-              <div class="pick-game">${sportEmoji} ${game.away_team} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">vs</span> ${game.home_team}</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;background:var(--surface-2);color:var(--text-hint);padding:2px 7px;border-radius:10px;">${sportEmoji} ${label}</span>
+              </div>
+              <div class="pick-game">${game.away_team} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">vs</span> ${game.home_team}</div>
               <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
                 <span class="pick-confidence ${conf.cls}">${conf.label}</span>
                 <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${edgeTypeLabel}</span>
@@ -1792,7 +1808,7 @@
     }, 45000);
 
     startLiveCounter();
-    loadSport('basketball_nba');
+    loadSport('all');
     setInterval(() => { oddsCache = {}; loadSport(currentSport); }, 300000);
 
     // Init view toggle UI on page load

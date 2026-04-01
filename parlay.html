@@ -831,34 +831,89 @@
 
   // ── Render suggested parlay (right column top) ────────────────────────
   function buildSuggestedParlay() {
-    const sorted = [...allGamesData]
-      .filter(g => g.bookmakers?.length > 0)
-      .sort((a, b) => calcEdgeForGame(b) - calcEdgeForGame(a))
-      .slice(0, 3);
+    // Build candidate legs across h2h and spreads for all games
+    const candidates = [];
 
-    return sorted.map(game => {
-      const bestBook = getBestBook(game);
-      if (!bestBook) return null;
-      const edge = calcEdgeForGame(game);
+    allGamesData.filter(g => g.bookmakers?.length > 0).forEach(game => {
       const emoji = SPORT_EMOJIS[game.sport_key] || '🎯';
+
+      // ── h2h (moneyline) ──
+      const mlHomeOdds = getOddsForSide(game, game.home_team, 'h2h');
+      const mlAwayOdds = getOddsForSide(game, game.away_team, 'h2h');
+      if (mlHomeOdds && mlAwayOdds) {
+        const evHome = calcLegEV(mlHomeOdds, mlAwayOdds);
+        const evAway = calcLegEV(mlAwayOdds, mlHomeOdds);
+        const bookHome = getBestBookForSide(game, game.home_team, 'h2h');
+        const bookAway = getBestBookForSide(game, game.away_team, 'h2h');
+        if (evHome && bookHome) candidates.push({ game, emoji, market: 'h2h', side: game.home_team, odds: mlHomeOdds, otherOdds: mlAwayOdds, ev: evHome.evPct, bookName: bookHome.bookName, bookUrl: bookHome.bookUrl });
+        if (evAway && bookAway) candidates.push({ game, emoji, market: 'h2h', side: game.away_team, odds: mlAwayOdds, otherOdds: mlHomeOdds, ev: evAway.evPct, bookName: bookAway.bookName, bookUrl: bookAway.bookUrl });
+      }
+
+      // ── spreads ──
+      const spHome = getBestBookForSide(game, game.home_team, 'spreads');
+      const spAway = getBestBookForSide(game, game.away_team, 'spreads');
+      if (spHome?.price && spAway?.price) {
+        const evSpHome = calcLegEV(spHome.price, spAway.price);
+        const evSpAway = calcLegEV(spAway.price, spHome.price);
+        if (evSpHome) candidates.push({ game, emoji, market: 'spreads', side: game.home_team, odds: spHome.price, point: spHome.point, otherOdds: spAway.price, ev: evSpHome.evPct, bookName: spHome.bookName, bookUrl: spHome.bookUrl });
+        if (evSpAway) candidates.push({ game, emoji, market: 'spreads', side: game.away_team, odds: spAway.price, point: spAway.point, otherOdds: spHome.price, ev: evSpAway.evPct, bookName: spAway.bookName, bookUrl: spAway.bookUrl });
+      }
+    });
+
+    // Filter: EV must be > -1% (exclude genuinely bad legs)
+    const eligible = candidates.filter(c => c.ev > -1);
+
+    // Sort by EV, deduplicate — only best leg per game
+    eligible.sort((a, b) => b.ev - a.ev);
+    const seenGames = new Set();
+    const selected = [];
+    for (const c of eligible) {
+      if (seenGames.has(c.game.id)) continue;
+      seenGames.add(c.game.id);
+      selected.push(c);
+      if (selected.length >= 3) break;
+    }
+
+    // If no legs pass the threshold, fall back to top 2 by raw edge (honest about it)
+    if (selected.length === 0) {
+      const fallback = [...allGamesData]
+        .filter(g => g.bookmakers?.length > 0)
+        .sort((a, b) => calcEdgeForGame(b) - calcEdgeForGame(a))
+        .slice(0, 2);
+      fallback.forEach(game => {
+        const bestBook = getBestBook(game);
+        if (!bestBook) return;
+        selected.push({
+          game, emoji: SPORT_EMOJIS[game.sport_key] || '🎯', market: 'h2h',
+          side: bestBook.side, odds: bestBook.price, otherOdds: getOddsForSide(game, bestBook.side === game.home_team ? game.away_team : game.home_team, 'h2h'),
+          ev: -Infinity, bookName: bestBook.bookName, bookUrl: bestBook.bookUrl
+        });
+      });
+    }
+
+    return selected.map(c => {
+      const { game, emoji, market, side, odds, point, otherOdds, bookName, bookUrl } = c;
+      const spreadStr = (market === 'spreads' && point != null) ? ` (${point >= 0 ? '+' : ''}${point})` : '';
       return {
         gameId: game.id,
         homeTeam: game.home_team,
         awayTeam: game.away_team,
         sportKey: game.sport_key,
         commenceTime: game.commence_time,
-        side: bestBook.side,
-        sideType: bestBook.side === game.home_team ? 'home_ml' : 'away_ml',
-        market: 'h2h',
-        odds: bestBook.price,
-        bookName: bestBook.bookName,
-        bookUrl: bestBook.bookUrl,
-        otherSideOdds: getOddsForSide(game, bestBook.side === game.home_team ? game.away_team : game.home_team, 'h2h'),
-        edge,
+        side,
+        sideType: side === game.home_team ? 'home_ml' : 'away_ml',
+        market,
+        odds,
+        point: point ?? null,
+        bookName,
+        bookUrl,
+        otherSideOdds: otherOdds || null,
+        edge: calcEdgeForGame(game),
         emoji,
         teamsLabel: `${emoji} ${game.away_team} @ ${game.home_team}`,
+        spreadStr,
       };
-    }).filter(Boolean);
+    });
   }
 
   function renderSuggested(suggested) {
@@ -874,6 +929,7 @@
     // Compute combined EV for suggested parlay
     let combinedEvPct = 0;
     let hasAllEV = true;
+    let posEvLegCount = 0;
     const legItems = suggested.map(l => {
       const oddsStr = fmtAm(l.odds);
       if (l.isProp) {
@@ -884,6 +940,10 @@
         </div>`;
       }
       const sideShort = l.side.split(' ').pop();
+      // Build pick line: spread if available, otherwise ML
+      const pickLine = l.market === 'spreads' && l.spreadStr
+        ? `${sideShort}${l.spreadStr} ${oddsStr}`
+        : `${sideShort} ML ${oddsStr}`;
       const evData = l.otherSideOdds ? calcLegEV(l.odds, l.otherSideOdds) : null;
       let evHtml = '', kellyHtml = '';
       if (evData) {
@@ -891,18 +951,22 @@
         evHtml = `<span class="ev-badge ${evInfo.cls}" title="Expected Value for this leg vs Pinnacle sharp line">${evInfo.emoji} ${evInfo.label} vs Pinnacle</span>`;
         kellyHtml = evData.kelly > 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:4px;">Kelly: ${evData.kelly}%</span>` : '';
         combinedEvPct = combinedEvPct === 0 ? evData.evPct : combinedEvPct + evData.evPct;
+        if (evData.evPct > 0) posEvLegCount++;
       } else { hasAllEV = false; }
       return `<div class="suggested-leg">
         <div class="suggested-leg-teams">${l.teamsLabel}</div>
-        <div class="suggested-leg-pick">${sideShort} ML ${oddsStr}</div>
+        <div class="suggested-leg-pick">${pickLine}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">${evHtml}${kellyHtml}</div>
         <div class="suggested-leg-book">Best at ${l.bookName}</div>
       </div>`;
     }).join('');
 
-    // Determine label based on combined EV (not avgEdge)
-    const confLabel = (hasAllEV && combinedEvPct > 0)
-      ? '🔥 Strong Parlay'
+    // 3-tier label: all +EV = Sharp, mixed = Best Available, all -EV = High Upside
+    const nonPropLegs = suggested.filter(l => !l.isProp);
+    const confLabel = posEvLegCount === nonPropLegs.length && nonPropLegs.length > 0
+      ? '🔥 Sharp Parlay'
+      : posEvLegCount > 0
+      ? '⚡ Best Available Parlay'
       : '🎰 High Upside Parlay (Negative EV — entertainment play)';
 
     const combinedEvDisplay = hasAllEV && suggested.length > 0
