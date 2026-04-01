@@ -32,8 +32,14 @@ module.exports = async (req, res) => {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    const picksText = picks.map((p, i) => {
-      const ev = p.ev_percent != null ? `${p.ev_percent > 0 ? '+' : ''}${p.ev_percent.toFixed(1)}% EV` : 'EV unknown';
+    // Sanitize EV values — Supabase sometimes stores 315.7 instead of 3.157
+    const sanitizedPicks = picks.map(p => ({
+      ...p,
+      ev_percent: p.ev_percent > 100 ? (p.ev_percent / 100).toFixed(1) : p.ev_percent
+    }));
+
+    const picksText = sanitizedPicks.map((p, i) => {
+      const ev = p.ev_percent != null ? `${p.ev_percent > 0 ? '+' : ''}${parseFloat(p.ev_percent).toFixed(1)}% EV` : 'EV unknown';
       const odds = p.odds > 0 ? `+${p.odds}` : `${p.odds}`;
       return `${i + 1}. ${p.pick} (${p.home_team} vs ${p.away_team}) — ${odds} at ${p.book} — ${ev}`;
     }).join('\n');
@@ -77,7 +83,7 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
         messages: [
           {
             role: 'system',
-            content: 'You are a sports betting content writer for Capy (getcapy.co). Return only valid JSON, no markdown, no backticks, no explanation.'
+            content: 'You are a sports betting content writer for Capy (getcapy.co). Return only valid JSON, no markdown, no backticks, no explanation. Return only a single valid JSON object. No newlines inside string values. No special characters inside strings. Escape all apostrophes.'
           },
           {
             role: 'user',
@@ -99,8 +105,11 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
       throw new Error('Groq returned no content');
     }
 
-    // ── 4. Parse JSON — strip any backtick fences ────────────────────────
-    const cleaned = rawContent.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+    // ── 4. Parse JSON — strip backticks and control characters ──────────
+    const cleaned = rawContent
+      .replace(/```json|```/g, '')
+      .replace(/[\x00-\x1F\x7F]/g, ' ') // remove control characters
+      .trim();
     let content;
     try {
       content = JSON.parse(cleaned);
