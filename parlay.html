@@ -1736,6 +1736,38 @@
   async function init() {
     parlayLegs = loadLegs();
 
+    // Import legs from odds page parlay suggestion cards
+    const importRaw = localStorage.getItem('capy_parlay_import');
+    if (importRaw) {
+      try {
+        const imported = JSON.parse(importRaw);
+        if (Array.isArray(imported) && imported.length > 0) {
+          parlayLegs = []; // replace existing legs with the imported set
+          imported.forEach(l => {
+            if (parlayLegs.length >= 10) return;
+            parlayLegs.push({
+              gameId:        l.gameId,
+              sideType:      l.side === l.homeTeam ? 'home_ml' : 'away_ml',
+              side:          l.side,
+              market:        'h2h',
+              odds:          l.price,
+              point:         null,
+              homeTeam:      l.homeTeam,
+              awayTeam:      l.awayTeam,
+              sportKey:      l.sportKey,
+              commenceTime:  l.commenceTime,
+              bookName:      l.bookName || '—',
+              otherSideOdds: null
+            });
+          });
+          saveLegs(parlayLegs);
+        }
+      } catch (e) {
+        console.error('[Parlay] Failed to import capy_parlay_import:', e.message);
+      }
+      localStorage.removeItem('capy_parlay_import');
+    }
+
     try {
       allGamesData = await fetchAllGames();
     } catch (e) {
