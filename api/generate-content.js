@@ -167,13 +167,15 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
     }
 
     // ── 7. Save generated content for follow-up use ──────────────────────────
-    try {
-      await supabase
-        .from('generated_content')
-        .insert({ content_json: content, picks_summary: picksText });
-    } catch (saveErr) {
-      // Non-fatal — log and continue
-      console.warn('[generate-content] Could not save to generated_content table:', saveErr.message);
+    // Note: supabase-js returns errors in { error } — does not throw — so check response directly
+    const { error: saveErr } = await supabase
+      .from('generated_content')
+      .insert({ content_json: content, picks_summary: picksText });
+    if (saveErr) {
+      // Non-fatal — log and continue so email still sends
+      console.warn('[generate-content] Could not save to generated_content:', saveErr.message);
+    } else {
+      console.log('[generate-content] Saved to generated_content');
     }
 
     // ── 8. Build HTML email ──────────────────────────────────────────────────
