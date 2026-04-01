@@ -23,7 +23,24 @@ export default async function handler(req, res) {
     .gte('created_at', today);
 
   const existingIds = (existing || []).map(e => e.game_id);
-  const newPicks = picks.filter(p => !existingIds.includes(p.game_id));
+  const newPicks = picks
+    .filter(p => !existingIds.includes(p.game_id))
+    .map(p => {
+      let ev = p.ev_percent;
+      if (ev != null) {
+        // Correct scale: sometimes 315.7 is passed instead of 3.157
+        if (Math.abs(ev) > 100) {
+          console.warn(`[save-picks] EV out of scale (${ev}) for game_id ${p.game_id} — dividing by 100`);
+          ev = ev / 100;
+        }
+        // Reject values outside the realistic range after correction
+        if (ev < -50 || ev > 30) {
+          console.warn(`[save-picks] EV out of range (${ev}) after correction for game_id ${p.game_id} — setting to null`);
+          ev = null;
+        }
+      }
+      return { ...p, ev_percent: ev };
+    });
 
   if (newPicks.length === 0) return res.status(200).json({ message: 'No new picks to save' });
 
