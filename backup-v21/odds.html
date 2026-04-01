@@ -544,99 +544,6 @@
 
     .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
     .theme-toggle-btn:hover { opacity: 0.8; }
-
-    /* ══ COMPACT STICKY EV FILTER BAR ══════════════════════════════════ */
-    .ev-filter-bar { position: sticky; top: 56px; z-index: 90; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .ev-filter-inner { max-width: 1400px; margin: 0 auto; padding: 9px 1.5rem; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-    .ev-filter-group { display: flex; align-items: center; gap: 7px; }
-    .ev-filter-label { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); white-space: nowrap; }
-    .ev-filter-select { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-mid); background: var(--surface); color: var(--text); cursor: pointer; outline: none; transition: border-color 0.15s; }
-    .ev-filter-select:focus { border-color: var(--green); }
-    .ev-filter-divider { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; }
-    .ev-pill-group { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-    .ev-pill { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-    .ev-pill:hover { border-color: var(--green); color: var(--green); }
-    .ev-pill.active { background: var(--green); color: #fff; border-color: var(--green); }
-    @media (max-width: 600px) { .ev-filter-inner { padding: 8px 1rem; gap: 10px; } .ev-filter-divider { display: none; } }
-
-    /* ══ EV EDGES SECTION ══════════════════════════════════════════════ */
-    .ev-section { margin-bottom: 1.5rem; }
-    .ev-section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
-    .ev-section-title { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); }
-    .ev-section-sub { font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text-muted); margin-top: 3px; }
-    .ev-section-count { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
-    .ev-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
-    @media (max-width: 700px) { .ev-cards-grid { grid-template-columns: 1fr; } }
-
-    /* ── EV Edge Card ─────────────────────────────────────────────────── */
-    .ev-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04); transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s; animation: fadeInUp 0.3s ease both; }
-    .ev-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); transform: translateY(-1px); border-color: var(--green); }
-    .ev-card.ev-positive { border-left: 3px solid var(--green); }
-    .ev-card.ev-suspicious { border-left: 3px solid var(--amber); }
-    .ev-card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 16px 10px; gap: 10px; }
-    .ev-card-meta { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
-    .ev-card-tags { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-    .ev-card-matchup { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ev-card-matchup:hover { color: var(--green); }
-    .ev-card-time { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
-
-    /* ── 3-column comparison — the hero element ───────────────────────── */
-    .ev-card-compare { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 0; margin: 0 16px 14px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .ev-card-book-col { padding: 14px 16px; display: flex; flex-direction: column; gap: 3px; background: var(--surface-2); }
-    .ev-card-sharp-col { padding: 14px 16px; text-align: right; display: flex; flex-direction: column; gap: 3px; align-items: flex-end; background: var(--surface-2); }
-    .ev-compare-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); }
-    .ev-compare-book { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 1px; }
-    .ev-compare-odds { font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 600; line-height: 1; margin-top: 4px; }
-    .ev-compare-odds.ev-pos-odds { color: var(--green); }
-    .ev-compare-odds.ev-neu-odds { color: var(--text); }
-    .ev-compare-side { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); margin-top: 3px; }
-
-    /* Center EV badge */
-    .ev-badge-center { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 12px; min-width: 80px; background: var(--green-light); border-left: 1px solid rgba(22,163,74,0.18); border-right: 1px solid rgba(22,163,74,0.18); }
-    .ev-badge-center.ev-neg-bg { background: var(--surface-2); border-color: var(--border); }
-    .ev-badge-pct { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1; color: var(--green); white-space: nowrap; }
-    .ev-badge-pct.ev-neg-pct { color: var(--text-muted); }
-    .ev-badge-lbl { font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin-top: 4px; white-space: nowrap; }
-    .ev-badge-lbl.ev-neg-lbl { color: var(--text-hint); }
-
-    /* Card actions row */
-    .ev-card-actions { display: flex; align-items: center; gap: 8px; padding: 0 16px 14px; flex-wrap: wrap; }
-    .ev-bet-btn { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px; background: var(--green); color: #fff; text-decoration: none; border: none; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
-    .ev-bet-btn:hover { opacity: 0.88; }
-    .ev-share-btn { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; padding: 7px 13px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-    .ev-share-btn:hover { border-color: var(--border-mid); color: var(--text); }
-    .ev-share-btn.copied { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
-
-    /* ── No edges empty state ─────────────────────────────────────────── */
-    .no-edges-state { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 3rem 2rem; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-    .no-edges-icon { font-size: 40px; display: block; margin-bottom: 14px; }
-    .no-edges-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-    .no-edges-sub { font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 420px; margin: 0 auto; }
-
-    /* ── Section divider ──────────────────────────────────────────────── */
-    .section-divider { display: flex; align-items: center; gap: 12px; margin: 1.75rem 0 1.25rem; }
-    .section-divider-line { flex: 1; height: 1px; background: var(--border); }
-    .section-divider-label { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.09em; white-space: nowrap; }
-    .parlay-section-sub { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-hint); font-style: italic; margin-bottom: 1rem; line-height: 1.5; }
-
-    /* ── All Games section header ─────────────────────────────────────── */
-    .all-games-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
-    .all-games-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: var(--text-muted); }
-
-    /* ══ DARK MODE ADDITIONS ══════════════════════════════════════════════ */
-    [data-theme="dark"] .ev-filter-bar { background: #0F1117; border-color: #1F2330; }
-    [data-theme="dark"] .ev-filter-select { background: #111318; border-color: rgba(255,255,255,0.1); color: var(--text); }
-    [data-theme="dark"] .ev-card { box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2); }
-    [data-theme="dark"] .ev-card.ev-positive { border-left-color: #22C55E; }
-    [data-theme="dark"] .ev-card-book-col, [data-theme="dark"] .ev-card-sharp-col { background: #0D0F15; }
-    [data-theme="dark"] .ev-badge-center { background: #052E16; border-color: rgba(34,197,94,0.2); }
-    [data-theme="dark"] .ev-badge-center.ev-neg-bg { background: #0D0F15; border-color: rgba(255,255,255,0.06); }
-    [data-theme="dark"] .ev-badge-pct { color: #4ADE80; }
-    [data-theme="dark"] .ev-badge-lbl { color: #4ADE80; }
-    [data-theme="dark"] .ev-compare-odds.ev-pos-odds { color: #4ADE80; }
-    [data-theme="dark"] .ev-share-btn { background: #111318; border-color: #1F2330; }
-    [data-theme="dark"] .ev-share-btn.copied { background: #052E16; border-color: #22C55E; color: #4ADE80; }
-    [data-theme="dark"] .no-edges-state { box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
   </style>
   <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
@@ -660,29 +567,6 @@
       </div>
     </div>
   </nav>
-
-  <!-- COMPACT STICKY EV FILTER BAR -->
-  <div class="ev-filter-bar" id="ev-filter-bar">
-    <div class="ev-filter-inner">
-      <div class="ev-filter-group">
-        <span class="ev-filter-label">Min EV</span>
-        <select class="ev-filter-select" id="min-ev-select" onchange="setMinEvFilter(+this.value)">
-          <option value="0">Any</option>
-          <option value="1">1%+</option>
-          <option value="2">2%+</option>
-          <option value="3">3%+</option>
-        </select>
-      </div>
-      <div class="ev-filter-divider"></div>
-      <div class="ev-pill-group" id="ev-sport-pills">
-        <button class="ev-pill active" onclick="setEvSportFilter('all', this)">All</button>
-        <button class="ev-pill" onclick="setEvSportFilter('basketball_nba', this)">NBA</button>
-        <button class="ev-pill" onclick="setEvSportFilter('baseball_mlb', this)">MLB</button>
-        <button class="ev-pill" onclick="setEvSportFilter('americanfootball_nfl', this)">NFL</button>
-        <button class="ev-pill" onclick="setEvSportFilter('icehockey_nhl', this)">NHL</button>
-      </div>
-    </div>
-  </div>
 
   <div class="main">
 
@@ -826,36 +710,7 @@
       </div>
     </div>
 
-    <!-- EV EDGES SECTION — primary above-fold content -->
-    <div class="ev-section" id="ev-section">
-      <div class="ev-section-header">
-        <div>
-          <div class="ev-section-title">📍 Today's Edges</div>
-          <div class="ev-section-sub">Bets where the sharpest market offers a better price than fair value.</div>
-        </div>
-        <span class="ev-section-count" id="ev-section-count"></span>
-      </div>
-      <div id="ev-cards-container">
-        <!-- populated by renderEvSection() -->
-      </div>
-    </div>
-
-    <!-- HIGH UPSIDE PARLAYS — below EV section -->
-    <div class="section-divider">
-      <div class="section-divider-line"></div>
-      <span class="section-divider-label">🎰 High Upside Parlays</span>
-      <div class="section-divider-line"></div>
-    </div>
-    <div class="picks-section parlay-suggestions-section" id="parlay-suggestions-section" style="display:none;">
-      <div class="parlay-section-sub">For entertainment — parlays carry negative expected value long term.</div>
-      <div class="parlay-suggestions-row" id="parlay-suggestions-row">
-        <div id="safe-parlay-container"></div>
-        <div id="value-parlay-container"></div>
-        <div id="upside-parlay-container"></div>
-      </div>
-    </div>
-
-    <!-- CAPY'S SMART PICKS (top 3 curated) -->
+    <!-- CAPY'S SMART PICKS -->
     <div class="picks-section" id="smart-picks-section" style="display:none;">
       <div class="picks-header">
         <div>
@@ -866,11 +721,17 @@
       <div class="picks-scroll" id="picks-container"></div>
     </div>
 
-    <!-- ALL GAMES — full odds table -->
-    <div class="section-divider">
-      <div class="section-divider-line"></div>
-      <span class="section-divider-label">All Games</span>
-      <div class="section-divider-line"></div>
+    <!-- PARLAY SUGGESTIONS (Safe + Value + High Upside) -->
+    <div class="picks-section parlay-suggestions-section" id="parlay-suggestions-section" style="display:none;">
+      <div class="parlay-suggestions-header">
+        <div class="parlay-suggestions-title">🎰 Today's Parlay Suggestions</div>
+        <div class="parlay-suggestions-sub">Three approaches — pick your style. Always bet responsibly.</div>
+      </div>
+      <div class="parlay-suggestions-row" id="parlay-suggestions-row">
+        <div id="safe-parlay-container"></div>
+        <div id="value-parlay-container"></div>
+        <div id="upside-parlay-container"></div>
+      </div>
     </div>
 
     <div class="method-banner">
@@ -1004,17 +865,6 @@
     let showEvOnly = false;
     let showPinnacleOnly = false;
     let lastUpdatedTime = null;
-
-    // EV filter bar state — client-side only, no re-fetch
-    let minEvFilter = 0;       // 0 = any, 1 = 1%+, 2 = 2%+, 3 = 3%+
-    let evSportFilter = 'all'; // 'all' or a sport_key
-
-    // Returns the affiliate/direct URL for a book name, or null
-    function getBookUrl(bookName) {
-      const idx = BOOKS.indexOf(bookName);
-      if (idx < 0) return null;
-      return BOOK_URLS[BOOK_KEYS[idx]] || null;
-    }
 
     // ── Live counter ──────────────────────────────────────────────────
     function startLiveCounter() {
@@ -1323,204 +1173,14 @@
       document.getElementById('stat-time').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
     }
 
-    // Returns freshness label HTML for a sport's cached odds (stale threshold: 10 min)
+    // Returns freshness label HTML for a sport's cached odds
     function fmtFreshness(sportKey) {
       const ts = oddsFetchedAt[sportKey];
       if (!ts) return '';
       const mins = Math.floor((Date.now() - ts) / 60000);
       if (mins < 5) return `<span class="freshness-label">Odds fetched ${mins < 1 ? 'just now' : mins + 'm ago'}</span>`;
-      if (mins < 10) return `<span class="freshness-label">${mins}m ago</span>`;
+      if (mins < 15) return `<span class="freshness-label">${mins}m ago</span>`;
       return `<span class="freshness-label stale">⚠️ ${mins}m ago — may be stale</span>`;
-    }
-
-    // Returns freshness label text (no HTML) for inline use in EV cards
-    function getFreshnessInfo(sportKey) {
-      const ts = oddsFetchedAt[sportKey];
-      if (!ts) return { text: '', stale: false };
-      const mins = Math.floor((Date.now() - ts) / 60000);
-      const text = mins < 1 ? 'just now' : `${mins}m ago`;
-      return { text, stale: mins >= 10 };
-    }
-
-    // ── EV Filter Bar ──────────────────────────────────────────────────────
-    function setMinEvFilter(val) {
-      minEvFilter = val;
-      renderEvSection();
-    }
-
-    function setEvSportFilter(sport, el) {
-      evSportFilter = sport;
-      document.querySelectorAll('.ev-pill').forEach(b => b.classList.remove('active'));
-      if (el) el.classList.add('active');
-      renderEvSection();
-    }
-
-    function getEvFilteredGames() {
-      return allGames.filter(g => {
-        if (evSportFilter !== 'all' && g.sport_key !== evSportFilter) return false;
-        const ev = calcGameEV(g);
-        if (!ev) return false;
-        const best = Math.max(ev.home.ev, ev.away.ev);
-        return best >= minEvFilter;
-      });
-    }
-
-    // ── EV Edge Card (new premium card layout) ────────────────────────────
-    function buildEvCard(game) {
-      const ev = calcGameEV(game);
-      if (!ev) return '';
-
-      const isHomeBetter = ev.home.ev >= ev.away.ev;
-      const bestSide = isHomeBetter ? ev.home : ev.away;
-      const bestTeam  = isHomeBetter ? game.home_team : game.away_team;
-
-      const sport = game.sport_key;
-      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
-      const label = SPORT_LABELS[sport] || sport;
-      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
-      const time = fmtGameDate(game.commence_time);
-      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
-
-      const isPositive = bestSide.ev > 0;
-      const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
-      const fairAm = fairProbToAm(bestSide.fairProb);
-      const refLabel = ev.refSource === 'Pinnacle' ? 'Pinnacle' : 'Market';
-      const teamShort = bestTeam.split(' ').pop();
-      const gameUrl = `/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${sport}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
-
-      // Freshness
-      const fresh = getFreshnessInfo(sport);
-      const freshnessHtml = fresh.text
-        ? `<span class="freshness-label${fresh.stale ? ' stale' : ''}">Updated ${fresh.text}</span>`
-        : '';
-
-      // Verify badge
-      const suspiciousHtml = ev.suspicious
-        ? `<span class="ev-verify-badge" title="EV over 15% — verify odds before betting">⚠️ Verify odds</span>`
-        : '';
-
-      // Bet link
-      const betUrl = getBookUrl(bestSide.bestBook);
-      const betBtn = betUrl
-        ? `<a href="${betUrl}" target="_blank" rel="noopener" class="ev-bet-btn">Bet at ${bestSide.bestBook} →</a>`
-        : '';
-
-      // Parlay button
-      const parlayLegsNow = loadParlayLegs();
-      const alreadyInParlay = parlayLegsNow.some(l => l.gameId === game.id);
-      const parlayBtn = `<button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlay ? ' added' : ''}" onclick="addToParlayFromGame('${game.id}')">${alreadyInParlay ? '✓ Added' : '+ Parlay'}</button>`;
-
-      return `
-        <div class="ev-card ${isPositive ? 'ev-positive' : ''}${ev.suspicious ? ' ev-suspicious' : ''}" data-gameid="${game.id}">
-          <div class="ev-card-header">
-            <div class="ev-card-meta">
-              <div class="ev-card-tags">
-                <span class="sport-tag tag-${tagKey}">${sportEmoji} ${label}</span>
-                ${freshnessHtml}
-                ${suspiciousHtml}
-              </div>
-              <div class="ev-card-matchup" onclick="window.location='${gameUrl}'">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team}</div>
-            </div>
-            <span class="ev-card-time">${time}</span>
-          </div>
-          <div class="ev-card-compare">
-            <div class="ev-card-book-col">
-              <div class="ev-compare-label">Best Book</div>
-              <div class="ev-compare-book">${bestSide.bestBook}</div>
-              <div class="ev-compare-odds ${isPositive ? 'ev-pos-odds' : 'ev-neu-odds'}">${fmtAm(bestSide.bestOdds)}</div>
-              <div class="ev-compare-side">${teamShort} ML</div>
-            </div>
-            <div class="ev-badge-center ${isPositive ? '' : 'ev-neg-bg'}">
-              <div class="ev-badge-pct ${isPositive ? '' : 'ev-neg-pct'}">${evStr}</div>
-              <div class="ev-badge-lbl ${isPositive ? '' : 'ev-neg-lbl'}">EV</div>
-            </div>
-            <div class="ev-card-sharp-col">
-              <div class="ev-compare-label">Sharp Line</div>
-              <div class="ev-compare-book">${refLabel}</div>
-              <div class="ev-compare-odds ev-neu-odds">${fmtAm(fairAm)}</div>
-              <div class="ev-compare-side">Fair price</div>
-            </div>
-          </div>
-          <div class="ev-card-actions">
-            ${betBtn}
-            <button class="ev-share-btn" id="share-btn-${game.id}" onclick="shareEdge('${game.id}', this)">📋 Share</button>
-            ${parlayBtn}
-          </div>
-        </div>`;
-    }
-
-    // ── Render the EV Edges section ────────────────────────────────────────
-    function renderEvSection() {
-      const container = document.getElementById('ev-cards-container');
-      const countEl = document.getElementById('ev-section-count');
-      if (!container) return;
-
-      if (!allGames.length) return; // skeleton still showing, don't overwrite
-
-      const positiveOnly = getEvFilteredGames()
-        .filter(g => {
-          const ev = calcGameEV(g);
-          return ev && Math.max(ev.home.ev, ev.away.ev) > 0;
-        })
-        .sort((a, b) => {
-          const evA = calcGameEV(a), evB = calcGameEV(b);
-          return Math.max(evB.home.ev, evB.away.ev) - Math.max(evA.home.ev, evA.away.ev);
-        });
-
-      if (countEl) {
-        countEl.textContent = positiveOnly.length > 0
-          ? `${positiveOnly.length} edge${positiveOnly.length !== 1 ? 's' : ''} found`
-          : '';
-      }
-
-      if (!positiveOnly.length) {
-        container.innerHTML = `
-          <div class="no-edges-state">
-            <span class="no-edges-icon">📊</span>
-            <div class="no-edges-title">No edges right now</div>
-            <div class="no-edges-sub">Most books are efficiently priced at the moment. Check back soon — lines move fast.</div>
-          </div>`;
-        return;
-      }
-
-      container.innerHTML = `<div class="ev-cards-grid">${positiveOnly.map(g => buildEvCard(g)).join('')}</div>`;
-    }
-
-    // ── Share button: copy edge text to clipboard ─────────────────────────
-    function shareEdge(gameId, btn) {
-      const game = allGames.find(g => g.id === gameId);
-      if (!game) return;
-      const ev = calcGameEV(game);
-      if (!ev) return;
-      const isHomeBetter = ev.home.ev >= ev.away.ev;
-      const bestSide = isHomeBetter ? ev.home : ev.away;
-      const bestTeam  = isHomeBetter ? game.home_team : game.away_team;
-      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
-      const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
-      const text = `${bestTeam} ${fmtAm(bestSide.bestOdds)} (${bestSide.bestBook})\n${evStr} edge vs Pinnacle sharp line\ngetcapy.co`;
-
-      const markCopied = () => {
-        if (!btn) return;
-        const orig = btn.textContent;
-        btn.textContent = '✅ Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
-      };
-
-      if (navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(text).then(markCopied).catch(() => {
-          // fallback
-          const ta = document.createElement('textarea');
-          ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;';
-          document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-          document.body.removeChild(ta); markCopied();
-        });
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;';
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-        document.body.removeChild(ta); markCopied();
-      }
     }
 
     function setSortMode(mode, el) {
@@ -1699,7 +1359,6 @@
     function renderGames() {
       const container = document.getElementById('games-container');
       renderPicks();
-      renderEvSection();
       if (!allGames.length) {
         container.innerHTML = `
           <div class="empty">
