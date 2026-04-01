@@ -1,6 +1,6 @@
 // Required env vars:
 //   SUPABASE_URL, SUPABASE_SERVICE_KEY
-//   GEMINI_API_KEY
+//   GROQ_API_KEY
 //   RESEND_API_KEY
 //   OWNER_EMAIL
 
@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
       return `${i + 1}. ${p.pick} (${p.home_team} vs ${p.away_team}) — ${odds} at ${p.book} — ${ev}`;
     }).join('\n');
 
-    // ── 3. Call Gemini API ───────────────────────────────────────────────
+    // ── 3. Call Groq API ─────────────────────────────────────────────────
     const prompt = `You are the social media voice for Capy, a sports betting analytics tool at getcapy.co. Capy is a capybara who finds value in betting markets using expected value (EV) calculations vs Pinnacle's sharp line. Tone: confident, data-driven, fun, never guarantee wins, always note these are mathematical edges not certainties.
 
 Today's top picks (${todayDate}):
@@ -66,33 +66,46 @@ Generate a JSON object (no markdown, no backticks, raw JSON only) with this exac
   }
 }`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.8, maxOutputTokens: 2048 }
-        })
-      }
-    );
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a sports betting content writer for Capy (getcapy.co). Return only valid JSON, no markdown, no backticks, no explanation.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 2000
+      })
+    });
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      throw new Error(`Gemini API error ${geminiRes.status}: ${errText}`);
+    const groqData = await groqRes.json();
+    const rawContent = groqData.choices?.[0]?.message?.content;
+
+    if (!groqRes.ok) {
+      throw new Error(`Groq API error ${groqRes.status}: ${JSON.stringify(groqData)}`);
+    }
+    if (!rawContent) {
+      throw new Error('Groq returned no content');
     }
 
-    const geminiData = await geminiRes.json();
-    const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
     // ── 4. Parse JSON — strip any backtick fences ────────────────────────
-    const cleaned = rawText.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+    const cleaned = rawContent.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
     let content;
     try {
       content = JSON.parse(cleaned);
     } catch (parseErr) {
-      throw new Error(`Failed to parse Gemini JSON: ${parseErr.message}\nRaw: ${rawText.slice(0, 500)}`);
+      throw new Error(`Failed to parse Groq JSON: ${parseErr.message}\nRaw: ${rawContent.slice(0, 500)}`);
     }
 
     // ── 5. Build HTML email ──────────────────────────────────────────────
