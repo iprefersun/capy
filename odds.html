@@ -333,6 +333,12 @@
     .pick-reason { font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-muted); line-height: 1.55; }
     .pick-bet-btn { display: block; background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; padding: 10px 16px; border-radius: 8px; text-decoration: none; text-align: center; transition: opacity 0.15s; margin-top: 8px; }
     .pick-bet-btn:hover { opacity: 0.88; }
+    /* Long Shot card: amber left-border accent to visually distinguish from sharp picks */
+    .longshot-card { border-left: 3px solid var(--amber); }
+    .picks-section-divider { display: flex; align-items: center; gap: 10px; margin: 1.5rem 0 1rem; }
+    .picks-section-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .picks-section-divider-label { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); white-space: nowrap; }
+    .longshot-section-note { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--amber-dark); background: var(--amber-light); border: 1px solid var(--amber); border-radius: 6px; padding: 7px 12px; margin-top: 10px; }
 
     /* PARLAY SUGGESTIONS SECTION */
     .parlay-suggestions-section { margin-bottom: 1.5rem; }
@@ -917,15 +923,33 @@
       </div>
     </div>
 
-    <!-- CAPY'S SMART PICKS (top 3 curated) -->
-    <div class="picks-section" id="smart-picks-section" style="display:none;">
+    <!-- CAPY'S SHARP PICKS -->
+    <div class="picks-section" id="sharp-picks-section" style="display:none;">
       <div class="picks-header">
         <div>
-          <div class="picks-title">🎯 Smart Picks — Best EV vs Pinnacle</div>
-          <div class="picks-sub">Top 3 mathematically sound bets — comparing every book against Pinnacle's sharp line to find real pricing gaps.</div>
+          <div class="picks-title">🎯 Capy's Sharp Picks</div>
+          <div class="picks-sub">High probability, positive EV vs Pinnacle — real pricing gaps across the best US books.</div>
         </div>
       </div>
-      <div class="picks-scroll" id="picks-container"></div>
+      <div class="picks-scroll" id="sharp-picks-container"></div>
+      <div class="picks-unlock-banner" id="sharp-unlock-banner" style="display:none;">
+        <span>🔒 You're missing some of today's best edges. Unlock with Pro — $7/mo → One better line pays for a year.</span>
+        <a href="/#pricing" class="picks-unlock-btn">Unlock Pro →</a>
+      </div>
+    </div>
+
+    <!-- LONG SHOT PLAYS -->
+    <div class="picks-section" id="longshot-picks-section" style="display:none;">
+      <div class="picks-header">
+        <div>
+          <div class="picks-title">🎲 Long Shot Plays</div>
+          <div class="picks-sub">Lower probability, high upside — positive EV underdogs with the best available odds.</div>
+        </div>
+      </div>
+      <div class="picks-scroll" id="longshot-picks-container"></div>
+      <div class="longshot-section-note" id="longshot-note" style="display:none;">
+        ⚠️ Long shots hit less often but pay significantly more when they do. Expected hit rate ~15–25% — value comes from the odds.
+      </div>
     </div>
 
     <!-- ALL GAMES — full odds table -->
@@ -2099,18 +2123,10 @@
     }
 
     // ── Capy's Picks ─────────────────────────────────────────────────────
-    function getPickConfidence(edge, pickEV, isEvPick) {
-      if (isEvPick) {
-        if (pickEV > 3) return { label: '🔥 Strong +EV vs Pinnacle', cls: 'pick-conf-strong' };
-        return             { label: '✅ +EV vs Pinnacle',             cls: 'pick-conf-good' };
-      }
-      if (edge > 5)  return { label: '⚡ Strong Edge', cls: 'pick-conf-strong' };
-      if (edge >= 2) return { label: '✅ Good Edge',   cls: 'pick-conf-good' };
-      return                 { label: '📊 Best Available', cls: 'pick-conf-look' };
-    }
 
+    // getBestBookForGame: returns the best h2h price across all tracked books for any side.
+    // Used by parlay builder and other non-picks features.
     function getBestBookForGame(game) {
-      // Returns { bookKey, bookName, bookUrl, price, side } for the best h2h line
       let best = null;
       BOOK_KEYS.forEach((k, i) => {
         const book = game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
@@ -2127,129 +2143,194 @@
       return best;
     }
 
+    // Quality score formula:
+    //   quality = (ev * 0.5) + (freshnessScore * 0.3) + (oddsConsistencyScore * 0.2)
+    // freshnessScore: 1.0 if odds < 5 min old, 0.5 if < 15 min, 0 otherwise
+    // oddsConsistencyScore: 1.0 if book decimal within 15% of fair decimal, 0.5 within 25%, else 0
+    function calcPickQualityScore(ev, game, bestOdds, fairProb) {
+      const fetchedAt = oddsFetchedAt[game.sport_key] || 0;
+      const ageMin = (Date.now() - fetchedAt) / 60000;
+      const freshnessScore = ageMin < 5 ? 1.0 : ageMin < 15 ? 0.5 : 0.0;
+
+      const bookDecimal = bestOdds > 0 ? (bestOdds / 100) + 1 : 1 + (100 / Math.abs(bestOdds));
+      const fairDecimal = fairProb > 0 ? 1 / fairProb : 1;
+      const pctDiff = Math.abs(bookDecimal - fairDecimal) / fairDecimal;
+      const oddsConsistencyScore = pctDiff <= 0.15 ? 1.0 : pctDiff <= 0.25 ? 0.5 : 0.0;
+
+      return parseFloat(((ev * 0.5) + (freshnessScore * 0.3) + (oddsConsistencyScore * 0.2)).toFixed(3));
+    }
+
+    // Builds a single pick card HTML string for sharp or longshot picks.
+    function buildPickCard(c, pickType, isLocked) {
+      const game = c.game;
+      const label = SPORT_LABELS[game.sport_key] || game.sport_key;
+      const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
+      const oddsStr = c.bestOdds > 0 ? `+${c.bestOdds}` : `${c.bestOdds}`;
+      const bookUrl = getBookUrl(c.bestBook) || '#';
+      const isLongshot = pickType === 'longshot';
+      const gameDateTime = fmtGameDate(game.commence_time);
+      const confLabel = isLongshot
+        ? '🎲 +EV Long Shot vs Pinnacle'
+        : c.ev > 3 ? '🔥 Strong +EV vs Pinnacle' : '✅ +EV vs Pinnacle';
+      const confCls = isLongshot ? 'pick-conf-look' : c.ev > 3 ? 'pick-conf-strong' : 'pick-conf-good';
+      const evColor = isLongshot ? 'var(--amber)' : 'var(--green)';
+      const fairOddsRaw = c.evData[c.side].fairOdds;
+      const fairOddsStr = fairOddsRaw > 0 ? `+${fairOddsRaw}` : `${fairOddsRaw}`;
+
+      const reason = isLongshot
+        ? `Fair odds vs Pinnacle: ${fairOddsStr}. At ${oddsStr} this is genuine positive EV — but expect to hit ~15–25% of the time. Value comes from the size of the payoff when it lands.`
+        : `Fair odds vs Pinnacle: ${fairOddsStr}. ${c.bestBook} is offering better than fair value — ${c.ev.toFixed(1)}% edge on a real pricing gap.`;
+
+      return `
+        <div class="pick-card${isLongshot ? ' longshot-card' : ''}${isLocked ? ' locked-card' : ''}">
+          <div class="pick-game-header">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;background:var(--surface-2);color:var(--text-hint);padding:2px 7px;border-radius:10px;">${sportEmoji} ${label}</span>
+              ${isLongshot ? '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--amber-light);color:var(--amber-dark);">Long Shot</span>' : ''}
+            </div>
+            <div class="pick-game">${game.away_team} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">vs</span> ${game.home_team}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);margin-top:2px;">${gameDateTime}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+              <span class="pick-confidence ${confCls}">${confLabel}</span>
+              <span style="font-family:'DM Mono',monospace;font-size:11px;color:${evColor};">${c.ev > 0 ? '+' : ''}${c.ev.toFixed(1)}% EV</span>
+            </div>
+          </div>
+          <div class="${isLocked ? 'pick-locked-wrap' : ''}">
+            <div class="pick-body${isLocked ? ' locked-content' : ''}">
+              <div style="margin-top:10px;">
+                <div class="pick-rec">Take ${c.teamName} ${oddsStr} at ${c.bestBook}</div>
+              </div>
+              <div class="pick-reason">${reason}</div>
+              ${!isLocked ? `<a href="${bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn" style="${isLongshot ? 'background:var(--amber);' : ''}">Bet at ${c.bestBook} →</a>` : ''}
+            </div>
+            ${isLocked ? `<div class="lock-overlay" onclick="showGate()">
+              <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span class="lock-label" style="font-size:12px;">Pro</span>
+              <span class="lock-hint" style="bottom:6px;">Unlock with Capy Pro</span>
+            </div>` : ''}
+          </div>
+          ${!isLocked && !isLongshot ? '<div style="font-size:11px;font-weight:600;color:var(--green);margin-top:6px;">⚡ This edge is live now — lines move fast</div>' : ''}
+        </div>`;
+    }
+
+    // Builds the Supabase save payload for a pick candidate.
+    function buildSavePickPayload(c, pickType) {
+      const qs = calcPickQualityScore(c.ev, c.game, c.bestOdds, c.fairProb);
+      return {
+        game_id:       c.game.id,
+        sport:         c.game.sport_key,
+        home_team:     c.game.home_team,
+        away_team:     c.game.away_team,
+        pick:          c.teamName,
+        bet_type:      'ml',
+        pick_type:     pickType,   // 'sharp' | 'longshot'
+        line:          null,
+        odds:          c.bestOdds,
+        book:          c.bestBook,
+        ev_percent:    c.ev,
+        edge:          null,
+        game_time:     c.game.commence_time,
+        quality_score: qs,
+      };
+    }
+
     function renderPicks() {
-      const section = document.getElementById('smart-picks-section');
-      const container = document.getElementById('picks-container');
-      // Same data source as game cards — allGames holds all fetched games across all sports
-      const sourceGames = allGames;
-      console.log('[Picks] Total games available:', sourceGames.length, 'Sports:', [...new Set(sourceGames.map(g => g.sport_key))]);
-      if (!sourceGames.length) { section.style.display = 'none'; return; }
+      const sharpSection      = document.getElementById('sharp-picks-section');
+      const longshotSection   = document.getElementById('longshot-picks-section');
+      const sharpContainer    = document.getElementById('sharp-picks-container');
+      const longshotContainer = document.getElementById('longshot-picks-container');
 
-      const getBestEV = g => { const ev = calcGameEV(g); return ev ? Math.max(ev.home.ev, ev.away.ev) : -Infinity; };
+      console.log('[Picks] Total games available:', allGames.length,
+        'Sports:', [...new Set(allGames.map(g => g.sport_key))]);
 
-      // Partition: positive EV first, then fill with highest edge score
-      const posEvGames = [...sourceGames]
-        .filter(g => getBestEV(g) > 0)
-        .sort((a, b) => getBestEV(b) - getBestEV(a));
-      const edgeGames = [...sourceGames]
-        .filter(g => getBestEV(g) <= 0)
-        .sort((a, b) => calcEdge(b) - calcEdge(a));
+      if (!allGames.length) {
+        sharpSection.style.display = 'none';
+        longshotSection.style.display = 'none';
+        return;
+      }
 
-      // Take up to 3 total: positive EV first, then edge fallbacks
-      const evSlots = posEvGames.slice(0, 3);
-      const fillNeeded = 3 - evSlots.length;
-      const top3 = [...evSlots, ...edgeGames.slice(0, fillNeeded)];
-      const evSet = new Set(evSlots.map(g => g.id));
+      const sharpCandidates    = [];
+      const longshotCandidates = [];
 
-      if (!top3.length) { section.style.display = 'none'; return; }
+      for (const game of allGames) {
+        // calcGameEV returns null if either Pinnacle side is missing — satisfies
+        // "Both Pinnacle sides present" requirement for both buckets.
+        const evData = calcGameEV(game);
+        if (!evData) continue;
 
-      section.style.display = 'block';
+        for (const side of ['home', 'away']) {
+          const sideEV   = evData[side].ev;
+          const bestOdds = evData[side].bestOdds;
+          const bestBook = evData[side].bestBook;
+          const fairProb = evData[side].fairProb;
+          const teamName = side === 'home' ? game.home_team : game.away_team;
+
+          if (!bestOdds || !bestBook) continue;
+
+          const qs = calcPickQualityScore(sideEV, game, bestOdds, fairProb);
+
+          // ── Sharp: EV 1.5–5%, odds –200 to +300 ────────────────────────
+          if (sideEV >= 1.5 && sideEV <= 5 && bestOdds >= -200 && bestOdds <= 300) {
+            sharpCandidates.push({ game, side, teamName, ev: sideEV, qs, bestOdds, bestBook, fairProb, evData });
+          }
+
+          // ── Longshot: EV 1–5%, odds > +300 to +1500 ────────────────────
+          if (sideEV >= 1 && sideEV <= 5 && bestOdds > 300 && bestOdds <= 1500) {
+            longshotCandidates.push({ game, side, teamName, ev: sideEV, qs, bestOdds, bestBook, fairProb, evData });
+          }
+        }
+      }
+
+      // Sharp: max 1 pick per sport, sorted by quality score, top 3
+      const sharpBySport = {};
+      const sharpPicks = [];
+      for (const c of [...sharpCandidates].sort((a, b) => b.qs - a.qs)) {
+        if (sharpBySport[c.game.sport_key]) continue;
+        sharpBySport[c.game.sport_key] = true;
+        sharpPicks.push(c);
+        if (sharpPicks.length >= 3) break;
+      }
+
+      // Longshot: highest EV wins, top 2
+      const longshotPicks = [...longshotCandidates].sort((a, b) => b.ev - a.ev).slice(0, 2);
+
+      console.log('[Picks] Sharp candidates:', sharpCandidates.length, '→ selected:', sharpPicks.length,
+        '| Longshot candidates:', longshotCandidates.length, '→ selected:', longshotPicks.length);
+
       const hasAccess = !!userEmail;
 
-      const cards = top3.map((game, idx) => {
-        const edgeInfo = calcEdgeInfo(game);
-        const edge = edgeInfo.value;
-        const bestBook = getBestBookForGame(game);
-        if (!bestBook) return '';
-        const gameEVData = calcGameEV(game);
-        const pickEV = gameEVData ? Math.max(gameEVData.home.ev, gameEVData.away.ev) : -Infinity;
-        const isEvPick = evSet.has(game.id);
-        const conf = getPickConfidence(edge, pickEV, isEvPick);
-        const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
-        const label = SPORT_LABELS[game.sport_key] || game.sport_key;
-        const oddsStr = bestBook.price > 0 ? `+${bestBook.price}` : `${bestBook.price}`;
-        const recText = `Take ${bestBook.side} ${oddsStr} at ${bestBook.bookName}`;
-        const edgeTypeLabel = edgeInfo.type === 'spread' ? `Spread edge: +${edge} pts` : `Best ML Available`;
-        const reason = edgeInfo.type === 'spread'
-          ? `${bestBook.bookName} has this spread ${edge} pts better than the worst available line — that's real money on the table.`
-          : `${bestBook.bookName} has the best moneyline on this game — ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books.`;
-        const isLocked = !previewMode && !hasAccess && idx > 0;
-        const gameDateTime = fmtGameDate(game.commence_time);
+      // ── Render sharp picks ──────────────────────────────────────────────
+      if (sharpPicks.length) {
+        sharpSection.style.display = 'block';
+        sharpContainer.innerHTML = sharpPicks.map((c, idx) =>
+          buildPickCard(c, 'sharp', !previewMode && !hasAccess && idx > 0)
+        ).join('');
+        const banner = document.getElementById('sharp-unlock-banner');
+        if (banner) banner.style.display = !hasAccess ? 'flex' : 'none';
+      } else {
+        sharpSection.style.display = 'none';
+      }
 
-        return `
-          <div class="pick-card${isLocked ? ' locked-card' : ''}">
-            <div class="pick-game-header">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;background:var(--surface-2);color:var(--text-hint);padding:2px 7px;border-radius:10px;">${sportEmoji} ${label}</span>
-              </div>
-              <div class="pick-game">${game.away_team} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">vs</span> ${game.home_team}</div>
-              <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);margin-top:2px;">${gameDateTime}</div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-                <span class="pick-confidence ${conf.cls}">${conf.label}</span>
-                <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${edgeTypeLabel}</span>
-              </div>
-            </div>
-            <div class="${isLocked ? 'pick-locked-wrap' : ''}">
-              <div class="pick-body${isLocked ? ' locked-content' : ''}">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
-                  <div><div class="pick-rec">${recText}</div></div>
-                  <div style="text-align:right;flex-shrink:0;">
-                    ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts edge</div>` : ''}
-                  </div>
-                </div>
-                <div class="pick-reason">${reason}</div>
-                ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
-              </div>
-              ${isLocked ? `<div class="lock-overlay" onclick="showGate()">
-                <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                <span class="lock-label" style="font-size:12px;">Pro</span>
-                <span class="lock-hint" style="bottom:6px;">Unlock with Capy Pro</span>
-              </div>` : ''}
-            </div>
-            ${!isLocked && idx === 0 ? '<div style="font-size:11px;font-weight:600;color:var(--green);margin-top:6px;">⚡ This edge is live now — lines move fast</div>' : ''}
-          </div>`;
-      }).join('');
+      // ── Render longshot picks ───────────────────────────────────────────
+      if (longshotPicks.length) {
+        longshotSection.style.display = 'block';
+        longshotContainer.innerHTML = longshotPicks.map((c, idx) =>
+          buildPickCard(c, 'longshot', !previewMode && !hasAccess && idx > 0)
+        ).join('');
+        const note = document.getElementById('longshot-note');
+        if (note) note.style.display = 'block';
+      } else {
+        longshotSection.style.display = 'none';
+      }
 
-      // Single unlock CTA below all cards (only when user is not Pro)
-      const unlockBanner = !hasAccess ? `
-        <div class="picks-unlock-banner">
-          <span>🔒 You're missing 2 of today's best edges. Unlock with Pro — $7/mo → One better line pays for a year.</span>
-          <a href="/#pricing" class="picks-unlock-btn">Unlock Pro →</a>
-        </div>` : '';
+      // ── Save both buckets to Supabase (silent — never affects UI) ───────
+      const allPicksPayload = [
+        ...sharpPicks.map(c    => buildSavePickPayload(c, 'sharp')),
+        ...longshotPicks.map(c => buildSavePickPayload(c, 'longshot')),
+      ].filter(Boolean);
+      saveCappyPicksToSupabase(allPicksPayload);
 
-      container.innerHTML = cards;
-
-      // Append unlock banner after the grid
-      const section2 = document.getElementById('smart-picks-section');
-      let existingBanner = section2.querySelector('.picks-unlock-banner');
-      if (existingBanner) existingBanner.remove();
-      if (unlockBanner) section2.insertAdjacentHTML('beforeend', unlockBanner);
-
-      // Auto-save picks to Supabase (silent — never affects UI)
-      const pickPayload = top3.map(game => {
-        const bestBook = getBestBookForGame(game);
-        const gameEVData = calcGameEV(game);
-        const pickEV = gameEVData ? Math.max(gameEVData.home.ev, gameEVData.away.ev) : null;
-        const edgeInfo = calcEdgeInfo(game);
-        if (!bestBook) return null;
-        return {
-          game_id: game.id,
-          sport: game.sport_key,
-          home_team: game.home_team,
-          away_team: game.away_team,
-          pick: bestBook.side,
-          pick_type: 'ml',
-          line: null,
-          odds: bestBook.price,
-          book: bestBook.bookName,
-          ev_percent: pickEV,
-          edge: edgeInfo.value,
-          game_time: game.commence_time
-        };
-      }).filter(Boolean);
-      saveCappyPicksToSupabase(pickPayload);
-
-      // Render the three parlay suggestion cards
+      // ── Parlay suggestions ──────────────────────────────────────────────
       renderParlaysuggestions();
     }
 

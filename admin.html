@@ -87,6 +87,14 @@
     .breakdown-label { color: var(--text-muted); }
     .breakdown-value { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; }
 
+    /* TYPE BADGE */
+    .type-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+    .type-sharp    { background: var(--green-light); color: var(--green-dark); }
+    .type-longshot { background: var(--amber-light); color: var(--amber-dark); }
+    /* Type dropdown inline in table */
+    .type-select { font-family: 'Inter', sans-serif; font-size: 11px; padding: 3px 6px; border-radius: 5px; border: 1.5px solid var(--border-mid); background: var(--surface); color: var(--text); cursor: pointer; }
+    .type-select:focus { outline: none; border-color: var(--amber); }
+
     /* MISC */
     .empty-msg { padding: 2rem; text-align: center; color: var(--text-hint); font-size: 14px; }
     .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
@@ -198,6 +206,7 @@
               <tr>
                 <th>Date</th>
                 <th>Sport</th>
+                <th>Type</th>
                 <th>Pick</th>
                 <th>Odds</th>
                 <th>EV%</th>
@@ -374,7 +383,7 @@
     function renderCompletedTab() {
       const tbody = document.getElementById('completed-tbody');
       if (!allResults.length) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-msg">No completed picks yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-msg">No completed picks yet.</td></tr>';
         return;
       }
 
@@ -384,6 +393,7 @@
           ? new Date(r.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
           : '—';
         const sport = SPORT_LABELS[p.sport] || p.sport || '—';
+        const pickType = p.pick_type || 'sharp';
         const pick = p.pick ? `${p.pick} ML` : '—';
         const game = p.home_team ? `${(p.away_team||'').split(' ').pop()} @ ${(p.home_team||'').split(' ').pop()}` : '—';
         const odds = p.odds != null ? (p.odds > 0 ? `+${p.odds}` : `${p.odds}`) : '—';
@@ -395,10 +405,18 @@
           : '—';
         const outcomeCls = r.outcome === 'win' ? 'outcome-win' : r.outcome === 'loss' ? 'outcome-loss' : 'outcome-push';
         const outcomeLabel = r.outcome === 'win' ? '✅ Win' : r.outcome === 'loss' ? '❌ Loss' : '➖ Push';
+        // pick_id from the results row is the FK; the picks row id is p.id
+        const pickRowId = r.pick_id;
 
         return `<tr>
           <td class="mono">${date}</td>
           <td><span class="sport-tag">${sport}</span></td>
+          <td>
+            <select class="type-select" onchange="setPickType('${pickRowId}', this.value)">
+              <option value="sharp"    ${pickType === 'sharp'    ? 'selected' : ''}>Sharp</option>
+              <option value="longshot" ${pickType === 'longshot' ? 'selected' : ''}>Long Shot</option>
+            </select>
+          </td>
           <td style="font-size:12px;">${pick}<br/><span style="color:var(--text-hint);font-size:11px;">${game}</span></td>
           <td class="mono">${odds}</td>
           <td class="mono">${ev}</td>
@@ -407,10 +425,10 @@
           <td class="mono">${clv}</td>
           <td>
             <div class="action-btns">
-              <button class="btn-override btn-win"  onclick="override('${r.pick_id}','win')">W</button>
-              <button class="btn-override btn-loss" onclick="override('${r.pick_id}','loss')">L</button>
-              <button class="btn-override btn-push" onclick="override('${r.pick_id}','push')">P</button>
-              <button class="btn-override btn-delete" onclick="deletePick('${r.pick_id}')">✕</button>
+              <button class="btn-override btn-win"  onclick="override('${pickRowId}','win')">W</button>
+              <button class="btn-override btn-loss" onclick="override('${pickRowId}','loss')">L</button>
+              <button class="btn-override btn-push" onclick="override('${pickRowId}','push')">P</button>
+              <button class="btn-override btn-delete" onclick="deletePick('${pickRowId}')">✕</button>
             </div>
           </td>
         </tr>`;
@@ -494,6 +512,21 @@
         if (res.status === 403) { showToast('Auth failed'); return; }
         const data = await res.json();
         if (data.success) { showToast('Pick deleted'); loadAllData(); }
+        else showToast('Error: ' + data.error);
+      } catch (err) { showToast('Request failed'); }
+    }
+
+    // ── Set pick type (sharp ↔ longshot) ─────────────────────────────────
+    async function setPickType(pickId, pick_type) {
+      try {
+        const res = await fetch('/api/admin-override', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: adminPassword, pick_id: pickId, pick_type, action: 'set-pick-type' })
+        });
+        if (res.status === 403) { showToast('Auth failed — re-enter password'); sessionStorage.removeItem('capy_admin_pw'); return; }
+        const data = await res.json();
+        if (data.success) showToast(`Type updated → ${pick_type}`);
         else showToast('Error: ' + data.error);
       } catch (err) { showToast('Request failed'); }
     }

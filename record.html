@@ -41,8 +41,14 @@
     .hero-title { font-family: 'Fraunces', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 900; line-height: 1.1; margin-bottom: 8px; }
     .hero-sub { font-size: 15px; color: var(--text-muted); max-width: 560px; }
 
+    /* SECTION DIVIDER */
+    .section-divider { display: flex; align-items: center; gap: 10px; margin: 2rem 0 1rem; }
+    .section-divider-line { flex: 1; height: 1px; background: var(--border-mid); }
+    .section-divider-label { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 900; white-space: nowrap; }
+    .section-divider-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1rem; }
+
     /* STAT CARDS */
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 1.5rem 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 1rem 0 1.5rem; }
     @media (max-width: 700px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
     .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
     .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); margin-bottom: 6px; }
@@ -52,6 +58,9 @@
     .stat-value.amber { color: var(--amber); }
     .stat-sub { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
 
+    /* LONGSHOT NOTICE */
+    .longshot-notice { background: var(--amber-light); border: 1.5px solid var(--amber); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 1rem; font-size: 13px; color: var(--amber-dark); }
+
     /* BUILDING NOTICE */
     .building-notice { background: var(--amber-light); border: 1.5px solid var(--amber); border-radius: var(--radius-sm); padding: 16px 20px; margin-bottom: 1.5rem; font-size: 14px; color: var(--amber-dark); }
 
@@ -59,8 +68,6 @@
     .table-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
     .filter-select { font-family: 'Inter', sans-serif; font-size: 13px; padding: 6px 10px; border: 1.5px solid var(--border-mid); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; }
     .filter-select:focus { outline: none; border-color: var(--amber); }
-    .sort-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--border-mid); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.12s; }
-    .sort-btn.active { background: var(--amber); color: #fff; border-color: var(--amber); }
     .result-count { font-size: 12px; color: var(--text-hint); margin-left: auto; }
 
     /* TABLE */
@@ -78,6 +85,9 @@
     .outcome-loss { background: var(--red-light); color: var(--red); }
     .outcome-push { background: var(--surface-2); color: var(--text-muted); }
     .sport-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--surface-2); color: var(--text-hint); }
+    .type-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+    .type-tag-sharp { background: var(--green-light); color: var(--green-dark); }
+    .type-tag-longshot { background: var(--amber-light); color: var(--amber-dark); }
     .mono { font-family: 'DM Mono', monospace; font-size: 12px; }
     .clv-positive { color: var(--green); font-weight: 600; }
     .clv-negative { color: var(--red); font-weight: 600; }
@@ -137,21 +147,58 @@
       <div class="hero-sub">Full transparency. Every pick logged automatically. Every result verified against official scores. Nothing deleted.</div>
     </div>
 
-    <!-- STAT CARDS -->
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card"><div class="stat-label">Total Picks</div><div class="stat-value" id="stat-total">—</div></div>
-      <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value green" id="stat-winrate">—</div></div>
-      <div class="stat-card"><div class="stat-label">ROI (flat $100)</div><div class="stat-value" id="stat-roi">—</div></div>
-      <div class="stat-card"><div class="stat-label">Avg EV at Pick</div><div class="stat-value amber" id="stat-ev">—</div></div>
-    </div>
-
-    <!-- BUILDING NOTICE (shown when < 20 picks) -->
+    <!-- BUILDING NOTICE (shown when < 20 picks total) -->
     <div class="building-notice" id="building-notice" style="display:none;">
-      📈 Building our record — check back soon. Every pick is being tracked from day one. Come back tomorrow to see results.
+      📈 Building our record — check back soon. Every pick is being tracked from day one.
     </div>
 
-    <!-- TABLE CONTROLS -->
+    <!-- ── SHARP PICKS RECORD ────────────────────────────────────────── -->
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-label">🎯 Sharp Picks Record</span>
+      <div class="section-divider-line"></div>
+    </div>
+    <div class="section-divider-sub">High probability, positive EV bets — record since April 2026</div>
+
+    <div class="stats-grid" id="sharp-stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Sharp Picks</div><div class="stat-value" id="sharp-stat-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value green" id="sharp-stat-winrate">—</div></div>
+      <div class="stat-card"><div class="stat-label">ROI (flat $100)</div><div class="stat-value" id="sharp-stat-roi">—</div></div>
+      <div class="stat-card"><div class="stat-label">Avg EV at Pick</div><div class="stat-value amber" id="sharp-stat-ev">—</div></div>
+    </div>
+
+    <!-- ── LONG SHOT PLAYS RECORD ─────────────────────────────────────── -->
+    <div class="section-divider" style="margin-top:2.5rem;">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-label">🎲 Long Shot Plays Record</span>
+      <div class="section-divider-line"></div>
+    </div>
+    <div class="section-divider-sub">High upside underdogs — record since April 2026</div>
+
+    <div class="longshot-notice">
+      ⚠️ Expected hit rate ~15–25% — value comes from the odds, not frequency. A losing streak is expected and normal.
+    </div>
+
+    <div class="stats-grid" id="longshot-stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Long Shots</div><div class="stat-value" id="ls-stat-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Hit Rate</div><div class="stat-value amber" id="ls-stat-winrate">—</div></div>
+      <div class="stat-card"><div class="stat-label">ROI (flat $100)</div><div class="stat-value" id="ls-stat-roi">—</div></div>
+      <div class="stat-card"><div class="stat-label">Biggest Winner</div><div class="stat-value amber" id="ls-stat-biggest">—</div><div class="stat-sub" id="ls-stat-biggest-sub"></div></div>
+    </div>
+
+    <!-- ── FULL TABLE ─────────────────────────────────────────────────── -->
+    <div class="section-divider" style="margin-top:2.5rem;">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-label" style="font-size:14px;font-family:'Inter',sans-serif;font-weight:700;">All Picks</span>
+      <div class="section-divider-line"></div>
+    </div>
+
     <div class="table-controls">
+      <select class="filter-select" id="filter-type" onchange="applyFilters()">
+        <option value="all">All types</option>
+        <option value="sharp">Sharp only</option>
+        <option value="longshot">Long shots only</option>
+      </select>
       <select class="filter-select" id="filter-sport" onchange="applyFilters()">
         <option value="all">All sports</option>
         <option value="basketball_nba">NBA</option>
@@ -168,13 +215,13 @@
       <span class="result-count" id="result-count"></span>
     </div>
 
-    <!-- PICKS TABLE -->
     <div class="table-wrap">
       <table id="picks-table">
         <thead>
           <tr>
             <th onclick="sortBy('date')">Date <span class="sort-icon">↕</span></th>
             <th>Sport</th>
+            <th>Type</th>
             <th onclick="sortBy('pick')">Pick <span class="sort-icon">↕</span></th>
             <th onclick="sortBy('odds')">Odds <span class="sort-icon">↕</span></th>
             <th onclick="sortBy('ev')">EV at Pick <span class="sort-icon">↕</span></th>
@@ -183,10 +230,9 @@
           </tr>
         </thead>
         <tbody id="picks-tbody">
-          <!-- skeleton rows -->
-          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:160px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
-          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:130px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
-          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:150px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:160px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:130px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:150px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -195,7 +241,7 @@
     <div class="credibility">
       <div class="credibility-title">How we track</div>
       <div class="credibility-text">
-        Every pick Capy flags is automatically saved to our database with the exact odds and EV at time of pick. Results are verified against official scores via The Odds API. We never delete losing picks. This record started March 2026 and every pick is shown — wins and losses alike. The goal is simple: if Capy's model has edge, it shows up here over time.
+        Every pick Capy flags is automatically saved to our database with the exact odds and EV at time of pick. Results are verified against official scores via The Odds API and BallDontLie. We never delete losing picks. Sharp Picks and Long Shot Plays are tracked separately — they have different expected win rates and should be evaluated differently. This record started April 2026 and every pick is shown — wins and losses alike.
       </div>
     </div>
 
@@ -214,9 +260,10 @@
     async function loadRecord() {
       try {
         const res = await fetch('/api/get-record');
-        const { picks, stats } = await res.json();
+        const { picks, stats, sharpStats, longshotStats } = await res.json();
         allPicks = picks || [];
-        renderStats(stats || {});
+        renderSharpStats(sharpStats || {});
+        renderLongshotStats(longshotStats || {});
         applyFilters();
 
         if (allPicks.length < 20) {
@@ -224,39 +271,63 @@
         }
       } catch (err) {
         document.getElementById('picks-tbody').innerHTML = `
-          <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-hint);">
+          <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-hint);">
             Could not load picks. Try refreshing.
           </td></tr>`;
       }
     }
 
-    function renderStats(stats) {
-      document.getElementById('stat-total').textContent = stats.total ?? '0';
+    function renderSharpStats(s) {
+      document.getElementById('sharp-stat-total').textContent = s.total ?? '0';
 
-      const wr = document.getElementById('stat-winrate');
-      wr.textContent = stats.winRate ? `${stats.winRate}%` : '—';
-      wr.className = 'stat-value green';
+      const wr = document.getElementById('sharp-stat-winrate');
+      wr.textContent = s.winRate ? `${s.winRate}%` : '—';
 
-      const roi = document.getElementById('stat-roi');
-      const roiVal = parseFloat(stats.roi || 0);
-      roi.textContent = roiVal >= 0 ? `+$${roiVal.toFixed(0)}` : `-$${Math.abs(roiVal).toFixed(0)}`;
+      const roi = document.getElementById('sharp-stat-roi');
+      const roiVal = parseFloat(s.roi || 0);
+      roi.textContent = roiVal >= 0 ? `+$${Math.abs(roiVal).toFixed(0)}` : `-$${Math.abs(roiVal).toFixed(0)}`;
       roi.className = `stat-value ${roiVal >= 0 ? 'green' : 'red'}`;
 
-      const ev = document.getElementById('stat-ev');
-      ev.textContent = stats.avgEV != null ? `${stats.avgEV > 0 ? '+' : ''}${stats.avgEV}%` : '—';
+      const ev = document.getElementById('sharp-stat-ev');
+      ev.textContent = s.avgEV != null ? `${s.avgEV > 0 ? '+' : ''}${s.avgEV}%` : '—';
+    }
+
+    function renderLongshotStats(s) {
+      document.getElementById('ls-stat-total').textContent = s.total ?? '0';
+
+      const wr = document.getElementById('ls-stat-winrate');
+      wr.textContent = s.winRate ? `${s.winRate}%` : '—';
+
+      const roi = document.getElementById('ls-stat-roi');
+      const roiVal = parseFloat(s.roi || 0);
+      roi.textContent = roiVal >= 0 ? `+$${Math.abs(roiVal).toFixed(0)}` : `-$${Math.abs(roiVal).toFixed(0)}`;
+      roi.className = `stat-value ${roiVal >= 0 ? 'green' : 'red'}`;
+
+      const biggestEl = document.getElementById('ls-stat-biggest');
+      const biggestSubEl = document.getElementById('ls-stat-biggest-sub');
+      if (s.biggestWinner) {
+        const odds = s.biggestWinner.odds;
+        biggestEl.textContent = odds > 0 ? `+${odds}` : `${odds}`;
+        biggestSubEl.textContent = s.biggestWinner.pick || '';
+      } else {
+        biggestEl.textContent = '—';
+        biggestSubEl.textContent = 'No winners yet';
+      }
     }
 
     function applyFilters() {
-      const sport = document.getElementById('filter-sport').value;
-      const outcome = document.getElementById('filter-outcome').value;
+      const typeFilter    = document.getElementById('filter-type').value;
+      const sportFilter   = document.getElementById('filter-sport').value;
+      const outcomeFilter = document.getElementById('filter-outcome').value;
 
       let filtered = allPicks.filter(r => {
-        if (sport !== 'all' && r.picks?.sport !== sport) return false;
-        if (outcome !== 'all' && r.outcome !== outcome) return false;
+        const pickType = r.picks?.pick_type || 'sharp';
+        if (typeFilter !== 'all' && pickType !== typeFilter) return false;
+        if (sportFilter !== 'all' && r.picks?.sport !== sportFilter) return false;
+        if (outcomeFilter !== 'all' && r.outcome !== outcomeFilter) return false;
         return true;
       });
 
-      // Sort
       filtered.sort((a, b) => {
         let va, vb;
         if (sortField === 'date')    { va = a.recorded_at; vb = b.recorded_at; }
@@ -285,7 +356,7 @@
 
       if (!picks.length) {
         tbody.innerHTML = `
-          <tr><td colspan="7">
+          <tr><td colspan="8">
             <div class="empty-state">
               <div class="empty-icon">🦫</div>
               <div class="empty-title">No picks yet</div>
@@ -301,6 +372,10 @@
           ? new Date(r.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
           : '—';
         const sport = SPORT_LABELS[p.sport] || p.sport || '—';
+        const pickType = p.pick_type || 'sharp';
+        const typeTag = pickType === 'longshot'
+          ? '<span class="type-tag type-tag-longshot">Long Shot</span>'
+          : '<span class="type-tag type-tag-sharp">Sharp</span>';
         const pick = p.pick && p.home_team
           ? `${p.pick} ML — ${(p.away_team||'').split(' ').pop()} @ ${(p.home_team||'').split(' ').pop()}`
           : (p.pick || '—');
@@ -323,6 +398,7 @@
         return `<tr>
           <td class="mono">${date}</td>
           <td><span class="sport-tag">${sport}</span></td>
+          <td>${typeTag}</td>
           <td>${pick}</td>
           <td class="mono">${odds}</td>
           <td class="mono">${ev}</td>

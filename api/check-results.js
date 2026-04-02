@@ -383,7 +383,9 @@ export default async function handler(req, res) {
       // ── Compute outcome ───────────────────────────────────────────────────
       let outcome = 'pending';
 
-      if (pick.pick_type === 'ml') {
+      // bet_type column (renamed from pick_type) holds 'ml' or 'spread'.
+      // Picks without bet_type (before schema change) default to ml resolution.
+      if (pick.bet_type === 'ml' || !pick.bet_type) {
         if (pickedHome) {
           outcome = homeWon ? 'win' : awayWon ? 'loss' : 'push';
         } else {

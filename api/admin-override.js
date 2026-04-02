@@ -3,8 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Simple admin password check
-  const { password, pick_id, outcome, action } = req.body;
+  const { password, pick_id, outcome, pick_type, action } = req.body;
   if (password !== process.env.ADMIN_PASSWORD) {
     return res.status(403).json({ error: 'Unauthorized' });
   }
@@ -33,6 +32,19 @@ export default async function handler(req, res) {
       manual_override: true
     }, { onConflict: 'pick_id' });
 
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ success: true });
+  }
+
+  // ── set-pick-type: manually reclassify a pick as sharp or longshot ────────
+  if (action === 'set-pick-type') {
+    if (!['sharp', 'longshot'].includes(pick_type)) {
+      return res.status(400).json({ error: 'pick_type must be sharp or longshot' });
+    }
+    const { error } = await supabase
+      .from('picks')
+      .update({ pick_type })
+      .eq('id', pick_id);
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ success: true });
   }
