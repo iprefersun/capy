@@ -130,24 +130,113 @@ export default async function handler(req, res) {
   }
 
   const API_KEY = process.env.ODDS_API_KEY;
+  const BDL_KEY = process.env.BALLDONTLIE_API_KEY;
+
   if (!API_KEY) {
     console.error('[check-results] ODDS_API_KEY env var is not set');
     return res.status(500).json({ error: 'Missing ODDS_API_KEY' });
   }
 
-  // ── Step 3: Fetch scores per sport ────────────────────────────────────────
+  // ── Step 3: Fetch scores per sport (sport-aware routing) ──────────────────
+  // NBA → BallDontLie (game IDs differ from Odds API — match by team name + date only)
+  // All other sports → The Odds API scores endpoint
+  //
+  // BallDontLie games are normalized into the same shape as Odds API games so
+  // the matching loop in Step 4 can treat all sports uniformly.
   const scoresCache = {};
   let resolved = 0;
   let skipped = 0;
   let errors = 0;
 
-  // Pre-fetch scores for all unique sports up front
   const uniqueSports = [...new Set(unresolved.map(p => p.sport).filter(Boolean))];
   console.log('[check-results] Unique sports to fetch scores for:', uniqueSports);
 
-  for (const sport of uniqueSports) {
-    const url = `https://api.the-odds-api.com/v4/sports/${sport}/scores/?apiKey=${API_KEY}&daysFrom=7&dateFormat=iso`;
-    console.log(`[check-results] Fetching scores: GET ${url.replace(API_KEY, 'REDACTED')}`);
+  // ── 3a: NBA via BallDontLie ───────────────────────────────────────────────
+  if (uniqueSports.includes('basketball_nba')) {
+    if (!BDL_KEY) {
+      console.error('[check-results] BALLDONTLIE_API_KEY is not set — cannot fetch NBA scores');
+      scoresCache['basketball_nba'] = [];
+    } else {
+      // Collect unique dates to query. Fetch the pick date plus adjacent days to
+      // handle ET/UTC boundary (e.g. a 10pm ET game is the next UTC day).
+      const nbaPickDates = new Set();
+      for (const pick of unresolved.filter(p => p.sport === 'basketball_nba')) {
+        if (!pick.game_time) continue;
+        const d = new Date(pick.game_time);
+        const utc = d.toISOString().split('T')[0];
+        const prev = new Date(d.getTime() - 86400000).toISOString().split('T')[0];
+        const next = new Date(d.getTime() + 86400000).toISOString().split('T')[0];
+        nbaPickDates.add(prev);
+        nbaPickDates.add(utc);
+        nbaPickDates.add(next);
+      }
+
+      const allNbaGames = [];
+
+      for (const date of nbaPickDates) {
+        const url = `https://api.balldontlie.io/v1/games?dates[]=${date}`;
+        console.log(`[check-results] Fetching BallDontLie NBA scores for date=${date}`);
+        try {
+          const bdlRes = await fetch(url, { headers: { 'Authorization': `Bearer ${BDL_KEY}` } });
+
+          if (!bdlRes.ok) {
+            const body = await bdlRes.text();
+            console.error(`[check-results] BallDontLie HTTP ${bdlRes.status} for date=${date} | body: ${body.slice(0, 300)}`);
+            continue;
+          }
+
+          const bdlJson = await bdlRes.json();
+          const games = bdlJson?.data;
+
+          if (!Array.isArray(games)) {
+            console.error(`[check-results] BallDontLie returned non-array for date=${date}:`, JSON.stringify(bdlJson).slice(0, 200));
+            continue;
+          }
+
+          const finalGames = games.filter(g => g.status === 'Final');
+          console.log(`[check-results] BallDontLie date=${date}: total=${games.length} final=${finalGames.length}`);
+
+          if (finalGames.length > 0) {
+            finalGames.forEach(g => {
+              console.log(`  bdl_id=${g.id} | ${g.visitor_team?.full_name} @ ${g.home_team?.full_name} | ${g.visitor_team_score}-${g.home_team_score} | status=${g.status}`);
+            });
+          }
+
+          // Normalize to Odds API shape so Step 4 works unchanged.
+          // NOTE: id is prefixed with "bdl_" so it will never accidentally
+          // match an Odds API game_id stored in picks — matching is always by team + date.
+          for (const g of games) {
+            const homeName = g.home_team?.full_name || '';
+            const awayName = g.visitor_team?.full_name || '';
+            allNbaGames.push({
+              id: `bdl_${g.id}`,
+              completed: g.status === 'Final',
+              home_team: homeName,
+              away_team: awayName,
+              commence_time: g.date, // ISO datetime returned by BDL
+              scores: [
+                { name: homeName, score: String(g.home_team_score ?? '') },
+                { name: awayName, score: String(g.visitor_team_score ?? '') },
+              ],
+            });
+          }
+
+        } catch (err) {
+          console.error(`[check-results] BallDontLie network error for date=${date}:`, err.message);
+        }
+      }
+
+      scoresCache['basketball_nba'] = allNbaGames;
+      console.log(`[check-results] NBA total games cached: ${allNbaGames.length} (${allNbaGames.filter(g => g.completed).length} final)`);
+    }
+  }
+
+  // ── 3b: All other sports via The Odds API ─────────────────────────────────
+  const nonNbaSports = uniqueSports.filter(s => s !== 'basketball_nba');
+
+  for (const sport of nonNbaSports) {
+    const url = `https://api.the-odds-api.com/v4/sports/${sport}/scores/?apiKey=${API_KEY}&daysFrom=3&dateFormat=iso`;
+    console.log(`[check-results] Fetching Odds API scores: GET ${url.replace(API_KEY, 'REDACTED')}`);
 
     try {
       const scoreRes = await fetch(url);
@@ -169,13 +258,11 @@ export default async function handler(req, res) {
 
       scoresCache[sport] = scoresJson;
 
-      // Log a summary of what came back
-      const completed   = scoresJson.filter(g => g.completed === true);
-      const inProgress  = scoresJson.filter(g => g.completed === false && g.scores?.length);
-      const scheduled   = scoresJson.filter(g => !g.scores?.length);
+      const completed  = scoresJson.filter(g => g.completed === true);
+      const inProgress = scoresJson.filter(g => g.completed === false && g.scores?.length);
+      const scheduled  = scoresJson.filter(g => !g.scores?.length);
       console.log(`[check-results] Scores for ${sport}: total=${scoresJson.length} completed=${completed.length} in-progress=${inProgress.length} scheduled=${scheduled.length}`);
 
-      // Log every completed game so we can visually match team names
       if (completed.length > 0) {
         console.log(`[check-results] Completed games for ${sport}:`);
         completed.forEach(g => {
@@ -184,7 +271,7 @@ export default async function handler(req, res) {
           console.log(`  id=${g.id} | ${g.away_team} @ ${g.home_team} | ${as}-${hs} | commence=${g.commence_time}`);
         });
       } else {
-        console.log(`[check-results] No completed games returned for ${sport} — all ${scoresJson.length} games may still be scheduled or in-progress`);
+        console.log(`[check-results] No completed games for ${sport} — ${scoresJson.length} games may be scheduled or in-progress`);
       }
 
     } catch (err) {
@@ -212,14 +299,18 @@ export default async function handler(req, res) {
         continue;
       }
 
+      const scoresSource = sport === 'basketball_nba' ? 'BallDontLie' : 'OddsAPI';
+
       // ── Primary match: by game_id ─────────────────────────────────────────
+      // NBA picks will always miss here because BallDontLie IDs (bdl_*) never
+      // match The Odds API game_ids stored in picks — falls through to team+date.
       let game = scores.find(s => s.id === pick.game_id);
 
       if (game) {
-        console.log(`[check-results] Pick ${pick.id} — game_id match FOUND: ${game.away_team} @ ${game.home_team} | completed=${game.completed}`);
+        console.log(`[check-results] Pick ${pick.id} — game_id match FOUND via ${scoresSource}: ${game.away_team} @ ${game.home_team} | completed=${game.completed}`);
       } else {
         // ── Fallback match: team names + date within 24 hours ─────────────
-        console.log(`[check-results] Pick ${pick.id} — game_id "${pick.game_id}" NOT found in scores. Trying team name + date fallback...`);
+        console.log(`[check-results] Pick ${pick.id} — game_id "${pick.game_id}" NOT found via ${scoresSource}. Trying team name + date fallback...`);
         console.log(`[check-results]   Looking for: home="${pick.home_team}" away="${pick.away_team}" pick="${pick.pick}" game_time=${pick.game_time}`);
 
         // Log what game_ids ARE in the scores to show the mismatch
@@ -233,7 +324,7 @@ export default async function handler(req, res) {
             (pick.pick && (teamsMatch(s.home_team, pick.pick) || teamsMatch(s.away_team, pick.pick)))
           );
           if (dateOk && teamsOk) {
-            console.log(`[check-results]   Fallback match: scores game "${s.away_team} @ ${s.home_team}" id=${s.id} (date window OK, teams matched)`);
+            console.log(`[check-results]   Fallback match via ${scoresSource}: "${s.away_team} @ ${s.home_team}" id=${s.id} (date OK, teams matched)`);
           }
           return dateOk && teamsOk;
         });
@@ -317,7 +408,7 @@ export default async function handler(req, res) {
         continue;
       }
 
-      console.log(`[check-results] Pick ${pick.id} — outcome determined: ${outcome} | ${game.away_team} ${awayInt}-${homeInt} ${game.home_team}`);
+      console.log(`[check-results] Pick ${pick.id} — outcome=${outcome} source=${scoresSource} | ${game.away_team} ${awayInt}-${homeInt} ${game.home_team}`);
 
       // ── Write result to Supabase ──────────────────────────────────────────
       const payload = {
