@@ -70,6 +70,10 @@
     .filter-bar::-webkit-scrollbar { height: 3px; }
     .filter-bar::-webkit-scrollbar-track { background: transparent; }
     .filter-bar::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+    @media (max-width: 640px) {
+      .filter-bar { scrollbar-width: none; }
+      .filter-bar::-webkit-scrollbar { display: none; }
+    }
     .filter-group { display: flex; flex-direction: column; gap: 5px; padding-right: 14px; border-right: 1px solid var(--border); margin-right: 14px; flex-shrink: 0; }
     .filter-group:last-child { border-right: none; padding-right: 0; margin-right: 0; }
     .filter-group-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); white-space: nowrap; }
@@ -472,11 +476,15 @@
     @media (max-width: 600px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .nav-inner { padding: 0.75rem 1rem; }
-      .main { padding: 1rem; }
+      .main { padding: 1rem; overflow-x: hidden; }
       .odds-grid { min-width: 400px; }
       .game-card { border-radius: var(--radius-sm); }
       .game-card:hover { transform: none; }
       .pick-bet-btn { width: 100%; }
+      .ev-bet-btn { width: 100%; text-align: center; }
+      .ev-share-btn { width: 100%; text-align: center; }
+      .ev-card-actions { flex-direction: column; }
+      .hero-edge-actions { flex-direction: column; }
     }
 
     /* ── PINNACLE ROW ────────────────────────────────────── */
@@ -569,6 +577,16 @@
     .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
     .theme-toggle-btn:hover { opacity: 0.8; }
 
+    /* LIVE ODDS BADGE — polished green pill */
+    .live-odds-badge { display: inline-flex; align-items: center; gap: 5px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--green); background: var(--green-light); border: 1px solid rgba(22,163,74,0.25); padding: 4px 12px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+    [data-theme="dark"] .live-odds-badge { color: #22C55E; background: #052E16; border-color: rgba(34,197,94,0.2); }
+
+    /* NAV — hide non-essential links on small screens */
+    @media (max-width: 640px) {
+      .nav-link { display: none !important; }
+      .nav-badge { display: none; }
+    }
+
     /* ══ COMPACT STICKY EV FILTER BAR ══════════════════════════════════ */
     .ev-filter-bar { position: sticky; top: 56px; z-index: 90; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .ev-filter-inner { max-width: 1400px; margin: 0 auto; padding: 9px 1.5rem; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
@@ -581,7 +599,12 @@
     .ev-pill { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
     .ev-pill:hover { border-color: var(--green); color: var(--green); }
     .ev-pill.active { background: var(--green); color: #fff; border-color: var(--green); }
-    @media (max-width: 600px) { .ev-filter-inner { padding: 8px 1rem; gap: 10px; } .ev-filter-divider { display: none; } }
+    @media (max-width: 600px) {
+      .ev-filter-inner { padding: 8px 1rem; gap: 10px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .ev-filter-inner::-webkit-scrollbar { display: none; }
+      .ev-filter-divider { display: none; }
+      .ev-pill-group { flex-wrap: nowrap; }
+    }
 
     /* ══ EV EDGES SECTION ══════════════════════════════════════════════ */
     .ev-section { margin-bottom: 1.5rem; }
@@ -715,9 +738,9 @@
       </a>
       <div class="nav-right">
         <a href="/parlay.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">Parlay</a>
-        <a href="/record.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">Record</a>
-        <a href="/stats.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f3'" onmouseout="this.style.background='none'">Stats</a>
-        <span style="font-size:12px;color:var(--text-muted);"><span class="live-dot"></span>Live odds</span>
+        <a href="/record.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">Record</a>
+        <a href="/stats.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f3'" onmouseout="this.style.background='none'">Stats</a>
+        <span class="live-odds-badge"><span class="live-dot"></span>Live odds</span>
         <a href="/parlay.html" id="parlay-nav-count" style="display:none;font-size:12px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:4px 10px;border-radius:20px;text-decoration:none;">🎰 Parlay (<span id="parlay-count">0</span>)</a>
         <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
         <a href="/#signup" class="btn-small">Go Pro</a>
