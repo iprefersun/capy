@@ -655,46 +655,6 @@
     [data-theme="dark"] .ev-share-btn { background: #111318; border-color: #1F2330; }
     [data-theme="dark"] .ev-share-btn.copied { background: #052E16; border-color: #22C55E; color: #4ADE80; }
     [data-theme="dark"] .no-edges-state { box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-
-    /* ══ HERO EDGE CARD ══════════════════════════════════════════════════ */
-    .hero-edge-section { margin-bottom: 1.5rem; }
-    .hero-edge-card { background: var(--surface); border-radius: var(--radius); border: 2px solid var(--green); box-shadow: 0 4px 24px rgba(22,163,74,0.10), 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; animation: fadeInUp 0.3s ease both; }
-    .hero-edge-label { background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; padding: 6px 16px; letter-spacing: 0.06em; text-transform: uppercase; }
-    .hero-edge-header { padding: 14px 16px 4px; }
-    .hero-edge-matchup { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-top: 6px; }
-    .hero-edge-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .hero-edge-body { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; margin: 14px 16px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .hero-book-col { padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; background: var(--surface-2); }
-    .hero-sharp-col { padding: 18px 20px; text-align: right; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; background: var(--surface-2); }
-    .hero-compare-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); }
-    .hero-compare-book { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 1px; }
-    .hero-compare-odds { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 600; line-height: 1; color: var(--green); margin-top: 6px; }
-    .hero-compare-odds.neutral { color: var(--text); }
-    .hero-compare-side { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); margin-top: 5px; }
-    .hero-ev-center { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px 20px; min-width: 110px; background: var(--green-light); border-left: 1px solid rgba(22,163,74,0.18); border-right: 1px solid rgba(22,163,74,0.18); }
-    .hero-ev-pct { font-family: 'DM Mono', monospace; font-size: 30px; font-weight: 700; color: var(--green); line-height: 1; }
-    .hero-ev-lbl { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin-top: 6px; white-space: nowrap; }
-    .hero-edge-note { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); padding: 0 16px 8px; line-height: 1.5; }
-    .hero-edge-actions { display: flex; align-items: center; gap: 10px; padding: 0 16px 16px; flex-wrap: wrap; }
-    @media (max-width: 600px) {
-      .hero-edge-body { grid-template-columns: 1fr; }
-      .hero-ev-center { border-left: none; border-right: none; border-top: 1px solid rgba(22,163,74,0.18); border-bottom: 1px solid rgba(22,163,74,0.18); }
-      .hero-sharp-col { text-align: left; align-items: flex-start; }
-      .hero-compare-odds { font-size: 28px; }
-      .hero-ev-pct { font-size: 24px; }
-    }
-    [data-theme="dark"] .hero-edge-card { border-color: #22C55E; box-shadow: 0 4px 24px rgba(34,197,94,0.08); }
-    [data-theme="dark"] .hero-book-col, [data-theme="dark"] .hero-sharp-col { background: #0D0F15; }
-    [data-theme="dark"] .hero-ev-center { background: #052E16; border-color: rgba(34,197,94,0.2); }
-    [data-theme="dark"] .hero-ev-pct { color: #4ADE80; }
-    [data-theme="dark"] .hero-ev-lbl { color: #4ADE80; }
-    [data-theme="dark"] .hero-compare-odds { color: #4ADE80; }
-    [data-theme="dark"] .hero-compare-odds.neutral { color: var(--text); }
-
-    /* ── EV floor label + "why this exists" blurb ─────────────────────── */
-    .ev-floor-label { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); padding: 4px 1.5rem 2px; max-width: 1400px; margin: 0 auto; }
-    .ev-why-blurb { font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text-hint); line-height: 1.6; margin-bottom: 1.5rem; padding: 0 2px; }
-    @media (max-width: 600px) { .ev-floor-label { padding: 4px 1rem 2px; } }
   </style>
   <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
@@ -726,7 +686,8 @@
       <div class="ev-filter-group">
         <span class="ev-filter-label">Min EV</span>
         <select class="ev-filter-select" id="min-ev-select" onchange="setMinEvFilter(+this.value)">
-          <option value="0">1%+ (default)</option>
+          <option value="0">Any</option>
+          <option value="1">1%+</option>
           <option value="2">2%+</option>
           <option value="3">3%+</option>
         </select>
@@ -740,7 +701,6 @@
         <button class="ev-pill" onclick="setEvSportFilter('icehockey_nhl', this)">NHL</button>
       </div>
     </div>
-    <div class="ev-floor-label">Showing edges ≥ 1% vs Pinnacle sharp line</div>
   </div>
 
   <div class="main">
@@ -899,9 +859,6 @@
       </div>
     </div>
 
-    <!-- TOP EDGE HERO — populated by renderTopEdgeHero() -->
-    <div id="top-edge-hero-section" style="display:none;"></div>
-
     <!-- HIGH UPSIDE PARLAYS — below EV section -->
     <div class="section-divider">
       <div class="section-divider-line"></div>
@@ -929,7 +886,6 @@
     </div>
 
     <!-- ALL GAMES — full odds table -->
-    <p class="ev-why-blurb">Books move at different speeds. We compare them to Pinnacle — the sharp market — to find mispriced odds before they close.</p>
     <div class="section-divider">
       <div class="section-divider-line"></div>
       <span class="section-divider-label">All Games</span>
@@ -1488,13 +1444,12 @@
     }
 
     function getEvFilteredGames() {
-      const floor = Math.max(1, minEvFilter); // hard floor at 1% — below this is noise, not signal
       return allGames.filter(g => {
         if (evSportFilter !== 'all' && g.sport_key !== evSportFilter) return false;
         const ev = calcGameEV(g);
         if (!ev) return false;
         const best = Math.max(ev.home.ev, ev.away.ev);
-        return best >= floor;
+        return best >= minEvFilter;
       });
     }
 
@@ -1583,7 +1538,6 @@
               <div class="ev-compare-book">${refLabel}</div>
               <div class="ev-compare-odds ev-neu-odds">${fmtAm(fairAm)}</div>
               <div class="ev-compare-side">Fair price</div>
-              <div style="font-family:'Outfit',sans-serif;font-size:9px;color:var(--text-hint);margin-top:6px;line-height:1.3;">Based on live<br>Pinnacle odds</div>
             </div>
           </div>
           <div class="ev-card-actions">
@@ -1622,93 +1576,13 @@
         container.innerHTML = `
           <div class="no-edges-state">
             <span class="no-edges-icon">📊</span>
-            <div class="no-edges-title">No edges above 1% right now</div>
+            <div class="no-edges-title">No edges right now</div>
             <div class="no-edges-sub">Most books are efficiently priced at the moment. Check back soon — lines move fast.</div>
           </div>`;
         return;
       }
 
       container.innerHTML = `<div class="ev-cards-grid">${positiveOnly.map(g => buildEvCard(g)).join('')}</div>`;
-      renderTopEdgeHero();
-    }
-
-    // ── Top Edge Hero card ────────────────────────────────────────────────
-    function renderTopEdgeHero() {
-      const section = document.getElementById('top-edge-hero-section');
-      if (!section) return;
-
-      // Best candidate: highest EV game ≥1% (safety cap already applied by calcGameEV)
-      const candidates = allGames
-        .map(g => ({ game: g, ev: calcGameEV(g) }))
-        .filter(({ ev }) => ev && Math.max(ev.home.ev, ev.away.ev) >= 1)
-        .sort((a, b) => Math.max(b.ev.home.ev, b.ev.away.ev) - Math.max(a.ev.home.ev, a.ev.away.ev));
-
-      if (!candidates.length) {
-        section.style.display = 'none';
-        section.innerHTML = '';
-        return;
-      }
-
-      const { game, ev } = candidates[0];
-      const isHomeBetter = ev.home.ev >= ev.away.ev;
-      const bestSide = isHomeBetter ? ev.home : ev.away;
-      const bestTeam = isHomeBetter ? game.home_team : game.away_team;
-      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
-      const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
-      const fairAm = fairProbToAm(bestSide.fairProb);
-      const teamShort = bestTeam.split(' ').pop();
-      const time = fmtGameDate(game.commence_time);
-      const sport = game.sport_key;
-      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
-      const label = SPORT_LABELS[sport] || sport;
-      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
-      const betUrl = getBookUrl(bestSide.bestBook);
-      const betBtn = betUrl
-        ? `<a href="${betUrl}" target="_blank" rel="noopener" class="ev-bet-btn">Bet at ${bestSide.bestBook} →</a>`
-        : '';
-      const fresh = getFreshnessInfo(sport);
-      const freshnessHtml = fresh.text
-        ? `<span class="freshness-label${fresh.stale ? ' stale' : ''}">Updated ${fresh.text}</span>`
-        : '';
-
-      section.style.display = 'block';
-      section.innerHTML = `
-        <div class="hero-edge-section">
-          <div class="hero-edge-card">
-            <div class="hero-edge-label">Top Edge Right Now</div>
-            <div class="hero-edge-header">
-              <div class="hero-edge-meta">
-                <span class="sport-tag tag-${tagKey}">${sportEmoji} ${label}</span>
-                <span class="game-time">${time}</span>
-                ${freshnessHtml}
-              </div>
-              <div class="hero-edge-matchup">${game.away_team} <span style="color:var(--text-hint);font-weight:400;font-size:14px;">@</span> ${game.home_team}</div>
-            </div>
-            <div class="hero-edge-body">
-              <div class="hero-book-col">
-                <div class="hero-compare-label">Best Book</div>
-                <div class="hero-compare-book">${bestSide.bestBook}</div>
-                <div class="hero-compare-odds">${fmtAm(bestSide.bestOdds)}</div>
-                <div class="hero-compare-side">${teamShort} ML</div>
-              </div>
-              <div class="hero-ev-center">
-                <div class="hero-ev-pct">${evStr}</div>
-                <div class="hero-ev-lbl">EV Edge</div>
-              </div>
-              <div class="hero-sharp-col">
-                <div class="hero-compare-label">Pinnacle Fair Odds</div>
-                <div class="hero-compare-book">Pinnacle</div>
-                <div class="hero-compare-odds neutral">${fmtAm(fairAm)}</div>
-                <div class="hero-compare-side">Fair price (no vig)</div>
-              </div>
-            </div>
-            <div class="hero-edge-note">Based on live Pinnacle sharp line &nbsp;·&nbsp; Pinnacle is the sharpest market in the world — used by professionals to benchmark fair value.</div>
-            <div class="hero-edge-actions">
-              ${betBtn}
-              <button class="ev-share-btn" id="hero-share-btn-${game.id}" onclick="shareEdge('${game.id}', this)">Share</button>
-            </div>
-          </div>
-        </div>`;
     }
 
     // ── Share button: copy edge text to clipboard ─────────────────────────
@@ -1722,7 +1596,7 @@
       const bestTeam  = isHomeBetter ? game.home_team : game.away_team;
       const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
       const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
-      const text = `${bestTeam} ${fmtAm(bestSide.bestOdds)} (${bestSide.bestBook})\n${evStr} edge vs Pinnacle\ngetcapy.co`;
+      const text = `${bestTeam} ${fmtAm(bestSide.bestOdds)} (${bestSide.bestBook})\n${evStr} edge vs Pinnacle sharp line\ngetcapy.co`;
 
       const markCopied = () => {
         if (!btn) return;
