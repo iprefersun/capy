@@ -168,25 +168,7 @@
     .odds-cell.worst { background: var(--red-light); color: var(--red-cell-text); font-size: 15px; font-weight: 500; }
     .odds-cell.row-alt:not(.best):not(.worst):not(.tied-best):not(.odds-cell-empty) { background: #FAFAFA; }
     .odds-row-label.row-alt { background: rgba(0,0,0,0.015); border-radius: 4px; }
-    .odds-cell.locked { position: relative; overflow: hidden; cursor: pointer; }
-    .odds-cell.locked > .locked-content { filter: blur(4px); user-select: none; pointer-events: none; display: block; }
-
-    /* LOCK OVERLAY — shared by desktop cells, mobile rows, and pick cards */
-    .lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; z-index: 2; }
-    .lock-icon { color: var(--text-hint); flex-shrink: 0; }
-    .lock-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; font-variant: small-caps; color: #16A34A; letter-spacing: 0.05em; line-height: 1; }
-    .lock-hint { font-family: 'Outfit', sans-serif; font-size: 9px; color: var(--text-hint); opacity: 0; transition: opacity 0.15s; white-space: nowrap; position: absolute; bottom: 3px; left: 0; right: 0; text-align: center; }
-    .odds-cell.locked:hover .lock-hint { opacity: 1; }
-    /* Pick card lock wrapper */
-    .pick-locked-wrap { position: relative; overflow: hidden; }
-    .pick-locked-wrap .locked-content { filter: blur(4px); user-select: none; pointer-events: none; opacity: 0.6; }
-    .pick-locked-wrap .lock-overlay { background: rgba(255,255,255,0.04); border-radius: 8px; }
-    .pick-locked-wrap .lock-icon { color: #9CA3AF; }
-    .pick-locked-wrap:hover .lock-hint { opacity: 1; }
-    /* Mobile lock indicator */
-    .mobile-lock-icon { display: inline-flex; align-items: center; gap: 4px; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; color: #16A34A; cursor: pointer; vertical-align: middle; }
-    /* PREVIEW MODE BANNER */
-    #preview-banner { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #FEF08A; color: #713F12; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; text-align: center; padding: 8px 16px; border-bottom: 1px solid #FDE047; letter-spacing: 0.01em; }
+    .odds-cell.locked { filter: blur(4px); cursor: pointer; user-select: none; }
     .odds-cell-empty { background: var(--surface-2); color: var(--text-hint); font-size: 13px; cursor: default; text-align: center; padding: 9px 4px; font-style: italic; }
     .odds-divider { grid-column: 1 / -1; height: 1px; background: var(--border); margin: 2px 0; }
     .odds-market-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 5px; padding: 10px 4px 3px; }
@@ -659,7 +641,6 @@
   <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
-<div id="preview-banner">Preview Mode — not visible to users</div>
 
   <nav>
     <div class="nav-inner">
@@ -1014,11 +995,6 @@
     let pinnacleCache = {}; // keyed by sport, then "home|away"
     let propsCache = {};    // keyed by eventId, value: { data, ts }
     let userEmail = localStorage.getItem('capy_email') || null;
-    const previewMode = new URLSearchParams(window.location.search).get('preview') === 'true';
-    if (previewMode) {
-      document.getElementById('preview-banner').style.display = 'block';
-      document.body.style.paddingTop = '36px';
-    }
     let gateShown = false;
     let viewMode = (() => {
       if (window.innerWidth < 768) return 'list';
@@ -2047,7 +2023,7 @@
         const reason = edgeInfo.type === 'spread'
           ? `${bestBook.bookName} has this spread ${edge} pts better than the worst available line — that's real money on the table.`
           : `${bestBook.bookName} has the best moneyline on this game — ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books.`;
-        const isLocked = !previewMode && !hasAccess && idx > 0;
+        const isLocked = !hasAccess && idx > 0;
         const gameDateTime = fmtGameDate(game.commence_time);
 
         return `
@@ -2063,23 +2039,17 @@
                 <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${edgeTypeLabel}</span>
               </div>
             </div>
-            <div class="${isLocked ? 'pick-locked-wrap' : ''}">
-              <div class="pick-body${isLocked ? ' locked-content' : ''}">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
-                  <div><div class="pick-rec">${recText}</div></div>
-                  <div style="text-align:right;flex-shrink:0;">
-                    ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts edge</div>` : ''}
-                  </div>
+            <div class="pick-body${isLocked ? ' pick-body-blurred' : ''}">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
+                <div><div class="pick-rec">${recText}</div></div>
+                <div style="text-align:right;flex-shrink:0;">
+                  ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts edge</div>` : ''}
                 </div>
-                <div class="pick-reason">${reason}</div>
-                ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
               </div>
-              ${isLocked ? `<div class="lock-overlay" onclick="showGate()">
-                <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                <span class="lock-label" style="font-size:12px;">Pro</span>
-                <span class="lock-hint" style="bottom:6px;">Unlock with Capy Pro</span>
-              </div>` : ''}
+              <div class="pick-reason">${reason}</div>
+              ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
             </div>
+            ${isLocked ? '<div class="pick-lock-badge">🔒 Pro Pick</div>' : ''}
             ${!isLocked && idx === 0 ? '<div style="font-size:11px;font-weight:600;color:var(--green);margin-top:6px;">⚡ This edge is live now — lines move fast</div>' : ''}
           </div>`;
       }).join('');
@@ -2558,17 +2528,14 @@
             if (!v) return '';
             const isBest = hasVariance && v.num === best;
             const isWorst = hasVariance && v.num === worst;
-            const isLocked = !previewMode && !isFirst && !userEmail && v.idx > 2;
-            const betBtn = isBest && !isLocked && market === 'h2h' && BOOK_URLS[BOOK_KEYS[v.idx]]
+            const isLocked = !isFirst && !userEmail && v.idx > 2;
+            const betBtn = isBest && market === 'h2h' && BOOK_URLS[BOOK_KEYS[v.idx]]
               ? `<a href="${BOOK_URLS[BOOK_KEYS[v.idx]]}" target="_blank" rel="noopener" class="odds-mobile-bet-btn" onclick="event.stopPropagation()">Bet →</a>`
               : '';
-            const valHtml = isLocked
-              ? `<span class="mobile-lock-icon" onclick="showGate()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Pro</span>`
-              : `<span class="odds-mobile-val ${isBest ? 'best' : isWorst ? 'worst' : ''}">${v.val}</span>`;
             return `<div class="odds-mobile-row">
               <div class="odds-mobile-book">${BOOKS[v.idx]}</div>
               <div style="display:flex;align-items:center;gap:8px;">
-                ${valHtml}
+                <span class="odds-mobile-val ${isBest ? 'best' : isWorst ? 'worst' : ''}">${isLocked ? '••••' : v.val}</span>
                 ${betBtn}
               </div>
             </div>`;
@@ -2639,7 +2606,7 @@
         const cells = vals.map((v, i) => {
           if (!v) return `<div class="odds-cell odds-cell-empty" title="This book doesn't offer odds on this game">—</div>`;
           const num = numVals[i];
-          const isLocked = !previewMode && !isFirst && !userEmail && i > 2;
+          const isLocked = !isFirst && !userEmail && i > 2;
           let cellClass = '';
           if (hasVariance) {
             if (num === best) cellClass = bestCount === 1 ? 'best' : 'tied-best';
@@ -2655,17 +2622,8 @@
             const evC = classifyEV(cellEV);
             evCellHtml = `<span class="ev-badge ev-cell ${evC.cls}">${evC.label}</span>`;
           }
-          if (isLocked) {
-            return `<div class="odds-cell ${cellClass} ${altClass} locked" onclick="showGate()">
-              <span class="locked-content">${v}${betNow}${evCellHtml}</span>
-              <div class="lock-overlay">
-                <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                <span class="lock-label">Pro</span>
-                <span class="lock-hint">Unlock with Capy Pro</span>
-              </div>
-            </div>`;
-          }
-          return `<div class="odds-cell ${cellClass} ${altClass}">${v}${betNow}${evCellHtml}</div>`;
+          return `<div class="odds-cell ${cellClass} ${altClass} ${isLocked ? 'locked' : ''}"
+            onclick="${isLocked ? 'showGate()' : ''}">${v}${betNow}${evCellHtml}</div>`;
         });
 
         const allEqualNote = allEqual
