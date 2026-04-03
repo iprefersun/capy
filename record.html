@@ -49,7 +49,9 @@
 
     /* STAT CARDS */
     .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 1rem 0 1.5rem; }
-    @media (max-width: 700px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stats-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 1rem 0 1.5rem; }
+    @media (max-width: 900px) { .stats-grid-5 { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 700px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .stats-grid-5 { grid-template-columns: repeat(2, 1fr); } }
     .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
     .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); margin-bottom: 6px; }
     .stat-value { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 500; color: var(--text); }
@@ -158,13 +160,14 @@
       <span class="section-divider-label">🎯 Sharp Picks Record</span>
       <div class="section-divider-line"></div>
     </div>
-    <div class="section-divider-sub">High probability, positive EV bets — record since April 2026</div>
+    <div class="section-divider-sub">High probability, positive EV bets — tracking since April 2, 2026</div>
 
-    <div class="stats-grid" id="sharp-stats-grid">
-      <div class="stat-card"><div class="stat-label">Total Sharp Picks</div><div class="stat-value" id="sharp-stat-total">—</div></div>
+    <div class="stats-grid-5" id="sharp-stats-grid">
+      <div class="stat-card"><div class="stat-label">Record</div><div class="stat-value" id="sharp-stat-total">—</div><div class="stat-sub" id="sharp-stat-record-sub"></div></div>
       <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value green" id="sharp-stat-winrate">—</div></div>
-      <div class="stat-card"><div class="stat-label">ROI (flat $100)</div><div class="stat-value" id="sharp-stat-roi">—</div></div>
+      <div class="stat-card"><div class="stat-label">ROI</div><div class="stat-value" id="sharp-stat-roi">—</div><div class="stat-sub" id="sharp-stat-roi-sub">flat $100/pick</div></div>
       <div class="stat-card"><div class="stat-label">Avg EV at Pick</div><div class="stat-value amber" id="sharp-stat-ev">—</div></div>
+      <div class="stat-card"><div class="stat-label">Avg CLV</div><div class="stat-value" id="sharp-stat-clv">—</div><div class="stat-sub">vs Pinnacle close</div></div>
     </div>
 
     <!-- ── LONG SHOT PLAYS RECORD ─────────────────────────────────────── -->
@@ -173,7 +176,7 @@
       <span class="section-divider-label">🎲 Long Shot Plays Record</span>
       <div class="section-divider-line"></div>
     </div>
-    <div class="section-divider-sub">High upside underdogs — record since April 2026</div>
+    <div class="section-divider-sub">High upside underdogs — tracking since April 2, 2026</div>
 
     <div class="longshot-notice">
       ⚠️ Expected hit rate ~15–25% — value comes from the odds, not frequency. A losing streak is expected and normal.
@@ -226,13 +229,14 @@
             <th onclick="sortBy('odds')">Odds <span class="sort-icon">↕</span></th>
             <th onclick="sortBy('ev')">EV at Pick <span class="sort-icon">↕</span></th>
             <th onclick="sortBy('outcome')">Result <span class="sort-icon">↕</span></th>
+            <th onclick="sortBy('units')">Units <span class="sort-icon">↕</span></th>
             <th>CLV</th>
           </tr>
         </thead>
         <tbody id="picks-tbody">
-          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:160px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
-          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:130px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
-          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:150px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:160px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:130px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:70px;"></div></td><td><div class="skeleton-cell" style="width:40px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:150px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td><td><div class="skeleton-cell" style="width:50px;"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -278,18 +282,46 @@
     }
 
     function renderSharpStats(s) {
-      document.getElementById('sharp-stat-total').textContent = s.total ?? '0';
+      // Record card: show W-L-P and total
+      const total = s.total ?? 0;
+      document.getElementById('sharp-stat-total').textContent = total > 0
+        ? `${s.wins ?? 0}-${s.losses ?? 0}-${s.pushes ?? 0}`
+        : '—';
+      const recSub = document.getElementById('sharp-stat-record-sub');
+      if (recSub) recSub.textContent = total > 0 ? `${total} pick${total !== 1 ? 's' : ''}` : '';
 
       const wr = document.getElementById('sharp-stat-winrate');
-      wr.textContent = s.winRate ? `${s.winRate}%` : '—';
+      wr.textContent = s.winRate && s.winRate !== '0.0' ? `${s.winRate}%` : '—';
 
+      // ROI: prefer units-based, fall back to flat $100
       const roi = document.getElementById('sharp-stat-roi');
-      const roiVal = parseFloat(s.roi || 0);
-      roi.textContent = roiVal >= 0 ? `+$${Math.abs(roiVal).toFixed(0)}` : `-$${Math.abs(roiVal).toFixed(0)}`;
-      roi.className = `stat-value ${roiVal >= 0 ? 'green' : 'red'}`;
+      const roiSub = document.getElementById('sharp-stat-roi-sub');
+      if (s.roiUnits != null) {
+        const v = parseFloat(s.roiUnits);
+        roi.textContent = `${v >= 0 ? '+' : ''}${v.toFixed(1)}u`;
+        roi.className = `stat-value ${v >= 0 ? 'green' : 'red'}`;
+        if (roiSub) roiSub.textContent = 'units ROI';
+      } else {
+        const roiVal = parseFloat(s.roi || 0);
+        roi.textContent = roiVal >= 0 ? `+$${Math.abs(roiVal).toFixed(0)}` : `-$${Math.abs(roiVal).toFixed(0)}`;
+        roi.className = `stat-value ${roiVal >= 0 ? 'green' : 'red'}`;
+        if (roiSub) roiSub.textContent = 'flat $100/pick';
+      }
 
       const ev = document.getElementById('sharp-stat-ev');
-      ev.textContent = s.avgEV != null ? `${s.avgEV > 0 ? '+' : ''}${s.avgEV}%` : '—';
+      ev.textContent = s.avgEV != null ? `${parseFloat(s.avgEV) > 0 ? '+' : ''}${s.avgEV}%` : '—';
+
+      const clv = document.getElementById('sharp-stat-clv');
+      if (clv) {
+        if (s.avgCLV != null) {
+          const v = parseFloat(s.avgCLV);
+          clv.textContent = `${v >= 0 ? '+' : ''}${v.toFixed(1)}`;
+          clv.className = `stat-value ${v >= 0 ? 'green' : 'red'}`;
+        } else {
+          clv.textContent = '—';
+          clv.className = 'stat-value';
+        }
+      }
     }
 
     function renderLongshotStats(s) {
@@ -335,6 +367,7 @@
         if (sortField === 'ev')      { va = a.picks?.ev_percent || 0; vb = b.picks?.ev_percent || 0; }
         if (sortField === 'outcome') { va = a.outcome; vb = b.outcome; }
         if (sortField === 'pick')    { va = a.picks?.pick || ''; vb = b.picks?.pick || ''; }
+        if (sortField === 'units')   { va = a.picks?.units_result ?? -999; vb = b.picks?.units_result ?? -999; }
         if (va < vb) return sortAsc ? -1 : 1;
         if (va > vb) return sortAsc ? 1 : -1;
         return 0;
@@ -356,7 +389,7 @@
 
       if (!picks.length) {
         tbody.innerHTML = `
-          <tr><td colspan="8">
+          <tr><td colspan="9">
             <div class="empty-state">
               <div class="empty-icon">🦫</div>
               <div class="empty-title">No picks yet</div>
@@ -385,11 +418,20 @@
         const ev = p.ev_percent != null
           ? `${p.ev_percent > 0 ? '+' : ''}${parseFloat(p.ev_percent).toFixed(1)}%`
           : '—';
-        const clv = r.closing_line != null && p.odds != null
+        // Units result (populated after check-results runs)
+        const unitsHtml = p.units_result != null
           ? (() => {
-              const diff = r.closing_line - p.odds;
-              const cls = diff > 0 ? 'clv-positive' : diff < 0 ? 'clv-negative' : '';
-              return `<span class="${cls}">${diff > 0 ? '+' : ''}${diff}</span>`;
+              const v = parseFloat(p.units_result);
+              const cls = v > 0 ? 'clv-positive' : v < 0 ? 'clv-negative' : '';
+              return `<span class="mono ${cls}">${v >= 0 ? '+' : ''}${v.toFixed(2)}u</span>`;
+            })()
+          : '<span style="color:var(--text-hint);">—</span>';
+        // CLV from picks.clv (written by check-results)
+        const clvHtml = p.clv != null
+          ? (() => {
+              const v = parseInt(p.clv, 10);
+              const cls = v > 0 ? 'clv-positive' : v < 0 ? 'clv-negative' : '';
+              return `<span class="mono ${cls}">${v >= 0 ? '+' : ''}${v}</span>`;
             })()
           : '<span style="color:var(--text-hint);">—</span>';
         const outcomeCls = r.outcome === 'win' ? 'outcome-win' : r.outcome === 'loss' ? 'outcome-loss' : 'outcome-push';
@@ -403,7 +445,8 @@
           <td class="mono">${odds}</td>
           <td class="mono">${ev}</td>
           <td><span class="outcome-badge ${outcomeCls}">${outcomeLabel}</span></td>
-          <td>${clv}</td>
+          <td>${unitsHtml}</td>
+          <td>${clvHtml}</td>
         </tr>`;
       }).join('');
     }

@@ -95,6 +95,16 @@
     .type-select { font-family: 'Inter', sans-serif; font-size: 11px; padding: 3px 6px; border-radius: 5px; border: 1.5px solid var(--border-mid); background: var(--surface); color: var(--text); cursor: pointer; }
     .type-select:focus { outline: none; border-color: var(--amber); }
 
+    /* EV QUALITY COLORS */
+    .ev-good     { color: var(--green);  font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
+    .ev-border   { color: var(--amber);  font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
+    .ev-bad      { color: var(--red);    font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
+    .ev-flag     { font-size: 12px; margin-left: 3px; cursor: help; }
+    /* Units result cell */
+    .units-pos   { color: var(--green);  font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
+    .units-neg   { color: var(--red);    font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
+    .units-zero  { color: var(--text-hint); font-family: 'DM Mono', monospace; font-size: 12px; }
+
     /* MISC */
     .empty-msg { padding: 2rem; text-align: center; color: var(--text-hint); font-size: 14px; }
     .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
@@ -210,6 +220,7 @@
                 <th>Pick</th>
                 <th>Odds</th>
                 <th>EV%</th>
+                <th>Units</th>
                 <th>Result</th>
                 <th>Score</th>
                 <th>CLV</th>
@@ -217,7 +228,7 @@
               </tr>
             </thead>
             <tbody id="completed-tbody">
-              <tr><td colspan="9" class="empty-msg">Loading...</td></tr>
+              <tr><td colspan="11" class="empty-msg">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -296,14 +307,15 @@
       document.getElementById('admin-sub').textContent = 'Loading...';
       try {
         const res = await fetch('/api/get-record');
-        const { picks, stats } = await res.json();
+        const { picks, stats, pendingPicks } = await res.json();
         allResults = picks || [];
+        allPending = pendingPicks || [];
         renderStats(stats || {});
         renderPendingTab();
         renderCompletedTab();
         const total = stats.total || 0;
         document.getElementById('admin-sub').textContent =
-          `${total} completed picks · ${allPending.length} pending · Last refresh: ${new Date().toLocaleTimeString()}`;
+          `${total} completed · ${allPending.length} pending · Last refresh: ${new Date().toLocaleTimeString()}`;
       } catch (err) {
         document.getElementById('admin-sub').textContent = 'Error loading data. Try refreshing.';
       }
@@ -367,23 +379,75 @@
       document.getElementById('tab-stats').style.display = name === 'stats' ? 'block' : 'none';
     }
 
+    // ── EV color/flag helpers ─────────────────────────────────────────────
+    function evCell(ev, pickType) {
+      if (ev == null) return '<span style="color:var(--text-hint);">—</span>';
+      const v = parseFloat(ev);
+      const min = (pickType === 'longshot') ? 1.0 : 1.5;
+      const max = 5.0;
+      const flag = (v < min || v > max) ? '<span class="ev-flag" title="EV outside accepted range">🚩</span>' : '';
+      let cls = 'ev-bad';
+      if (v >= min && v <= max)      cls = 'ev-good';
+      else if (v > 0 && v < min)     cls = 'ev-border';
+      return `<span class="${cls}">${v >= 0 ? '+' : ''}${v.toFixed(1)}%${flag}</span>`;
+    }
+
+    function unitsCell(units) {
+      if (units == null) return '<span style="color:var(--text-hint);">—</span>';
+      const v = parseFloat(units);
+      const cls = v > 0 ? 'units-pos' : v < 0 ? 'units-neg' : 'units-zero';
+      return `<span class="${cls}">${v >= 0 ? '+' : ''}${v.toFixed(2)}u</span>`;
+    }
+
     // ── Pending tab ───────────────────────────────────────────────────────
     function renderPendingTab() {
-      // Pending = picks not in allResults (no resolved result)
-      // Since get-record only returns resolved results, pending would require a separate query
-      // For now, show a message directing to check-results
       const tbody = document.getElementById('pending-tbody');
-      tbody.innerHTML = `<tr><td colspan="9" class="empty-msg">
-        Pending picks are those awaiting score resolution.<br/>
-        Click "Run score check" above to process pending results.
-      </td></tr>`;
+
+      if (!allPending.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty-msg">
+          No pending picks in the last 14 days.<br/>
+          Picks are saved automatically when Capy's Picks are viewed on the odds page.
+        </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = allPending.map(p => {
+        const date = p.created_at
+          ? new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+          : '—';
+        const sport = SPORT_LABELS[p.sport] || p.sport || '—';
+        const game = p.home_team
+          ? `${(p.away_team || '').split(' ').pop()} @ ${(p.home_team || '').split(' ').pop()}`
+          : '—';
+        const pick = p.pick ? `${p.pick} ML` : '—';
+        const odds = p.odds != null ? (p.odds > 0 ? `+${p.odds}` : `${p.odds}`) : '—';
+        const gameTime = p.game_time
+          ? new Date(p.game_time).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+          : '—';
+        const pickType = p.pick_type || 'sharp';
+        return `<tr>
+          <td class="mono">${date}</td>
+          <td><span class="sport-tag">${sport}</span></td>
+          <td>${game}</td>
+          <td style="font-size:12px;">${pick}</td>
+          <td class="mono">${odds}</td>
+          <td>${evCell(p.ev_percent, pickType)}</td>
+          <td style="font-size:11px;color:var(--text-hint);">${p.book || '—'}</td>
+          <td class="mono" style="font-size:11px;">${gameTime}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-override btn-delete" onclick="deletePick('${p.id}')">✕</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
     }
 
     // ── Completed tab ─────────────────────────────────────────────────────
     function renderCompletedTab() {
       const tbody = document.getElementById('completed-tbody');
       if (!allResults.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="empty-msg">No completed picks yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-msg">No completed picks yet.</td></tr>';
         return;
       }
 
@@ -395,17 +459,22 @@
         const sport = SPORT_LABELS[p.sport] || p.sport || '—';
         const pickType = p.pick_type || 'sharp';
         const pick = p.pick ? `${p.pick} ML` : '—';
-        const game = p.home_team ? `${(p.away_team||'').split(' ').pop()} @ ${(p.home_team||'').split(' ').pop()}` : '—';
+        const game = p.home_team
+          ? `${(p.away_team||'').split(' ').pop()} @ ${(p.home_team||'').split(' ').pop()}`
+          : '—';
         const odds = p.odds != null ? (p.odds > 0 ? `+${p.odds}` : `${p.odds}`) : '—';
-        const ev = p.ev_percent != null ? `${parseFloat(p.ev_percent).toFixed(1)}%` : '—';
         const score = (r.score_home != null && r.score_away != null)
           ? `${r.score_home}–${r.score_away}` : '—';
-        const clv = r.closing_line != null && p.odds != null
-          ? (() => { const d = r.closing_line - p.odds; return `${d > 0 ? '+' : ''}${d}`; })()
-          : '—';
+        // CLV from picks.clv (positive = beat the closing line)
+        const clvHtml = p.clv != null
+          ? (() => {
+              const v = parseInt(p.clv, 10);
+              const style = v > 0 ? 'color:var(--green);font-weight:700' : v < 0 ? 'color:var(--red);font-weight:700' : '';
+              return `<span class="mono" style="${style}">${v >= 0 ? '+' : ''}${v}</span>`;
+            })()
+          : '<span style="color:var(--text-hint);">—</span>';
         const outcomeCls = r.outcome === 'win' ? 'outcome-win' : r.outcome === 'loss' ? 'outcome-loss' : 'outcome-push';
         const outcomeLabel = r.outcome === 'win' ? '✅ Win' : r.outcome === 'loss' ? '❌ Loss' : '➖ Push';
-        // pick_id from the results row is the FK; the picks row id is p.id
         const pickRowId = r.pick_id;
 
         return `<tr>
@@ -419,10 +488,11 @@
           </td>
           <td style="font-size:12px;">${pick}<br/><span style="color:var(--text-hint);font-size:11px;">${game}</span></td>
           <td class="mono">${odds}</td>
-          <td class="mono">${ev}</td>
+          <td>${evCell(p.ev_percent, pickType)}</td>
+          <td>${unitsCell(p.units_result)}</td>
           <td><span class="outcome-badge ${outcomeCls}">${outcomeLabel}</span></td>
           <td class="mono">${score}</td>
-          <td class="mono">${clv}</td>
+          <td>${clvHtml}</td>
           <td>
             <div class="action-btns">
               <button class="btn-override btn-win"  onclick="override('${pickRowId}','win')">W</button>

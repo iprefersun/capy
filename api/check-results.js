@@ -1,5 +1,32 @@
 import { createClient } from '@supabase/supabase-js';
 
+// ── Decimal ↔ American odds conversion ───────────────────────────────────────
+// Pinnacle EU odds endpoint returns decimal; we store American.
+function decimalToAmerican(decimal) {
+  if (!decimal || decimal <= 1) return null;
+  if (decimal >= 2.0) return Math.round((decimal - 1) * 100);
+  return Math.round(-100 / (decimal - 1));
+}
+
+// ── Units result from outcome + odds ─────────────────────────────────────────
+// Win: units = wagered × (decimal_odds - 1)
+// Loss: units = -wagered
+// Push: units = 0
+function calcUnitsResult(outcome, americanOdds, unitsWagered = 1.0) {
+  if (outcome === 'push') return 0;
+  if (outcome === 'loss') return -unitsWagered;
+  if (outcome === 'win') {
+    let decimal;
+    if (americanOdds > 0) {
+      decimal = 1 + (americanOdds / 100);
+    } else {
+      decimal = 1 + (100 / Math.abs(americanOdds));
+    }
+    return Math.round(unitsWagered * (decimal - 1) * 100) / 100;
+  }
+  return null;
+}
+
 // ── Team name normalization ───────────────────────────────────────────────────
 // Strips and standardizes team names before comparing. Handles common variations
 // between how picks save team names (from odds API) and how scores API returns them.
@@ -280,6 +307,48 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Step 3c: Fetch closing Pinnacle odds (best-effort, for CLV) ──────────────
+  // If a game was resolved recently Pinnacle may still have its closing odds in
+  // the EU odds endpoint. We fetch once per sport and build a lookup map keyed
+  // by game_id (primary) and team names (fallback), exactly as we do for scores.
+  // Failures here are non-fatal — CLV will just be null for those picks.
+  const closingOddsCache = {}; // sport → [ { id, home_team, away_team, commence_time, homeAmerican, awayAmerican } ]
+
+  for (const sport of uniqueSports) {
+    const url = `https://api.the-odds-api.com/v4/sports/${sport}/odds/?apiKey=${API_KEY}&regions=eu&markets=h2h&bookmakers=pinnacle`;
+    try {
+      const r = await fetch(url);
+      if (!r.ok) {
+        console.log(`[check-results] Closing odds fetch HTTP ${r.status} for ${sport} — CLV will be null for this sport`);
+        closingOddsCache[sport] = [];
+        continue;
+      }
+      const events = await r.json();
+      if (!Array.isArray(events)) { closingOddsCache[sport] = []; continue; }
+
+      closingOddsCache[sport] = events.map(ev => {
+        const pinnacleBook = ev.bookmakers?.find(b => b.key === 'pinnacle');
+        const h2h = pinnacleBook?.markets?.find(m => m.key === 'h2h');
+        if (!h2h) return null;
+        const homeOutcome = h2h.outcomes?.find(o => o.name === ev.home_team);
+        const awayOutcome = h2h.outcomes?.find(o => o.name === ev.away_team);
+        return {
+          id: ev.id,
+          home_team: ev.home_team,
+          away_team: ev.away_team,
+          commence_time: ev.commence_time,
+          homeAmerican: homeOutcome ? decimalToAmerican(homeOutcome.price) : null,
+          awayAmerican: awayOutcome ? decimalToAmerican(awayOutcome.price) : null,
+        };
+      }).filter(Boolean);
+
+      console.log(`[check-results] Closing odds for ${sport}: ${closingOddsCache[sport].length} events with Pinnacle lines`);
+    } catch (err) {
+      console.log(`[check-results] Closing odds fetch error for ${sport}: ${err.message} — CLV will be null`);
+      closingOddsCache[sport] = [];
+    }
+  }
+
   // ── Step 4: Match each pick to a completed game ───────────────────────────
   for (const pick of unresolved) {
     try {
@@ -412,13 +481,50 @@ export default async function handler(req, res) {
 
       console.log(`[check-results] Pick ${pick.id} — outcome=${outcome} source=${scoresSource} | ${game.away_team} ${awayInt}-${homeInt} ${game.home_team}`);
 
+      // ── Calculate units_result ────────────────────────────────────────────
+      const unitsWagered = pick.units_wagered ?? 1.0;
+      const unitsResult  = calcUnitsResult(outcome, pick.odds, unitsWagered);
+      console.log(`[check-results] Pick ${pick.id} — units_result=${unitsResult} (outcome=${outcome}, odds=${pick.odds}, wagered=${unitsWagered})`);
+
+      // ── Attempt closing line lookup for CLV ───────────────────────────────
+      // CLV = pick_odds − closing_pinnacle_odds
+      // Positive CLV = we got better price than where Pinnacle settled → beat the market
+      let closingOdds = null;
+      let clv         = null;
+
+      const closingEvents = closingOddsCache[sport] || [];
+      // Primary: match by game_id
+      let closingEvent = closingEvents.find(e => e.id === pick.game_id);
+      // Fallback: team names + date
+      if (!closingEvent) {
+        closingEvent = closingEvents.find(e =>
+          datesWithin24h(e.commence_time, pick.game_time) &&
+          ((pick.home_team && teamsMatch(e.home_team, pick.home_team)) ||
+           (pick.away_team && teamsMatch(e.away_team, pick.away_team)))
+        );
+      }
+
+      if (closingEvent) {
+        const pickedHomeInClosing = teamsMatch(pick.pick, closingEvent.home_team);
+        closingOdds = pickedHomeInClosing
+          ? closingEvent.homeAmerican
+          : closingEvent.awayAmerican;
+
+        if (closingOdds != null && pick.odds != null) {
+          clv = pick.odds - closingOdds;
+          console.log(`[check-results] Pick ${pick.id} — closing_odds=${closingOdds} pick_odds=${pick.odds} CLV=${clv > 0 ? '+' : ''}${clv}`);
+        }
+      } else {
+        console.log(`[check-results] Pick ${pick.id} — no closing Pinnacle line found (game may have already been removed)`);
+      }
+
       // ── Write result to Supabase ──────────────────────────────────────────
       const payload = {
         pick_id: pick.id,
         outcome,
         score_home: homeInt,
         score_away: awayInt,
-        closing_line: pick.odds,
+        closing_line: closingOdds ?? pick.odds, // store actual closing if available
         recorded_at: new Date().toISOString(),
       };
 
@@ -441,6 +547,24 @@ export default async function handler(req, res) {
       }
 
       console.log(`[check-results] Supabase upsert SUCCESS for pick ${pick.id} | response rows:`, upsertData?.length ?? 0);
+
+      // ── Back-write units_result, closing_odds, clv to picks table ─────────
+      const pickUpdate = { units_result: unitsResult };
+      if (closingOdds != null) pickUpdate.closing_odds = closingOdds;
+      if (clv         != null) pickUpdate.clv           = clv;
+
+      const { error: pickUpdateErr } = await supabase
+        .from('picks')
+        .update(pickUpdate)
+        .eq('id', pick.id);
+
+      if (pickUpdateErr) {
+        // Non-fatal — result is already saved, just log the failure
+        console.warn(`[check-results] picks update failed for ${pick.id} (units/CLV):`, pickUpdateErr.message);
+      } else {
+        console.log(`[check-results] picks updated — units_result=${unitsResult} closing_odds=${closingOdds ?? 'null'} clv=${clv ?? 'null'}`);
+      }
+
       resolved++;
 
     } catch (err) {
