@@ -7,7 +7,7 @@
   <meta name="description" content="Real-time odds comparison across every major sportsbook. Always know where the best number lives — before it's gone." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -37,7 +37,7 @@
     body {
       font-family: 'Inter', sans-serif;
       color: var(--text);
-      background: #fafaf8;
+      background-color: #fafaf8;
       line-height: 1.6;
     }
 
@@ -134,7 +134,7 @@
 
     /* HERO */
     .hero {
-      padding: 5rem 0 3rem;
+      padding: 2.5rem 0 1.5rem;
       text-align: center;
     }
 
@@ -210,7 +210,7 @@
       gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 2rem;
+      margin-bottom: 1.25rem;
     }
 
     .btn-hero {
@@ -256,6 +256,49 @@
     }
 
     .stars { color: var(--amber); font-size: 13px; }
+
+    /* HERO STATS STRIP */
+    .hero-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .hero-stats-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .hero-stats-num { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--text); }
+    .hero-stats-label { font-family: 'Outfit', sans-serif; }
+    .hero-stats-sep { color: var(--text-hint); line-height: 1; }
+    @media (max-width: 600px) {
+      .hero-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 16px;
+        text-align: center;
+      }
+      .hero-stats-sep { display: none; }
+    }
+
+    /* DOT GRID — visible only in margins outside max-width: 900px content area */
+    body {
+      background-image:
+        linear-gradient(to right,
+          transparent 0%,
+          transparent calc(50% - 480px),
+          #fafaf8 calc(50% - 420px),
+          #fafaf8 calc(50% + 420px),
+          transparent calc(50% + 480px),
+          transparent 100%
+        ),
+        radial-gradient(circle, rgba(186,117,23,0.12) 1.5px, transparent 1.5px);
+      background-size: 100% 100%, 22px 22px;
+    }
+    @media (max-width: 768px) {
+      body { background-image: none; }
+    }
 
     /* TICKER */
     .ticker {
@@ -719,7 +762,7 @@
     }
 
     @media (max-width: 600px) {
-      .hero { padding: 3rem 0 2rem; }
+      .hero { padding: 1.5rem 0 1rem; }
       .hero-capy { font-size: 60px; }
       .tagline-block { gap: 1.5rem; }
       .stats-banner-new { grid-template-columns: repeat(2, 1fr); }
@@ -746,7 +789,23 @@
       --surface: #1a1d27;
       --surface-2: #13151f;
     }
-    [data-theme="dark"] body { background: #0f1117; }
+    [data-theme="dark"] body {
+      background-color: #0f1117;
+      background-image:
+        linear-gradient(to right,
+          transparent 0%,
+          transparent calc(50% - 480px),
+          #0f1117 calc(50% - 420px),
+          #0f1117 calc(50% + 420px),
+          transparent calc(50% + 480px),
+          transparent 100%
+        ),
+        radial-gradient(circle, rgba(232,153,30,0.08) 1.5px, transparent 1.5px);
+      background-size: 100% 100%, 22px 22px;
+    }
+    @media (max-width: 768px) {
+      [data-theme="dark"] body { background-image: none; }
+    }
     [data-theme="dark"] nav { background: #161920; border-color: rgba(255,255,255,0.07); }
     [data-theme="dark"] .ticker { background: var(--surface); border-color: rgba(255,255,255,0.07); }
     [data-theme="dark"] .preview-worst { background: #2a1009; color: #f07050; }
@@ -810,6 +869,15 @@
       <div class="hero-cta">
         <a href="#signup" class="btn-hero">Start for free</a>
         <a href="/odds" class="btn-hero-out">See today's best lines</a>
+      </div>
+      <div class="hero-stats">
+        <span class="hero-stats-item"><span class="hero-stats-num">6</span><span class="hero-stats-label"> edges live</span></span>
+        <span class="hero-stats-sep">·</span>
+        <span class="hero-stats-item"><span class="hero-stats-label">Avg edge </span><span class="hero-stats-num">+2.3%</span></span>
+        <span class="hero-stats-sep">·</span>
+        <span class="hero-stats-item"><span class="hero-stats-num">5</span><span class="hero-stats-label"> books tracked</span></span>
+        <span class="hero-stats-sep">·</span>
+        <span class="hero-stats-item"><span class="hero-stats-label">Updated every </span><span class="hero-stats-num">60s</span></span>
       </div>
       <div class="hero-urgency">⚡ 2,400+ bettors already have the edge. You don't yet.</div>
       <div class="hero-proof">
