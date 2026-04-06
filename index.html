@@ -59,7 +59,7 @@
     .nav-inner {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 24px;
       padding: 1rem 1.5rem;
       max-width: 900px;
       margin: 0 auto;
@@ -91,6 +91,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-left: auto;
     }
 
     .nav-link {
@@ -118,6 +119,9 @@
       text-decoration: none;
       display: inline-block;
     }
+
+    /* Nav CTA button — compact two-line format */
+    .btn-nav-cta { padding: 6px 12px; text-align: center; line-height: 1.3; }
 
     .btn-primary { background: var(--amber); color: #fff; }
     .btn-primary:hover { opacity: 0.88; }
@@ -748,7 +752,7 @@
     [data-theme="dark"] .preview-worst { background: #2a1009; color: #f07050; }
     [data-theme="dark"] .pricing-card.featured { border-color: #22c48a; box-shadow: 0 0 0 4px #0a2118, 0 8px 30px rgba(34,196,138,0.2); }
 
-    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
+    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 4px 10px; border-radius: 20px; text-decoration: none; text-align: center; line-height: 1.3; }
     .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
     .theme-toggle-btn:hover { opacity: 0.8; }
   </style>
@@ -769,8 +773,8 @@
         <a href="/stats.html" class="nav-link nav-link-stats">Stats</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#pricing" class="nav-link">Pricing</a>
-        <a href="#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
-        <a href="#signup" class="btn btn-primary">Get early access</a>
+        <a href="#pricing" class="nav-badge">⚡ Founding rate<br>$7/mo</a>
+        <a href="#signup" class="btn btn-primary btn-nav-cta">Get early<br>access</a>
         <button class="hamburger-btn" id="hamburger-btn" onclick="openMobileMenu()" aria-label="Open menu">☰</button>
         <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
       </div>
