@@ -15,6 +15,17 @@ const LONGSHOT_MAX_DAILY = 2;
 
 const DAILY_TOTAL_LIMIT = 5;
 
+// ── Bets table guards (stricter — canonical dataset) ─────────────────────────
+const BETS_SHARP_EV_MIN    = 0.015;  // 1.5%
+const BETS_LONGSHOT_EV_MIN = 0.010;  // 1.0%
+const BETS_EV_MAX          = 0.050;  // 5.0%
+
+// ── American → decimal odds conversion ───────────────────────────────────────
+function amToDecimal(american) {
+  if (american == null || isNaN(american)) return null;
+  return american > 0 ? (american / 100) + 1 : (100 / Math.abs(american)) + 1;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -161,7 +172,7 @@ export default async function handler(req, res) {
     console.log(`  → ${p.pick_type} | ${p.pick} | EV: ${p.ev_percent?.toFixed(2)}% | odds: ${p.odds} | qs: ${(p.quality_score || 0).toFixed(2)}`);
   });
 
-  // ── Step 5: Insert ─────────────────────────────────────────────────────────
+  // ── Step 5: Insert into picks table ───────────────────────────────────────
   const { data, error } = await supabase.from('picks').insert(selected);
   if (error) {
     console.error('[SavePicks] Insert error:', error.message);
@@ -169,5 +180,67 @@ export default async function handler(req, res) {
   }
 
   console.log(`[SavePicks] Successfully saved ${selected.length} picks`);
-  return res.status(200).json({ saved: selected.length, data });
+
+  // ── Step 6: Insert into bets table (canonical performance dataset) ─────────
+  // Only insert if we have a valid Pinnacle reference for both sides
+  const betsRows = [];
+
+  for (const p of selected) {
+    const evDecimal = p.ev_percent / 100;   // picks stores 2.1 → bets stores 0.021
+
+    // Bets-specific EV guard
+    const evMin = p.pick_type === 'longshot' ? BETS_LONGSHOT_EV_MIN : BETS_SHARP_EV_MIN;
+    if (evDecimal < evMin || evDecimal > BETS_EV_MAX) {
+      console.log(`[SavePicks/Bets] SKIP ${p.pick} — EV ${evDecimal.toFixed(4)} out of bets range`);
+      continue;
+    }
+
+    // Require both Pinnacle sides for a clean bets record
+    if (p.pinnacle_odds == null || p.pinnacle_away_odds == null) {
+      console.log(`[SavePicks/Bets] SKIP ${p.pick} — missing Pinnacle sides (pinnacle_odds=${p.pinnacle_odds}, away=${p.pinnacle_away_odds})`);
+      continue;
+    }
+
+    const decimalOdds = amToDecimal(p.odds);
+    if (!decimalOdds) {
+      console.log(`[SavePicks/Bets] SKIP ${p.pick} — could not convert odds ${p.odds} to decimal`);
+      continue;
+    }
+
+    betsRows.push({
+      pick:               p.pick,
+      sport:              p.sport,
+      game_time:          p.game_time,
+      date:               p.game_time ? p.game_time.split('T')[0] : today,
+      bet_type:           p.bet_type || 'ml',
+      pick_type:          p.pick_type,
+      odds_placed:        p.odds,
+      decimal_odds:       decimalOdds,
+      book:               p.book,
+      ev_percent:         evDecimal,
+      pinnacle_odds:      p.pinnacle_odds,
+      pinnacle_away_odds: p.pinnacle_away_odds,
+      true_probability:   p.true_probability ?? null,
+      stake_units:        p.pick_type === 'longshot' ? 0.5 : 1.0,
+      result:             'pending',
+      profit_units:       null,
+      closing_odds:       null,
+      clv:                null,
+      archived:           false,
+    });
+  }
+
+  if (betsRows.length > 0) {
+    const { error: betsErr } = await supabase.from('bets').insert(betsRows);
+    if (betsErr) {
+      // Log but don't fail the request — picks were already saved successfully
+      console.error('[SavePicks/Bets] Bets insert error (non-fatal):', betsErr.message);
+    } else {
+      console.log(`[SavePicks/Bets] Inserted ${betsRows.length} rows into bets table`);
+    }
+  } else {
+    console.log('[SavePicks/Bets] No picks qualified for bets table (missing Pinnacle data or EV out of range)');
+  }
+
+  return res.status(200).json({ saved: selected.length, betsSaved: betsRows.length, data });
 }

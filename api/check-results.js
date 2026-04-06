@@ -8,6 +8,12 @@ function decimalToAmerican(decimal) {
   return Math.round(-100 / (decimal - 1));
 }
 
+// American → decimal odds (for bets table CLV ratio calculation)
+function amToDecimal(american) {
+  if (american == null || isNaN(american)) return null;
+  return american > 0 ? (american / 100) + 1 : (100 / Math.abs(american)) + 1;
+}
+
 // ── Units result from outcome + odds ─────────────────────────────────────────
 // Win: units = wagered × (decimal_odds - 1)
 // Loss: units = -wagered
@@ -563,6 +569,60 @@ export default async function handler(req, res) {
         console.warn(`[check-results] picks update failed for ${pick.id} (units/CLV):`, pickUpdateErr.message);
       } else {
         console.log(`[check-results] picks updated — units_result=${unitsResult} closing_odds=${closingOdds ?? 'null'} clv=${clv ?? 'null'}`);
+      }
+
+      // ── Update bets table row (canonical performance dataset) ─────────────
+      // Match by pick text + sport + same day (bets table has no game_id).
+      // CLV in bets is a decimal ratio: (closing_decimal - placed_decimal) / placed_decimal
+      // Positive = market moved away from our number (we beat the closing line).
+      try {
+        const betDate       = pick.game_time ? pick.game_time.split('T')[0] : null;
+        const betDayStart   = betDate ? `${betDate}T00:00:00.000Z` : null;
+        const betDayEnd     = betDate ? `${betDate}T23:59:59.999Z` : null;
+
+        if (betDate && pick.pick && pick.sport) {
+          // Calculate bets-table CLV as decimal ratio
+          let betClv = null;
+          if (closingOdds != null && pick.odds != null) {
+            const placedDecimal  = amToDecimal(pick.odds);
+            const closingDecimal = amToDecimal(closingOdds);
+            if (placedDecimal && closingDecimal) {
+              betClv = (closingDecimal - placedDecimal) / placedDecimal;
+              betClv = Math.round(betClv * 10000) / 10000; // 4 decimal places
+            }
+          }
+
+          // profit_units for bets table uses stake_units (longshot = 0.5, sharp = 1.0)
+          // We don't have stake_units here so compute from pick_type default
+          const stakeUnits   = pick.pick_type === 'longshot' ? 0.5 : 1.0;
+          const profitUnits  = calcUnitsResult(outcome, pick.odds, stakeUnits);
+
+          const betsUpdate = {
+            result:       outcome,
+            profit_units: profitUnits,
+          };
+          if (closingOdds != null) betsUpdate.closing_odds = closingOdds;
+          if (betClv      != null) betsUpdate.clv           = betClv;
+
+          const { error: betsUpdateErr } = await supabase
+            .from('bets')
+            .update(betsUpdate)
+            .eq('pick', pick.pick)
+            .eq('sport', pick.sport)
+            .eq('result', 'pending')
+            .gte('date', betDayStart)
+            .lte('date', betDayEnd);
+
+          if (betsUpdateErr) {
+            console.warn(`[check-results] bets update failed for "${pick.pick}" (non-fatal):`, betsUpdateErr.message);
+          } else {
+            console.log(`[check-results] bets updated — pick="${pick.pick}" result=${outcome} profit_units=${profitUnits} clv=${betClv ?? 'null'}`);
+          }
+        } else {
+          console.log(`[check-results] Skipping bets update for pick ${pick.id} — missing date, pick text, or sport`);
+        }
+      } catch (betsErr) {
+        console.warn(`[check-results] bets update threw for pick ${pick.id} (non-fatal):`, betsErr.message);
       }
 
       resolved++;

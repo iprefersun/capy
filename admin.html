@@ -182,6 +182,7 @@
         <button class="tab active" onclick="switchTab('pending', this)">Pending Picks</button>
         <button class="tab" onclick="switchTab('completed', this)">Completed</button>
         <button class="tab" onclick="switchTab('stats', this)">Stats</button>
+        <button class="tab" onclick="switchTab('bets', this)">Bets</button>
       </div>
 
       <!-- PENDING TAB -->
@@ -240,6 +241,70 @@
           <div class="empty-msg">Loading stats...</div>
         </div>
       </div>
+
+      <!-- BETS TAB -->
+      <div id="tab-bets" style="display:none;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+          <select id="bets-filter-date" onchange="renderBetsTab()" style="font-size:12px;padding:5px 8px;border:1px solid var(--border-mid);border-radius:6px;background:var(--surface);color:var(--text);">
+            <option value="all">All dates</option>
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+          </select>
+          <select id="bets-filter-sport" onchange="renderBetsTab()" style="font-size:12px;padding:5px 8px;border:1px solid var(--border-mid);border-radius:6px;background:var(--surface);color:var(--text);">
+            <option value="all">All sports</option>
+            <option value="basketball_nba">NBA</option>
+            <option value="americanfootball_nfl">NFL</option>
+            <option value="baseball_mlb">MLB</option>
+            <option value="icehockey_nhl">NHL</option>
+          </select>
+          <select id="bets-filter-result" onchange="renderBetsTab()" style="font-size:12px;padding:5px 8px;border:1px solid var(--border-mid);border-radius:6px;background:var(--surface);color:var(--text);">
+            <option value="all">All results</option>
+            <option value="win">Wins</option>
+            <option value="loss">Losses</option>
+            <option value="pending">Pending</option>
+            <option value="push">Pushes</option>
+          </select>
+          <select id="bets-filter-type" onchange="renderBetsTab()" style="font-size:12px;padding:5px 8px;border:1px solid var(--border-mid);border-radius:6px;background:var(--surface);color:var(--text);">
+            <option value="all">All types</option>
+            <option value="sharp">Sharp</option>
+            <option value="longshot">Longshot</option>
+          </select>
+          <span id="bets-count" style="font-size:11px;color:var(--text-hint);margin-left:auto;"></span>
+        </div>
+        <div class="table-wrap">
+          <table id="bets-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sport</th>
+                <th>Pick</th>
+                <th>Odds</th>
+                <th>EV%</th>
+                <th>Book</th>
+                <th>Result</th>
+                <th>Units</th>
+                <th>CLV</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody id="bets-tbody">
+              <tr><td colspan="10" class="empty-msg">Loading...</td></tr>
+            </tbody>
+            <tfoot id="bets-tfoot" style="display:none;">
+              <tr style="font-weight:700;background:var(--surface-2);">
+                <td colspan="3" style="font-size:12px;padding:10px 14px;">Totals</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td id="bets-total-results" style="font-size:12px;padding:10px 14px;font-family:'DM Mono',monospace;"></td>
+                <td id="bets-total-units" style="font-size:12px;padding:10px 14px;font-family:'DM Mono',monospace;"></td>
+                <td id="bets-total-clv" style="font-size:12px;padding:10px 14px;font-family:'DM Mono',monospace;"></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -249,6 +314,7 @@
     let adminPassword = '';
     let allResults = [];
     let allPending = [];
+    let allBets = [];
 
     const SPORT_LABELS = {
       basketball_nba: 'NBA', americanfootball_nfl: 'NFL',
@@ -374,9 +440,11 @@
     function switchTab(name, btn) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      document.getElementById('tab-pending').style.display = name === 'pending' ? 'block' : 'none';
+      document.getElementById('tab-pending').style.display   = name === 'pending'   ? 'block' : 'none';
       document.getElementById('tab-completed').style.display = name === 'completed' ? 'block' : 'none';
-      document.getElementById('tab-stats').style.display = name === 'stats' ? 'block' : 'none';
+      document.getElementById('tab-stats').style.display     = name === 'stats'     ? 'block' : 'none';
+      document.getElementById('tab-bets').style.display      = name === 'bets'      ? 'block' : 'none';
+      if (name === 'bets' && allBets.length === 0) loadBetsData();
     }
 
     // ── EV color/flag helpers ─────────────────────────────────────────────
@@ -599,6 +667,126 @@
         if (data.success) showToast(`Type updated → ${pick_type}`);
         else showToast('Error: ' + data.error);
       } catch (err) { showToast('Request failed'); }
+    }
+
+    // ── Bets tab ──────────────────────────────────────────────────────────
+    async function loadBetsData() {
+      document.getElementById('bets-tbody').innerHTML =
+        '<tr><td colspan="10" class="empty-msg">Loading bets...</td></tr>';
+      try {
+        const res = await fetch('/api/get-bets');
+        const { bets } = await res.json();
+        allBets = bets || [];
+        renderBetsTab();
+      } catch (err) {
+        document.getElementById('bets-tbody').innerHTML =
+          '<tr><td colspan="10" class="empty-msg">Error loading bets.</td></tr>';
+      }
+    }
+
+    function renderBetsTab() {
+      const tbody  = document.getElementById('bets-tbody');
+      const tfoot  = document.getElementById('bets-tfoot');
+      const dateF  = document.getElementById('bets-filter-date').value;
+      const sportF = document.getElementById('bets-filter-sport').value;
+      const resF   = document.getElementById('bets-filter-result').value;
+      const typeF  = document.getElementById('bets-filter-type').value;
+
+      const cutoff = dateF !== 'all'
+        ? new Date(Date.now() - parseInt(dateF, 10) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        : null;
+
+      const filtered = allBets.filter(b => {
+        if (sportF !== 'all' && b.sport !== sportF) return false;
+        if (resF   !== 'all' && b.result !== resF)  return false;
+        if (typeF  !== 'all' && b.pick_type !== typeF) return false;
+        if (cutoff && b.date && b.date.slice(0, 10) < cutoff) return false;
+        return true;
+      });
+
+      document.getElementById('bets-count').textContent =
+        `${filtered.length} bet${filtered.length !== 1 ? 's' : ''}`;
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-msg">No bets match the current filters.</td></tr>';
+        tfoot.style.display = 'none';
+        return;
+      }
+
+      const SPORT_MAP = {
+        basketball_nba: 'NBA', americanfootball_nfl: 'NFL',
+        baseball_mlb: 'MLB', icehockey_nhl: 'NHL',
+        basketball_ncaab: 'NCAAB', americanfootball_ncaaf: 'NCAAF',
+        soccer_epl: 'EPL',
+      };
+
+      tbody.innerHTML = filtered.map(b => {
+        const date   = b.date ? b.date.slice(0, 10) : '—';
+        const sport  = SPORT_MAP[b.sport] || b.sport || '—';
+        const odds   = b.odds_placed != null ? (b.odds_placed > 0 ? `+${b.odds_placed}` : `${b.odds_placed}`) : '—';
+        const ev     = b.ev_percent != null ? `${(b.ev_percent * 100).toFixed(1)}%` : '—';
+        const evCls  = b.ev_percent >= 0.02 ? 'ev-good' : b.ev_percent >= 0.015 ? 'ev-border' : 'ev-bad';
+
+        const resCls = b.result === 'win' ? 'outcome-win' : b.result === 'loss' ? 'outcome-loss'
+          : b.result === 'push' ? 'outcome-push' : 'outcome-pending';
+        const resLabel = b.result === 'win' ? '✅ Win' : b.result === 'loss' ? '❌ Loss'
+          : b.result === 'push' ? '➖ Push' : '⏳ Pending';
+
+        const rowBg = b.result === 'win' ? 'background:rgba(29,158,117,0.05)'
+          : b.result === 'loss' ? 'background:rgba(216,90,48,0.05)'
+          : b.result === 'pending' ? 'background:rgba(186,117,23,0.04)' : '';
+
+        const units = b.profit_units != null
+          ? `<span class="${b.profit_units > 0 ? 'units-pos' : b.profit_units < 0 ? 'units-neg' : 'units-zero'}">${b.profit_units >= 0 ? '+' : ''}${b.profit_units.toFixed(2)}u</span>`
+          : '<span style="color:var(--text-hint);">—</span>';
+
+        const clv = b.clv != null
+          ? (() => {
+              const pct = (b.clv * 100).toFixed(1);
+              const cls = b.clv > 0 ? 'color:var(--green);font-weight:700' : b.clv < 0 ? 'color:var(--red);font-weight:700' : '';
+              return `<span class="mono" style="${cls}">${b.clv >= 0 ? '+' : ''}${pct}%</span>`;
+            })()
+          : '<span style="color:var(--text-hint);">—</span>';
+
+        const typeBadge = b.pick_type === 'longshot'
+          ? '<span class="type-badge type-longshot">Long Shot</span>'
+          : '<span class="type-badge type-sharp">Sharp</span>';
+
+        return `<tr style="${rowBg}">
+          <td class="mono" style="font-size:11px;">${date}</td>
+          <td><span class="sport-tag">${sport}</span></td>
+          <td style="font-size:12px;">${b.pick || '—'}</td>
+          <td class="mono">${odds}</td>
+          <td><span class="${evCls}">${ev}</span></td>
+          <td style="font-size:11px;color:var(--text-hint);">${b.book || '—'}</td>
+          <td><span class="outcome-badge ${resCls}">${resLabel}</span></td>
+          <td>${units}</td>
+          <td>${clv}</td>
+          <td>${typeBadge}</td>
+        </tr>`;
+      }).join('');
+
+      // ── Running totals footer ───────────────────────────────────────────
+      const resolved = filtered.filter(b => b.result !== 'pending');
+      const wins     = resolved.filter(b => b.result === 'win').length;
+      const losses   = resolved.filter(b => b.result === 'loss').length;
+      const totalU   = filtered.reduce((s, b) => s + (b.profit_units || 0), 0);
+      const roi      = resolved.length > 0
+        ? ((totalU / filtered.reduce((s, b) => s + (b.stake_units || 1), 0)) * 100).toFixed(1)
+        : null;
+      const withClv  = filtered.filter(b => b.clv != null);
+      const avgClv   = withClv.length > 0
+        ? withClv.reduce((s, b) => s + b.clv, 0) / withClv.length
+        : null;
+
+      document.getElementById('bets-total-results').textContent =
+        `${wins}W–${losses}L · ${roi != null ? (roi >= 0 ? '+' : '') + roi + '% ROI' : '—'}`;
+      document.getElementById('bets-total-units').textContent =
+        `${totalU >= 0 ? '+' : ''}${totalU.toFixed(2)}u`;
+      document.getElementById('bets-total-clv').textContent = avgClv != null
+        ? `Avg CLV: ${avgClv >= 0 ? '+' : ''}${(avgClv * 100).toFixed(1)}%`
+        : '—';
+      tfoot.style.display = '';
     }
 
     // ── Toast ─────────────────────────────────────────────────────────────

@@ -282,22 +282,20 @@
       .hero-stats-sep { display: none; }
     }
 
-    /* DOT GRID — visible only in margins outside max-width: 900px content area */
-    body {
-      background-image:
-        linear-gradient(to right,
-          transparent 0%,
-          transparent calc(50% - 480px),
-          #fafaf8 calc(50% - 420px),
-          #fafaf8 calc(50% + 420px),
-          transparent calc(50% + 480px),
-          transparent 100%
-        ),
-        radial-gradient(circle, rgba(186,117,23,0.12) 1.5px, transparent 1.5px);
-      background-size: 100% 100%, 22px 22px;
+    /* DOT PANELS — canvas-based, see JS below */
+    .dot-panel {
+      position: fixed;
+      top: 0;
+      width: 160px;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      display: block;
     }
+    .dot-panel-left  { left: 0; }
+    .dot-panel-right { right: 0; }
     @media (max-width: 768px) {
-      body { background-image: none; }
+      .dot-panel { display: none !important; }
     }
 
     /* TICKER */
@@ -789,23 +787,7 @@
       --surface: #1a1d27;
       --surface-2: #13151f;
     }
-    [data-theme="dark"] body {
-      background-color: #0f1117;
-      background-image:
-        linear-gradient(to right,
-          transparent 0%,
-          transparent calc(50% - 480px),
-          #0f1117 calc(50% - 420px),
-          #0f1117 calc(50% + 420px),
-          transparent calc(50% + 480px),
-          transparent 100%
-        ),
-        radial-gradient(circle, rgba(232,153,30,0.08) 1.5px, transparent 1.5px);
-      background-size: 100% 100%, 22px 22px;
-    }
-    @media (max-width: 768px) {
-      [data-theme="dark"] body { background-image: none; }
-    }
+    [data-theme="dark"] body { background-color: #0f1117; }
     [data-theme="dark"] nav { background: #161920; border-color: rgba(255,255,255,0.07); }
     [data-theme="dark"] .ticker { background: var(--surface); border-color: rgba(255,255,255,0.07); }
     [data-theme="dark"] .preview-worst { background: #2a1009; color: #f07050; }
@@ -818,6 +800,9 @@
   <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
+
+  <canvas id="dot-left"  class="dot-panel dot-panel-left"  aria-hidden="true"></canvas>
+  <canvas id="dot-right" class="dot-panel dot-panel-right" aria-hidden="true"></canvas>
 
   <nav>
     <div class="nav-inner">
@@ -1317,6 +1302,127 @@
     (function() {
       const icon = document.getElementById('theme-icon');
       if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    })();
+
+    // ── Concentric ring dot panels ────────────────────────────────────────
+    (function() {
+      const PANEL_W = 160;
+      const GRID    = 20;
+      const CONTENT_W = 900;
+      const EDGE_BUFFER = 10; // px gap between last dot and content area
+
+      // Color stops from outer page edge (t=0) inward toward content (t=1)
+      // Each stop: [r, g, b, alpha, dotRadius]
+      const STOPS_LIGHT = [
+        [186, 117,  23, 0.45, 1.8],  // outermost — amber
+        [120, 140,  55, 0.30, 1.5],  // amber→green blend
+        [ 29, 158, 117, 0.15, 1.2],  // inner green
+        [ 29, 158, 117, 0.07, 1.0],  // innermost — barely visible
+      ];
+      const STOPS_DARK = [
+        [232, 153,  30, 0.63, 1.8],  // amber, +40% opacity
+        [ 80, 168,  90, 0.42, 1.5],
+        [ 29, 158, 117, 0.21, 1.2],
+        [ 29, 158, 117, 0.10, 1.0],
+      ];
+
+      function lerp(a, b, t) { return a + (b - a) * t; }
+
+      function colorAt(stops, t) {
+        const n = stops.length - 1;
+        const s = Math.max(0, Math.min(1, t)) * n;
+        const i = Math.min(Math.floor(s), n - 1);
+        const f = s - i;
+        const A = stops[i], B = stops[i + 1];
+        return [
+          lerp(A[0], B[0], f),
+          lerp(A[1], B[1], f),
+          lerp(A[2], B[2], f),
+          lerp(A[3], B[3], f),
+          lerp(A[4], B[4], f),
+        ];
+      }
+
+      function drawPanel(canvas, side, isDark) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        canvas.width  = PANEL_W;
+        canvas.height = vh;
+
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, PANEL_W, vh);
+
+        // How many px of margin exist between the viewport edge and content?
+        const marginW = (vw - CONTENT_W) / 2;
+        // Safe draw width: stay at least EDGE_BUFFER px inside the margin
+        const safeW = Math.max(0, Math.min(PANEL_W, marginW - EDGE_BUFFER));
+        if (safeW < GRID / 2) return; // not enough room
+
+        const stops = isDark ? STOPS_DARK : STOPS_LIGHT;
+
+        for (let row = 0; ; row++) {
+          const dotY = row * GRID + GRID / 2;
+          if (dotY - GRID / 2 > vh) break;
+
+          for (let col = 0; ; col++) {
+            const rawX = col * GRID + GRID / 2;
+            if (rawX - GRID / 2 > safeW) break;
+
+            // Map rawX to canvas x based on panel side
+            // Left panel:  outer edge = x 0, inner edge = x safeW
+            // Right panel: outer edge = x PANEL_W, inner edge = x (PANEL_W - safeW)
+            let dotX, t;
+            if (side === 'left') {
+              dotX = rawX;
+              t    = rawX / safeW; // 0 = outer, 1 = inner
+            } else {
+              dotX = PANEL_W - rawX; // mirror: first col is rightmost
+              t    = rawX / safeW;
+            }
+
+            // Smooth fade toward content edge (last 30% of safe zone)
+            const fadeStart = 0.70;
+            const fadeMult  = t < fadeStart ? 1 : 1 - (t - fadeStart) / (1 - fadeStart);
+
+            const [r, g, b, a, radius] = colorAt(stops, t);
+            const alpha = a * fadeMult;
+            if (alpha < 0.005) continue;
+
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${alpha.toFixed(3)})`;
+            ctx.fill();
+          }
+        }
+      }
+
+      function redraw() {
+        if (window.innerWidth <= 768) return;
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const left  = document.getElementById('dot-left');
+        const right = document.getElementById('dot-right');
+        if (left)  drawPanel(left,  'left',  isDark);
+        if (right) drawPanel(right, 'right', isDark);
+      }
+
+      // Redraw on resize (debounced)
+      let resizeTimer;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(redraw, 80);
+      });
+
+      // Redraw when theme toggles
+      new MutationObserver(redraw).observe(document.documentElement, {
+        attributes: true, attributeFilter: ['data-theme'],
+      });
+
+      // Initial draw
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', redraw);
+      } else {
+        redraw();
+      }
     })();
   </script>
 
