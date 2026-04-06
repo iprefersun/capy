@@ -39,6 +39,7 @@
       color: var(--text);
       background-color: #fafaf8;
       line-height: 1.6;
+      position: relative;
     }
 
     .container {
@@ -284,7 +285,7 @@
 
     /* DOT PANELS — canvas-based, see JS below */
     .dot-panel {
-      position: fixed;
+      position: absolute;
       top: 0;
       width: 160px;
       height: 100%;
@@ -1345,7 +1346,7 @@
 
       function drawPanel(canvas, side, isDark) {
         const vw = window.innerWidth;
-        const vh = window.innerHeight;
+        const vh = document.body.scrollHeight;
         canvas.width  = PANEL_W;
         canvas.height = vh;
 
