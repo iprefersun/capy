@@ -101,6 +101,7 @@
       padding: 5px 10px;
       border-radius: 6px;
       transition: background 0.15s;
+      white-space: nowrap;
     }
 
     .nav-link:hover { background: var(--surface-2); color: var(--text); }
@@ -688,8 +689,32 @@
     @media (max-width: 700px) {
       .stats-banner-new { grid-template-columns: repeat(2, 1fr); padding: 1.5rem 1.25rem; }
     }
+    /* HAMBURGER BUTTON */
+    .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px 6px; font-size: 22px; line-height: 1; color: var(--text); flex-shrink: 0; }
+
+    /* MOBILE MENU OVERLAY */
+    .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--surface); flex-direction: column; overflow-y: auto; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 0.5px solid var(--border); }
+    .mobile-menu-logo { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .mobile-menu-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); padding: 4px 6px; line-height: 1; }
+    .mobile-menu-links { display: flex; flex-direction: column; padding: 0.5rem 0; }
+    .mobile-menu-link { font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 500; color: var(--text); text-decoration: none; padding: 15px 1.5rem; border-bottom: 0.5px solid var(--border); display: block; transition: background 0.12s; }
+    .mobile-menu-link:hover { background: var(--surface-2); }
+    .mobile-menu-cta { display: block; margin: 1.25rem 1.5rem; text-align: center; background: var(--amber); color: #fff; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; padding: 13px 20px; border-radius: 8px; text-decoration: none; transition: opacity 0.15s; }
+    .mobile-menu-cta:hover { opacity: 0.88; }
+    [data-theme="dark"] .mobile-menu { background: #161920; }
+    [data-theme="dark"] .mobile-menu-header { border-color: rgba(255,255,255,0.07); }
+    [data-theme="dark"] .mobile-menu-link { border-color: rgba(255,255,255,0.07); }
+
+    @media (max-width: 640px) {
+      .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+      .nav-links .nav-link,
+      .nav-links .nav-badge,
+      .nav-links .btn { display: none; }
+    }
+
     @media (max-width: 600px) {
-      .nav-links .nav-link:not(.nav-link-odds):not(.nav-link-stats) { display: none; }
       .hero { padding: 3rem 0 2rem; }
       .hero-capy { font-size: 60px; }
       .tagline-block { gap: 1.5rem; }
@@ -746,10 +771,28 @@
         <a href="#pricing" class="nav-link">Pricing</a>
         <a href="#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
         <a href="#signup" class="btn btn-primary">Get early access</a>
+        <button class="hamburger-btn" id="hamburger-btn" onclick="openMobileMenu()" aria-label="Open menu">☰</button>
         <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
       </div>
     </div>
   </nav>
+
+  <!-- MOBILE FULLSCREEN MENU -->
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation">
+    <div class="mobile-menu-header">
+      <a href="#" class="mobile-menu-logo"><div class="logo-mark" style="width:28px;height:28px;font-size:14px;">🐾</div>Capy</a>
+      <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">✕</button>
+    </div>
+    <nav class="mobile-menu-links">
+      <a href="/odds" class="mobile-menu-link" onclick="closeMobileMenu()">Live Odds</a>
+      <a href="/parlay.html" class="mobile-menu-link" onclick="closeMobileMenu()">Parlay Builder</a>
+      <a href="/record.html" class="mobile-menu-link" onclick="closeMobileMenu()">Track Record</a>
+      <a href="/stats.html" class="mobile-menu-link" onclick="closeMobileMenu()">Stats</a>
+      <a href="#features" class="mobile-menu-link" onclick="closeMobileMenu()">Features</a>
+      <a href="#pricing" class="mobile-menu-link" onclick="closeMobileMenu()">Pricing</a>
+    </nav>
+    <a href="#signup" class="mobile-menu-cta" onclick="closeMobileMenu()">Get early access →</a>
+  </div>
 
   <div class="container">
     <div class="hero">
@@ -1177,6 +1220,19 @@
       const el = document.getElementById('founding-spots');
       if (el) el.textContent = count;
     })();
+
+    // ── Mobile hamburger menu ─────────────────────────────────────────────
+    function openMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) { menu.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) { menu.classList.remove('open'); document.body.style.overflow = ''; }
+    }
+    document.getElementById('mobile-menu')?.addEventListener('click', function(e) {
+      if (e.target === this) closeMobileMenu();
+    });
 
     // ── Theme toggle ──────────────────────────────────────────────────────
     function toggleTheme() {
