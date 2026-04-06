@@ -19,7 +19,7 @@
     },
     {
       "path": "/api/refresh-odds",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 * * * *"
     }
   ]
 }
