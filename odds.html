@@ -64,6 +64,10 @@
     .stat-value.green { color: var(--green); }
     .stat-value.amber { color: var(--amber); }
 
+    /* STATS SUB-BAR */
+    .stats-subbar { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-muted); padding: 6px 0 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .stats-subbar .mono { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--text); }
+
     /* FILTER BAR */
     .filter-wrap { margin-bottom: 1.25rem; }
     .filter-bar { display: flex; align-items: flex-start; gap: 0; overflow-x: auto; padding-bottom: 6px; }
@@ -582,10 +586,32 @@
     [data-theme="dark"] .live-odds-badge { color: #22C55E; background: #052E16; border-color: rgba(34,197,94,0.2); }
 
     /* NAV — hide non-essential links on small screens */
+    .nav-right { flex-wrap: nowrap; }
     @media (max-width: 640px) {
       .nav-link { display: none !important; }
       .nav-badge { display: none; }
     }
+
+    /* HAMBURGER BUTTON */
+    .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px 6px; font-size: 22px; line-height: 1; color: var(--text); flex-shrink: 0; }
+    @media (max-width: 640px) {
+      .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+    }
+
+    /* MOBILE MENU OVERLAY */
+    .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--surface); flex-direction: column; padding: 0; overflow-y: auto; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .mobile-menu-logo { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .mobile-menu-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); padding: 4px 6px; line-height: 1; }
+    .mobile-menu-links { display: flex; flex-direction: column; padding: 1rem 0; }
+    .mobile-menu-link { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 500; color: var(--text); text-decoration: none; padding: 14px 1.5rem; border-bottom: 1px solid var(--border); display: block; transition: background 0.12s; }
+    .mobile-menu-link:hover { background: var(--surface-2); }
+    .mobile-menu-gopro { display: block; margin: 1.25rem 1.5rem; text-align: center; background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; padding: 13px 20px; border-radius: 8px; text-decoration: none; transition: opacity 0.15s; }
+    .mobile-menu-gopro:hover { opacity: 0.88; }
+    [data-theme="dark"] .mobile-menu { background: #0F1117; }
+    [data-theme="dark"] .mobile-menu-header { border-color: #1F2330; }
+    [data-theme="dark"] .mobile-menu-link { border-color: #1F2330; }
 
     /* ══ COMPACT STICKY EV FILTER BAR ══════════════════════════════════ */
     .ev-filter-bar { position: sticky; top: 56px; z-index: 90; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
@@ -721,6 +747,13 @@
     [data-theme="dark"] .hero-compare-odds.neutral { color: var(--text); }
 
     /* ── EV floor label + "why this exists" blurb ─────────────────────── */
+    /* EV CONFIDENCE PILLS */
+    .ev-conf-pill { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 6px; white-space: nowrap; display: inline-block; }
+    .ev-conf-playable { background: #DCFCE7; color: #15803D; }
+    .ev-conf-lean { background: #F3F4F6; color: #6B7280; }
+    [data-theme="dark"] .ev-conf-playable { background: #052E16; color: #4ADE80; }
+    [data-theme="dark"] .ev-conf-lean { background: #1E2330; color: #94A3B8; }
+
     .ev-floor-label { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); padding: 4px 1.5rem 2px; max-width: 1400px; margin: 0 auto; }
     .ev-why-blurb { font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text-hint); line-height: 1.6; margin-bottom: 1.5rem; padding: 0 2px; }
     @media (max-width: 600px) { .ev-floor-label { padding: 4px 1rem 2px; } }
@@ -744,10 +777,26 @@
         <a href="/parlay.html" id="parlay-nav-count" style="display:none;font-size:12px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:4px 10px;border-radius:20px;text-decoration:none;">🎰 Parlay (<span id="parlay-count">0</span>)</a>
         <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
         <a href="/#signup" class="btn-small">Go Pro</a>
+        <button class="hamburger-btn" id="hamburger-btn" onclick="openMobileMenu()" aria-label="Open menu">☰</button>
         <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
       </div>
     </div>
   </nav>
+
+  <!-- MOBILE FULLSCREEN MENU -->
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation">
+    <div class="mobile-menu-header">
+      <a href="/" class="mobile-menu-logo"><div class="logo-mark" style="width:28px;height:28px;font-size:14px;">🐾</div>Capy</a>
+      <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">✕</button>
+    </div>
+    <nav class="mobile-menu-links">
+      <a href="/odds.html" class="mobile-menu-link" onclick="closeMobileMenu()">Live Odds</a>
+      <a href="/parlay.html" class="mobile-menu-link" onclick="closeMobileMenu()">Parlay Builder</a>
+      <a href="/record.html" class="mobile-menu-link" onclick="closeMobileMenu()">Track Record</a>
+      <a href="/stats.html" class="mobile-menu-link" onclick="closeMobileMenu()">Stats</a>
+    </nav>
+    <a href="/#signup" class="mobile-menu-gopro" onclick="closeMobileMenu()">Go Pro →</a>
+  </div>
 
   <!-- COMPACT STICKY EV FILTER BAR -->
   <div class="ev-filter-bar" id="ev-filter-bar">
@@ -792,6 +841,7 @@
         <div class="stat-value" id="stat-time" style="font-size:14px;">—</div>
       </div>
     </div>
+    <div class="stats-subbar" id="stats-subbar" style="margin-bottom:0.5rem;"></div>
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:0.5rem;">⏱ Today's edges expire at game time. Check back tomorrow for new opportunities.</div>
     <p class="ev-disclaimer">EV calculations are estimates based on market-implied probabilities. Past performance does not guarantee future results. Bet responsibly.</p>
 
@@ -946,12 +996,12 @@
       </div>
     </div>
 
-    <!-- CAPY'S SHARP PICKS -->
+    <!-- CAPY'S +EV PICKS -->
     <div class="picks-section" id="sharp-picks-section" style="display:none;">
       <div class="picks-header">
         <div>
-          <div class="picks-title">🎯 Capy's Sharp Picks</div>
-          <div class="picks-sub">High probability, positive EV vs Pinnacle — real pricing gaps across the best US books.</div>
+          <div class="picks-title">🎯 Capy's +EV Picks</div>
+          <div class="picks-sub">Positive EV vs Pinnacle — real pricing gaps across the best US books.</div>
         </div>
       </div>
       <div class="picks-scroll" id="sharp-picks-container"></div>
@@ -961,11 +1011,11 @@
       </div>
     </div>
 
-    <!-- LONG SHOT PLAYS -->
+    <!-- HIGH VARIANCE PLAYS -->
     <div class="picks-section" id="longshot-picks-section" style="display:none;">
       <div class="picks-header">
         <div>
-          <div class="picks-title">🎲 Long Shot Plays</div>
+          <div class="picks-title">🎲 High Variance Plays</div>
           <div class="picks-sub">Lower probability, high upside — positive EV underdogs with the best available odds.</div>
         </div>
       </div>
@@ -986,7 +1036,7 @@
     <div class="method-banner">
       <span class="method-banner-icon">📍</span>
       <div class="method-banner-text">
-        <strong>Capy compares every major US book against Pinnacle — the sharpest market in the world.</strong> When a US book offers better odds than Pinnacle's fair price, that's a genuine edge. Green = beating the sharp line. Everything else = you're paying the house.
+        Odds compared vs Pinnacle sharp line. Price gap = potential edge.
       </div>
     </div>
 
@@ -1101,8 +1151,9 @@
     let allGames = [];
     let currentSport = 'all';
     let oddsCache = {};
-    let oddsFetchedAt = {}; // keyed by sport, value: timestamp ms
-    let pinnacleCache = {}; // keyed by sport, then "home|away"
+    let oddsFetchedAt = {};      // keyed by sport, value: timestamp ms
+    let pinnacleCache = {};      // keyed by sport, then game.id or "home|away" → full game object
+    let pinnacleTimestamps = {}; // keyed by sport, then game.id or "home|away" → Pinnacle h2h last_update string
     let propsCache = {};    // keyed by eventId, value: { data, ts }
     let userEmail = localStorage.getItem('capy_email') || null;
     const previewMode = new URLSearchParams(window.location.search).get('preview') === 'true';
@@ -1214,15 +1265,19 @@
     function getSharpRef(game) {
       const sport = game.sport_key;
       const pk = pinnacleCache[sport] || {};
+      const pt = pinnacleTimestamps[sport] || {};
       // Primary lookup by game.id (avoids team name mismatch), fallback to name key
-      const pinnacleGame = (game.id && pk[game.id]) || pk[`${game.home_team}|${game.away_team}`];
+      const gameKey = `${game.home_team}|${game.away_team}`;
+      const pinnacleGame = (game.id && pk[game.id]) || pk[gameKey];
       if (!pinnacleGame) return null;
       const h2h = pinnacleGame.bookmakers?.[0]?.markets?.find(m => m.key === 'h2h');
       if (!h2h) return null;
       const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
       const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
       if (homeO?.price != null && awayO?.price != null) {
-        return { homePrice: homeO.price, awayPrice: awayO.price, bookName: 'Pinnacle', source: 'Pinnacle' };
+        // pinnacleLastUpdate — used in stale-timestamp check (Priority 2)
+        const pinnacleLastUpdate = (game.id && pt[game.id]) || pt[gameKey] || h2h.last_update || null;
+        return { homePrice: homeO.price, awayPrice: awayO.price, bookName: 'Pinnacle', source: 'Pinnacle', pinnacleLastUpdate };
       }
       return null;
     }
@@ -1287,7 +1342,8 @@
         }
       }
 
-      // Find best available moneyline price per side across all tracked books
+      // Find best available moneyline price per side across all tracked books.
+      // Also capture each book's h2h last_update for the stale-timestamp check.
       let bestHome = null, bestAway = null;
       BOOK_KEYS.forEach((k, i) => {
         const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
@@ -1297,10 +1353,11 @@
         if (!h2h) return;
         const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
         const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
+        const bookLastUpdate = h2h.last_update || null;
         if (homeO?.price != null && (bestHome === null || homeO.price > bestHome.price))
-          bestHome = { price: homeO.price, bookName: BOOKS[i] };
+          bestHome = { price: homeO.price, bookName: BOOKS[i], lastUpdate: bookLastUpdate };
         if (awayO?.price != null && (bestAway === null || awayO.price > bestAway.price))
-          bestAway = { price: awayO.price, bookName: BOOKS[i] };
+          bestAway = { price: awayO.price, bookName: BOOKS[i], lastUpdate: bookLastUpdate };
       });
       if (!bestHome || !bestAway) return null;
 
@@ -1354,12 +1411,37 @@
         });
       }
 
+      // ── Stale timestamp check (Priority 2) ─────────────────────────────────
+      // If Pinnacle and the best book last updated more than 5 minutes apart, the
+      // EV comparison is apples-to-oranges. Flag it and exclude from Capy's Picks.
+      let staleTimestamps = false;
+      const pinnacleTs = ref.pinnacleLastUpdate;
+      const bookTs     = bestHome?.lastUpdate || bestAway?.lastUpdate || null;
+      if (pinnacleTs && bookTs) {
+        const diffMin = Math.abs(new Date(pinnacleTs) - new Date(bookTs)) / 60000;
+        if (diffMin > 5) {
+          staleTimestamps = true;
+          console.warn('[Capy EV] Stale timestamps — Pinnacle and book odds differ by', diffMin.toFixed(1), 'min', {
+            game:        `${game.away_team} @ ${game.home_team}`,
+            pinnacleTs,
+            bookTs,
+          });
+        }
+      }
+
+      // ── 9.9% display cap (Priority 2) ──────────────────────────────────────
+      // Defense-in-depth: the >5% filter above already discards implausible EV,
+      // but cap individual side values at 9.9% so nothing absurd ever renders.
+      const homeEV = Math.min(homeResult.ev, 9.9);
+      const awayEV = Math.min(awayResult.ev, 9.9);
+
       return {
-        home: { ev: homeResult.ev, fairProb: homeResult.fairProb, fairOdds: homeResult.fairOdds, bestOdds: bestHome.price, bestBook: bestHome.bookName },
-        away: { ev: awayResult.ev, fairProb: awayResult.fairProb, fairOdds: awayResult.fairOdds, bestOdds: bestAway.price, bestBook: bestAway.bookName },
+        home: { ev: homeEV, fairProb: homeResult.fairProb, fairOdds: homeResult.fairOdds, bestOdds: bestHome.price, bestBook: bestHome.bookName },
+        away: { ev: awayEV, fairProb: awayResult.fairProb, fairOdds: awayResult.fairOdds, bestOdds: bestAway.price, bestBook: bestAway.bookName },
         pinnacleRef: { homePrice: ref.homePrice, awayPrice: ref.awayPrice },
         refSource: 'Pinnacle',
         suspicious,
+        staleTimestamps,
       };
     }
     // Convert fair probability to American odds
@@ -1460,12 +1542,27 @@
       oddsFetchedAt[key] = Date.now();
       // Cache Pinnacle data — keyed by game.id (primary) and "home|away" (fallback)
       if (Array.isArray(data.pinnacleOdds) && data.pinnacleOdds.length) {
-        if (!pinnacleCache[key]) pinnacleCache[key] = {};
+        if (!pinnacleCache[key])      pinnacleCache[key]      = {};
+        if (!pinnacleTimestamps[key]) pinnacleTimestamps[key] = {};
         data.pinnacleOdds.forEach(g => {
           pinnacleCache[key][`${g.home_team}|${g.away_team}`] = g;
           if (g.id) pinnacleCache[key][g.id] = g;
+          // Store Pinnacle h2h last_update for stale-timestamp check (Priority 2)
+          const h2hMkt = g.bookmakers?.[0]?.markets?.find(m => m.key === 'h2h');
+          const ts = h2hMkt?.last_update || null;
+          if (ts) {
+            pinnacleTimestamps[key][`${g.home_team}|${g.away_team}`] = ts;
+            if (g.id) pinnacleTimestamps[key][g.id] = ts;
+          }
         });
         console.log('[Capy] Pinnacle lines cached for', data.pinnacleOdds.length, 'games');
+      }
+      // Also accept pre-built pinnacleMap from server (new refresh-odds format)
+      if (data.pinnacleMap && typeof data.pinnacleMap === 'object') {
+        if (!pinnacleTimestamps[key]) pinnacleTimestamps[key] = {};
+        Object.entries(data.pinnacleMap).forEach(([k, v]) => {
+          if (v?.lastUpdate) pinnacleTimestamps[key][k] = v.lastUpdate;
+        });
       }
       return games;
     }
@@ -1574,9 +1671,14 @@
         ? `<span class="freshness-label${fresh.stale ? ' stale' : ''}">Updated ${fresh.text}</span>`
         : '';
 
+      // Stale timestamp badge — shown when Pinnacle and book lines are >5 min apart
+      const staleHtml = ev.staleTimestamps
+        ? `<span class="ev-verify-badge" title="Pinnacle and book odds timestamps differ by more than 5 minutes — EV may be unreliable">⏱ Stale data</span>`
+        : '';
+
       // Verify badge
       const suspiciousHtml = ev.suspicious
-        ? `<span class="ev-verify-badge" title="EV 10-15% — verify odds are live before betting">⚠️ Verify odds</span>`
+        ? `<span class="ev-verify-badge" title="EV 4-5% — verify odds are live before betting">⚠️ Verify odds</span>`
         : '';
 
       // EV breakdown tooltip (ⓘ)
@@ -1608,6 +1710,7 @@
               <div class="ev-card-tags">
                 <span class="sport-tag tag-${tagKey}">${sportEmoji} ${label}</span>
                 ${freshnessHtml}
+                ${staleHtml}
                 ${suspiciousHtml}
               </div>
               <div class="ev-card-matchup" onclick="window.location='${gameUrl}'">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team}</div>
@@ -1624,6 +1727,7 @@
             <div class="ev-badge-center ${isPositive ? '' : 'ev-neg-bg'}">
               <div class="ev-badge-pct ${isPositive ? '' : 'ev-neg-pct'}">${evStr}</div>
               <div class="ev-badge-lbl ${isPositive ? '' : 'ev-neg-lbl'}">EV ${evInfoBtn}</div>
+              ${bestSide.ev >= 3 ? '<span class="ev-conf-pill ev-conf-playable">Playable</span>' : bestSide.ev >= 1 ? '<span class="ev-conf-pill ev-conf-lean">Lean</span>' : ''}
             </div>
             <div class="ev-card-sharp-col">
               <div class="ev-compare-label">Sharp Line</div>
@@ -1672,11 +1776,32 @@
             <div class="no-edges-title">No edges above 1% right now</div>
             <div class="no-edges-sub">Most books are efficiently priced at the moment. Check back soon — lines move fast.</div>
           </div>`;
+        updateStatsSubbar([]);
         return;
       }
 
       container.innerHTML = `<div class="ev-cards-grid">${positiveOnly.map(g => buildEvCard(g)).join('')}</div>`;
+      updateStatsSubbar(positiveOnly);
       renderTopEdgeHero();
+    }
+
+    // ── Stats sub-bar ─────────────────────────────────────────────────────
+    function updateStatsSubbar(edgeGames) {
+      const el = document.getElementById('stats-subbar');
+      if (!el) return;
+      const count = edgeGames ? edgeGames.length : 0;
+      if (!count) {
+        el.innerHTML = '<span>— edges live</span>';
+        return;
+      }
+      const evValues = edgeGames.map(g => {
+        const ev = calcGameEV(g);
+        return ev ? Math.max(ev.home.ev, ev.away.ev) : 0;
+      }).filter(v => v > 0);
+      const avg = evValues.length ? (evValues.reduce((a, b) => a + b, 0) / evValues.length) : 0;
+      const minsAgo = lastUpdatedTime ? Math.floor((Date.now() - lastUpdatedTime) / 60000) : null;
+      const updatedText = minsAgo === null ? '—' : minsAgo < 1 ? 'just now' : `${minsAgo}m ago`;
+      el.innerHTML = `<span class="mono">${count}</span> edge${count !== 1 ? 's' : ''} live &nbsp;·&nbsp; Avg edge: <span class="mono">${avg > 0 ? '+' + avg.toFixed(1) + '%' : '—'}</span> &nbsp;·&nbsp; Updated <span class="mono">${updatedText}</span>`;
     }
 
     // ── Top Edge Hero card ────────────────────────────────────────────────
@@ -1968,10 +2093,62 @@
         <div style="font-size:10px;color:var(--text-hint);margin-top:6px;text-align:right;"><a href="/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${sport}&time=${encodeURIComponent(game.commence_time)}&id=${gameId}" style="color:var(--amber);">See all props →</a></div>`;
     }
 
+    // ── Lazy loading state ────────────────────────────────────────────────────
+    const LAZY_BATCH = 10; // games to render per batch
+    let lazySortedGames = [];
+    let lazyRenderedCount = 0;
+    let lazyObserver = null;
+
+    function disconnectLazyObserver() {
+      if (lazyObserver) { lazyObserver.disconnect(); lazyObserver = null; }
+    }
+
+    // Append the next LAZY_BATCH cards to the container and re-attach the sentinel.
+    function lazyLoadMore() {
+      const container = document.getElementById('games-container');
+      if (!container) return;
+      const start = lazyRenderedCount;
+      const end   = Math.min(start + LAZY_BATCH, lazySortedGames.length);
+      if (start >= lazySortedGames.length) return;
+
+      // Remove sentinel before appending
+      const sentinel = document.getElementById('lazy-sentinel');
+      if (sentinel) sentinel.remove();
+
+      const buildFn = (viewMode === 'grid2' || viewMode === 'grid4') ? buildGridCard : buildGameCard;
+      const frag = document.createDocumentFragment();
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'contents';
+      wrapper.innerHTML = lazySortedGames.slice(start, end).map((game, i) => buildFn(game, start + i)).join('');
+      while (wrapper.firstChild) container.appendChild(wrapper.firstChild);
+
+      lazyRenderedCount = end;
+      console.log('[Capy] Lazy loaded', end - start, 'more games (total rendered:', lazyRenderedCount, '/', lazySortedGames.length, ')');
+
+      // Attach new sentinel if more games remain
+      if (lazyRenderedCount < lazySortedGames.length) {
+        attachLazySentinel(container);
+      }
+    }
+
+    function attachLazySentinel(container) {
+      disconnectLazyObserver();
+      const sentinel = document.createElement('div');
+      sentinel.id = 'lazy-sentinel';
+      sentinel.style.cssText = 'height:1px;width:100%;grid-column:1/-1;';
+      container.appendChild(sentinel);
+
+      lazyObserver = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) lazyLoadMore();
+      }, { rootMargin: '200px' }); // start loading 200px before sentinel enters view
+      lazyObserver.observe(sentinel);
+    }
+
     function renderGames() {
       const container = document.getElementById('games-container');
       if (!container) { console.error('[Capy] renderGames: #games-container not found'); return; }
       console.log('[Capy] renderGames — allGames:', allGames.length, '| viewMode:', viewMode, '| sortMode:', sortMode);
+      disconnectLazyObserver();
       renderPicks();
       renderEvSection();
       if (!allGames.length) {
@@ -1988,17 +2165,31 @@
       const sorted = getSortedGames();
       console.log('[Capy] renderGames — sorted games to render:', sorted.length);
       try {
+        // ── Lazy loading (Priority 3) ───────────────────────────────────────
+        // Render first LAZY_BATCH games immediately; defer the rest until the user
+        // scrolls near the bottom. All data is already in memory — no extra fetches.
+        lazySortedGames    = sorted;
+        lazyRenderedCount  = 0;
+
+        const initialCount = Math.min(LAZY_BATCH, sorted.length);
+        const buildFn = (viewMode === 'grid2' || viewMode === 'grid4') ? buildGridCard : buildGameCard;
+
         if (viewMode === 'grid2') {
           container.className = 'games grid-2';
-          container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
         } else if (viewMode === 'grid4') {
           container.className = 'games grid-4';
-          container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
         } else {
           container.className = 'games';
-          container.innerHTML = sorted.map((game, idx) => buildGameCard(game, idx)).join('');
         }
-        console.log('[Capy] renderGames — DOM updated, cards in container:', container.children.length);
+
+        container.innerHTML = sorted.slice(0, initialCount).map((game, idx) => buildFn(game, idx)).join('');
+        lazyRenderedCount = initialCount;
+
+        if (sorted.length > initialCount) {
+          attachLazySentinel(container);
+        }
+
+        console.log('[Capy] renderGames — initial render:', initialCount, 'of', sorted.length, 'games');
       } catch (err) {
         console.error('[Capy] renderGames — card build threw:', err);
         container.innerHTML = `<div class="error-state"><span class="error-icon">🦫</span><div class="error-title">Render error</div><div class="error-sub">${err.message}</div><button class="retry-btn" onclick="oddsCache={}; loadSport(currentSport)">Retry</button></div>`;
@@ -2023,13 +2214,19 @@
 
     function expandCard(gameId) {
       expandedCards.add(gameId);
-      // Re-render in grid mode — expanded cards use full buildGameCard
-      const sorted = getSortedGames();
+      // Re-render all currently-rendered games in grid mode (lazy state is preserved).
+      // Uses lazySortedGames so we only re-render what was visible, not more.
+      disconnectLazyObserver();
+      const gamesToRender = lazySortedGames.length ? lazySortedGames.slice(0, lazyRenderedCount) : getSortedGames();
       const container = document.getElementById('games-container');
-      container.innerHTML = sorted.map((game, idx) => {
+      container.innerHTML = gamesToRender.map((game, idx) => {
         if (expandedCards.has(game.id)) return buildGameCard(game, idx);
         return buildGridCard(game, idx);
       }).join('');
+      // Re-attach sentinel if more games remain
+      if (lazySortedGames.length > lazyRenderedCount) {
+        attachLazySentinel(container);
+      }
     }
 
     function buildGridCard(game, idx) {
@@ -2193,7 +2390,7 @@
       const isLongshot = pickType === 'longshot';
       const gameDateTime = fmtGameDate(game.commence_time);
       const confLabel = isLongshot
-        ? '🎲 +EV Long Shot vs Pinnacle'
+        ? '🎲 +EV High Variance vs Pinnacle'
         : c.ev > 3 ? '🔥 Strong +EV vs Pinnacle' : '✅ +EV vs Pinnacle';
       const confCls = isLongshot ? 'pick-conf-look' : c.ev > 3 ? 'pick-conf-strong' : 'pick-conf-good';
       const evColor = isLongshot ? 'var(--amber)' : 'var(--green)';
@@ -2209,7 +2406,7 @@
           <div class="pick-game-header">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
               <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;background:var(--surface-2);color:var(--text-hint);padding:2px 7px;border-radius:10px;">${sportEmoji} ${label}</span>
-              ${isLongshot ? '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--amber-light);color:var(--amber-dark);">Long Shot</span>' : ''}
+              ${isLongshot ? '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--amber-light);color:var(--amber-dark);">High Variance</span>' : ''}
             </div>
             <div class="pick-game">${game.away_team} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">vs</span> ${game.home_team}</div>
             <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);margin-top:2px;">${gameDateTime}</div>
@@ -2238,22 +2435,28 @@
 
     // Builds the Supabase save payload for a pick candidate.
     function buildSavePickPayload(c, pickType) {
-      const qs = calcPickQualityScore(c.ev, c.game, c.bestOdds, c.fairProb);
+      const qs           = calcPickQualityScore(c.ev, c.game, c.bestOdds, c.fairProb);
+      const pinnacleRef  = c.evData?.pinnacleRef || {};
+      const isHome       = c.side === 'home';
       return {
-        game_id:       c.game.id,
-        sport:         c.game.sport_key,
-        home_team:     c.game.home_team,
-        away_team:     c.game.away_team,
-        pick:          c.teamName,
-        bet_type:      'ml',
-        pick_type:     pickType,   // 'sharp' | 'longshot'
-        line:          null,
-        odds:          c.bestOdds,
-        book:          c.bestBook,
-        ev_percent:    c.ev,
-        edge:          null,
-        game_time:     c.game.commence_time,
-        quality_score: qs,
+        game_id:            c.game.id,
+        sport:              c.game.sport_key,
+        home_team:          c.game.home_team,
+        away_team:          c.game.away_team,
+        pick:               c.teamName,
+        bet_type:           'ml',
+        pick_type:          pickType,   // 'sharp' | 'longshot'
+        line:               null,
+        odds:               c.bestOdds,
+        book:               c.bestBook,
+        ev_percent:         c.ev,
+        edge:               null,
+        game_time:          c.game.commence_time,
+        quality_score:      qs,
+        // Bets table fields — Pinnacle reference line and fair probability
+        pinnacle_odds:      isHome ? (pinnacleRef.homePrice ?? null) : (pinnacleRef.awayPrice ?? null),
+        pinnacle_away_odds: isHome ? (pinnacleRef.awayPrice ?? null) : (pinnacleRef.homePrice ?? null),
+        true_probability:   c.fairProb ?? null,
       };
     }
 
@@ -2280,6 +2483,13 @@
         // "Both Pinnacle sides present" requirement for both buckets.
         const evData = calcGameEV(game);
         if (!evData) continue;
+
+        // Stale timestamp guard: if Pinnacle and book odds are more than 5 min apart,
+        // the EV comparison is unreliable — exclude from picks entirely.
+        if (evData.staleTimestamps) {
+          console.warn('[Picks] Skipping stale-timestamp candidate:', game.away_team, '@', game.home_team);
+          continue;
+        }
 
         for (const side of ['home', 'away']) {
           const sideEV   = evData[side].ev;
@@ -2562,7 +2772,7 @@
       return `
         <div class="parlay-card parlay-card--upside">
           <span class="parlay-badge parlay-badge--upside">⚠️ Negative EV — entertainment only</span>
-          <div class="parlay-card-title">🎰 High Upside — Long Shot Parlay</div>
+          <div class="parlay-card-title">🎰 High Upside — High Variance Parlay</div>
           <div class="parlay-card-sub">Maximum potential payout. Not a smart bet — but if it hits... 🤑</div>
           <div class="parlay-legs">${legsHtml}</div>
           <div style="margin-top:6px;">
@@ -3071,6 +3281,26 @@
     }
     // Init parlay count on load
     updateParlayNavCount();
+
+    // ── Mobile hamburger menu ─────────────────────────────────────────────
+    function openMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) {
+        menu.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+    function closeMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) {
+        menu.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    }
+    // Close on tap outside menu content
+    document.getElementById('mobile-menu')?.addEventListener('click', function(e) {
+      if (e.target === this) closeMobileMenu();
+    });
 
     // ── Theme toggle ─────────────────────────────────────────────────────
     function toggleTheme() {
