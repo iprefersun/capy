@@ -839,6 +839,18 @@
     [data-theme="dark"] .hero-ev-center { background: #052E16; border-color: rgba(34,197,94,0.2); }
     [data-theme="dark"] .hero-ev-pct, [data-theme="dark"] .hero-ev-lbl { color: #4ADE80; }
     [data-theme="dark"] .hero-compare-odds { color: #4ADE80; }
+
+    /* NAV TAGLINE */
+    .nav-tagline {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--text-hint);
+      line-height: 1.2;
+      margin-top: 1px;
+      white-space: nowrap;
+    }
+    @media (max-width: 640px) { .nav-tagline { display: none; } }
   </style>
   <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
@@ -851,7 +863,10 @@
     <div class="nav-inner">
       <a href="#" class="nav-logo">
         <div class="logo-mark">🐾</div>
-        Capy
+        <div>
+          Capy
+          <div class="nav-tagline">Casual betting is fun. Sharp betting wins.</div>
+        </div>
       </a>
       <div class="nav-links">
         <a href="/odds" class="nav-link nav-link-odds">Live odds</a>
@@ -860,7 +875,7 @@
         <a href="/stats.html" class="nav-link nav-link-stats">Stats</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#pricing" class="nav-link">Pricing</a>
-        <a href="#pricing" class="nav-badge">⚡ Founding rate<br>$7/mo</a>
+        <a href="#pricing" class="nav-badge">⚡ Founding rate<br>$10/mo</a>
         <a href="#signup" class="btn btn-primary btn-nav-cta">Get early<br>access</a>
         <button class="hamburger-btn" id="hamburger-btn" onclick="openMobileMenu()" aria-label="Open menu">☰</button>
         <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
@@ -892,8 +907,8 @@
         Live market data
       </div>
       <span class="hero-capy">🦫</span>
-      <h1>Lines move.<br><em>Capy</em> doesn't.</h1>
-      <p class="hero-sub">Real-time odds vs the sharpest book in the world. Find mispriced lines before they close.</p>
+      <h1>Casual betting is fun.<br><em>Sharp betting wins.</em></h1>
+      <p class="hero-sub">We show you the gap between what books offer and what the sharpest market says it's worth. That gap is your edge.</p>
       <div class="hero-cta">
         <a href="#signup" class="btn-hero">Start for free</a>
         <a href="/odds" class="btn-hero-out">See today's best lines</a>
@@ -903,22 +918,16 @@
         <span class="hero-stats-sep">·</span>
         <span class="hero-stats-item"><span class="hero-stats-label">Avg edge </span><span class="hero-stats-num">+2.3%</span></span>
         <span class="hero-stats-sep">·</span>
-        <span class="hero-stats-item"><span class="hero-stats-num">5</span><span class="hero-stats-label"> books tracked</span></span>
+        <span class="hero-stats-item"><span class="hero-stats-num">10+</span><span class="hero-stats-label"> books tracked</span></span>
         <span class="hero-stats-sep">·</span>
         <span class="hero-stats-item"><span class="hero-stats-label">Updated every </span><span class="hero-stats-num">60s</span></span>
       </div>
-      <div class="hero-urgency">⚡ 2,400+ bettors already have the edge. You don't yet.</div>
-      <div class="hero-proof">
-        <span class="stars">★★★★★</span>
-        <span>2,400+ bettors on the waitlist &nbsp;·&nbsp; Updated every 60 seconds</span>
-      </div>
-
       <!-- HOW IT WORKS -->
       <div class="how-steps">
         <div class="how-step">
           <div class="how-step-num">01</div>
-          <div class="how-step-title">We track 5 major sportsbooks in real time</div>
-          <div class="how-step-desc">FanDuel, DraftKings, BetMGM, Caesars, and more — every line, every game, continuously updated.</div>
+          <div class="how-step-title">We track 10+ major sportsbooks in real time</div>
+          <div class="how-step-desc">FanDuel, DraftKings, BetMGM, BetRivers, BetOnline, and more — every line, every game, continuously updated.</div>
         </div>
         <div class="how-step">
           <div class="how-step-num">02</div>
@@ -1008,10 +1017,10 @@
         </div>
         <div class="cost-card">
           <div class="cost-num">60 seconds</div>
-          <div class="cost-label">how long it takes Capy to find you the best line across 5 books</div>
+          <div class="cost-label">how long it takes Capy to find you the best line across 10+ books</div>
         </div>
       </div>
-      <div class="cost-cta">Capy Pro costs $7/month. One better line pays for a year.</div>
+      <div class="cost-cta">Capy Sharp costs $10/month founding rate. One better line covers your subscription.</div>
       <div class="cost-disclaimer">Average figures based on industry estimates. Individual results vary.</div>
     </div>
 
@@ -1081,18 +1090,18 @@
     <section id="pricing">
       <div class="section-label">Pricing</div>
       <div class="section-title">Simple, honest pricing</div>
-      <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:1.25rem;line-height:1.65;">Still on the fence? One better line pays for a year of Pro.</p>
+      <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:1.25rem;line-height:1.65;">Still on the fence? One better line pays for a year of Sharp.</p>
       <div style="background:var(--amber-light);border:2px solid var(--amber);border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:1.5rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
         <span style="font-size:28px;">🦫</span>
         <div style="flex:1;min-width:200px;">
           <div style="font-size:15px;font-weight:700;color:var(--amber-dark);">Founding member pricing — locked in forever</div>
           <div style="font-size:13px;color:var(--amber-dark);opacity:0.85;margin-top:2px;">First 50 users get this price for life. Goes up when spots fill.</div>
         </div>
-        <div style="background:var(--amber);color:#fff;font-family:'DM Mono',monospace;font-size:15px;font-weight:700;padding:8px 16px;border-radius:6px;white-space:nowrap;">⚡ <span id="founding-spots">47</span> spots left</div>
+        <div style="background:var(--amber);color:#fff;font-family:'DM Mono',monospace;font-size:15px;font-weight:700;padding:8px 16px;border-radius:6px;white-space:nowrap;">⚡ <span id="founding-spots">50</span> spots left</div>
       </div>
       <div class="pricing-grid">
         <div class="pricing-card">
-          <div class="plan-name">Free</div>
+          <div class="plan-name">Casual</div>
           <div class="plan-price"><sup>$</sup>0</div>
           <div class="plan-period">forever</div>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Everything a sharp bettor needs. No credit card ever.</p>
@@ -1105,15 +1114,15 @@
         </div>
         <div class="pricing-card featured">
           <div class="plan-badge">Most popular</div>
-          <div class="plan-name">Pro</div>
+          <div class="plan-name">Sharp</div>
           <div style="display:flex;align-items:baseline;gap:8px;">
-            <div class="plan-price"><sup>$</sup>7</div>
-            <div style="font-size:14px;color:var(--text-muted);text-decoration:line-through;margin-bottom:2px;">$19</div>
+            <div class="plan-price"><sup>$</sup>10</div>
+            <div style="font-size:14px;color:var(--text-muted);text-decoration:line-through;margin-bottom:2px;">$29</div>
           </div>
           <div class="plan-period">per month · founding rate · 7-day free trial</div>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Let Capy do the thinking. Best bets served up daily — just bet and win.</p>
           <ul class="plan-features">
-            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>All sports + all 5 books</li>
+            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>All sports + all 10+ books</li>
             <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Live odds, 60-sec refresh</li>
             <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Unlimited best bets</li>
             <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Line movement alerts</li>
@@ -1121,22 +1130,7 @@
             <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>📍 Full vs Pinnacle EV breakdown</li>
           </ul>
           <a href="#signup" class="btn btn-primary" style="width:100%;text-align:center;padding:12px;">Claim founding rate</a>
-          <div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:8px;">Price locks in forever when you claim. Goes to $19/mo after.</div>
-        </div>
-        <div class="pricing-card">
-          <div class="plan-name">Sharp</div>
-          <div style="display:flex;align-items:baseline;gap:8px;">
-            <div class="plan-price"><sup>$</sup>19</div>
-            <div style="font-size:14px;color:var(--text-muted);text-decoration:line-through;margin-bottom:2px;">$49</div>
-          </div>
-          <div class="plan-period">per month · founding rate</div>
-          <ul class="plan-features">
-            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>Everything in Pro</li>
-            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>AI deep analysis</li>
-            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>CLV tracking</li>
-            <li><span class="check"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/></svg></span>API access</li>
-          </ul>
-          <a href="#signup" class="btn btn-outline" style="width:100%;text-align:center;">Get in touch</a>
+          <div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:8px;">Price locks in forever when you claim. Goes to $29/mo after.</div>
         </div>
       </div>
     </section>
@@ -1144,11 +1138,11 @@
     <section>
       <div class="stats-banner-new fade-in">
         <div class="stats-banner-new-item">
-          <div class="stats-banner-new-num"><span class="count-up" data-target="2400" data-suffix="+">2,400+</span></div>
-          <div class="stats-banner-new-label">bettors on the waitlist</div>
+          <div class="stats-banner-new-num"><span class="count-up" data-target="500" data-suffix="+">500+</span></div>
+          <div class="stats-banner-new-label">lines scanned daily</div>
         </div>
         <div class="stats-banner-new-item">
-          <div class="stats-banner-new-num">5</div>
+          <div class="stats-banner-new-num">10+</div>
           <div class="stats-banner-new-label">books tracked simultaneously</div>
         </div>
         <div class="stats-banner-new-item">

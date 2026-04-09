@@ -155,6 +155,52 @@
     .game-teams { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); }
     .game-time { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 400; color: var(--text-muted); }
     .game-tags { display: flex; align-items: center; gap: 6px; }
+
+    /* ── NEW GAME CARD LAYOUT ──────────────────────────────────────────── */
+    .gc-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .gc-matchup { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); flex: 1; cursor: pointer; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gc-matchup:hover { color: var(--green); }
+    .games.grid-4 .gc-matchup { font-size: 13px; }
+    .gc-time { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .gc-summary { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .gc-col { display: flex; flex-direction: column; gap: 2px; }
+    .gc-col-center { align-items: center; text-align: center; }
+    .gc-col-right { align-items: flex-end; text-align: right; }
+    .gc-divider { width: 1px; height: 52px; background: var(--border-mid); margin: 0 14px; flex-shrink: 0; }
+    .gc-col-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); }
+    .gc-col-book { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .gc-col-odds { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--text); line-height: 1.1; }
+    .gc-col-odds.green { color: var(--green); }
+    .gc-col-sub { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); }
+    .gc-no-sharp { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-hint); font-style: italic; padding: 8px 0; }
+    .gc-allbooks { display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+    .gc-allbooks::-webkit-scrollbar { display: none; }
+    .gc-allbooks-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); white-space: nowrap; margin-right: 2px; }
+    .gc-book-pill { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 34px; }
+    .gc-book-abbr { font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-hint); }
+    .gc-book-price { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; color: var(--text); }
+    .gc-book-price.best { color: var(--green); font-weight: 700; }
+    .gc-book-price.worst { color: var(--red); }
+    .gc-book-price.pro-locked { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; color: var(--text-hint); cursor: pointer; letter-spacing: 0.02em; }
+    .gc-book-divider { width: 1px; height: 28px; background: var(--border-mid); margin: 0 4px; flex-shrink: 0; }
+    .gc-pinnacle-pill { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .gc-pinnacle-abbr { font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--text-hint); letter-spacing: 0.04em; }
+    .gc-pinnacle-price { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-hint); }
+    .gc-actions { display: flex; align-items: center; gap: 8px; padding: 10px 16px; flex-wrap: wrap; }
+    .gc-bet-btn { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 6px; background: var(--green); color: #fff; border: none; cursor: pointer; text-decoration: none; white-space: nowrap; transition: opacity 0.12s; }
+    .gc-bet-btn:hover { opacity: 0.87; }
+    .gc-sec-btn { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 6px; background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border-mid); cursor: pointer; white-space: nowrap; transition: border-color 0.12s, color 0.12s; }
+    .gc-sec-btn:hover, .gc-sec-btn.added { border-color: var(--green); color: var(--green); }
+    .gc-props-link { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--amber); text-decoration: none; margin-left: auto; white-space: nowrap; }
+    .gc-props-link:hover { text-decoration: underline; }
+    @media (max-width: 500px) {
+      .gc-summary { grid-template-columns: 1fr auto 1fr auto 1fr; }
+      .gc-col-odds { font-size: 18px; }
+      .gc-divider { margin: 0 8px; }
+    }
+    [data-theme="dark"] .gc-book-price.best { color: #4ADE80; }
+    [data-theme="dark"] .gc-book-price.worst { color: #F87171; }
+    [data-theme="dark"] .gc-bet-btn { background: #22C55E; color: #052E16; }
     .sport-tag { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 6px; }
     .tag-nba { background: #E6F1FB; color: #185FA5; }
     .tag-nfl { background: #FAECE7; color: #993C1D; }
@@ -328,6 +374,12 @@
     .picks-unlock-banner span { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: var(--amber-dark); }
     .picks-unlock-btn { background: var(--amber); color: #fff; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 8px; text-decoration: none; white-space: nowrap; transition: opacity 0.15s; }
     .picks-unlock-btn:hover { opacity: 0.88; }
+    /* CASUAL GATE BANNER */
+    .casual-gate-banner { background: var(--surface); border: 1.5px solid var(--green); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .casual-gate-banner-text { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.5; }
+    .casual-gate-banner-text strong { color: var(--green-dark); }
+    .casual-gate-btn { background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+    .casual-gate-btn:hover { opacity: 0.88; }
     .pick-game { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); }
     .pick-rec { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
     .pick-confidence { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px; display: inline-block; }
@@ -749,10 +801,12 @@
     /* ── EV floor label + "why this exists" blurb ─────────────────────── */
     /* EV CONFIDENCE PILLS */
     .ev-conf-pill { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 6px; white-space: nowrap; display: inline-block; }
-    .ev-conf-playable { background: #DCFCE7; color: #15803D; }
-    .ev-conf-lean { background: #F3F4F6; color: #6B7280; }
-    [data-theme="dark"] .ev-conf-playable { background: #052E16; color: #4ADE80; }
-    [data-theme="dark"] .ev-conf-lean { background: #1E2330; color: #94A3B8; }
+    .ev-conf-strong   { background: #DCFCE7; color: #15803D; }
+    .ev-conf-playable { background: #FEF9C3; color: #854D0E; }
+    .ev-conf-small    { background: #F3F4F6; color: #6B7280; }
+    [data-theme="dark"] .ev-conf-strong   { background: #052E16; color: #4ADE80; }
+    [data-theme="dark"] .ev-conf-playable { background: #3D2800; color: #FCD34D; }
+    [data-theme="dark"] .ev-conf-small    { background: #1E2330; color: #94A3B8; }
 
     .ev-floor-label { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); padding: 4px 1.5rem 2px; max-width: 1400px; margin: 0 auto; }
     .ev-why-blurb { font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text-hint); line-height: 1.6; margin-bottom: 1.5rem; padding: 0 2px; }
@@ -775,8 +829,8 @@
         <a href="/stats.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f3'" onmouseout="this.style.background='none'">Stats</a>
         <span class="live-odds-badge"><span class="live-dot"></span>Live odds</span>
         <a href="/parlay.html" id="parlay-nav-count" style="display:none;font-size:12px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:4px 10px;border-radius:20px;text-decoration:none;">🎰 Parlay (<span id="parlay-count">0</span>)</a>
-        <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
-        <a href="/#signup" class="btn-small">Go Pro</a>
+        <a href="/#pricing" class="nav-badge">⚡ Founding rate — $10/mo</a>
+        <a href="/#signup" class="btn-small">Go Sharp</a>
         <button class="hamburger-btn" id="hamburger-btn" onclick="openMobileMenu()" aria-label="Open menu">☰</button>
         <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
       </div>
@@ -795,7 +849,7 @@
       <a href="/record.html" class="mobile-menu-link" onclick="closeMobileMenu()">Track Record</a>
       <a href="/stats.html" class="mobile-menu-link" onclick="closeMobileMenu()">Stats</a>
     </nav>
-    <a href="/#signup" class="mobile-menu-gopro" onclick="closeMobileMenu()">Go Pro →</a>
+    <a href="/#signup" class="mobile-menu-gopro" onclick="closeMobileMenu()">Go Sharp →</a>
   </div>
 
   <!-- COMPACT STICKY EV FILTER BAR -->
@@ -833,7 +887,7 @@
         <div class="stat-value amber">5</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Best edge</div>
+        <div class="stat-label">Top edge</div>
         <div class="stat-value green" id="stat-edge">—</div>
       </div>
       <div class="stat-card">
@@ -943,7 +997,7 @@
           <button id="btn-ev-filter" class="filter-btn" onclick="toggleEvFilter()" style="margin-right:4px;">Show +EV only</button>
           <button id="btn-pinnacle-filter" class="filter-btn" onclick="togglePinnacleFilter()" style="margin-right:6px;">📍 +EV vs Pinnacle only</button>
           <div class="sort-toggle">
-            <button class="sort-toggle-btn active" onclick="setSortMode('edge', this)">Sort: Best edge</button>
+            <button class="sort-toggle-btn active" onclick="setSortMode('edge', this)">Sort: Top edge</button>
             <button class="sort-toggle-btn" onclick="setSortMode('time', this)">Sort: Time</button>
           </div>
           <div class="view-toggle" id="view-toggle">
@@ -964,11 +1018,14 @@
       </div>
     </div>
 
+    <div style="font-family:'Outfit',sans-serif;font-size:12px;color:var(--text-hint);margin-bottom:0.75rem;">Consistently betting +EV lines like these is how sharp bettors profit long-term — even when individual bets lose.</div>
+
     <!-- EV EDGES SECTION — primary above-fold content -->
     <div class="ev-section" id="ev-section">
       <div class="ev-section-header">
         <div>
           <div class="ev-section-title">📍 Today's Edges</div>
+          <div id="ev-scan-line" style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--text-hint);margin-bottom:2px;"></div>
           <div class="ev-section-sub">Bets where the sharpest market offers a better price than fair value.</div>
         </div>
         <span class="ev-section-count" id="ev-section-count"></span>
@@ -1006,8 +1063,8 @@
       </div>
       <div class="picks-scroll" id="sharp-picks-container"></div>
       <div class="picks-unlock-banner" id="sharp-unlock-banner" style="display:none;">
-        <span>🔒 You're missing some of today's best edges. Unlock with Pro — $7/mo → One better line pays for a year.</span>
-        <a href="/#pricing" class="picks-unlock-btn">Unlock Pro →</a>
+        <span>🔒 You're missing some of today's best edges. Unlock with Sharp — $10/mo → One better line covers your subscription.</span>
+        <a href="/#pricing" class="picks-unlock-btn">Unlock Sharp →</a>
       </div>
     </div>
 
@@ -1268,8 +1325,15 @@
       const pt = pinnacleTimestamps[sport] || {};
       // Primary lookup by game.id (avoids team name mismatch), fallback to name key
       const gameKey = `${game.home_team}|${game.away_team}`;
-      const pinnacleGame = (game.id && pk[game.id]) || pk[gameKey];
-      if (!pinnacleGame) return null;
+      const byId = game.id && pk[game.id];
+      if (!byId && game.id && pk[gameKey]) {
+        console.warn(`[GetCapy] Pinnacle id lookup missed, fell back to name key for: ${game.home_team} vs ${game.away_team} — game.id: ${game.id}`);
+      }
+      const pinnacleGame = byId || pk[gameKey];
+      if (!pinnacleGame) {
+        console.warn(`[GetCapy] No Pinnacle match for: ${game.home_team} vs ${game.away_team} — game.id: ${game.id}`);
+        return null;
+      }
       const h2h = pinnacleGame.bookmakers?.[0]?.markets?.find(m => m.key === 'h2h');
       if (!h2h) return null;
       const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
@@ -1325,6 +1389,7 @@
     // Returns { home, away, pinnacleRef, refSource, suspicious } or null.
     // Requires Pinnacle — never falls back to US books. Games without a Pinnacle line show no EV.
     function calcGameEV(game) {
+      if (game._ev !== undefined) return game._ev;
       const ref = getSharpRef(game);
       if (!ref) return null;
 
@@ -1435,7 +1500,7 @@
       const homeEV = Math.min(homeResult.ev, 9.9);
       const awayEV = Math.min(awayResult.ev, 9.9);
 
-      return {
+      const result = {
         home: { ev: homeEV, fairProb: homeResult.fairProb, fairOdds: homeResult.fairOdds, bestOdds: bestHome.price, bestBook: bestHome.bookName },
         away: { ev: awayEV, fairProb: awayResult.fairProb, fairOdds: awayResult.fairOdds, bestOdds: bestAway.price, bestBook: bestAway.bookName },
         pinnacleRef: { homePrice: ref.homePrice, awayPrice: ref.awayPrice },
@@ -1443,6 +1508,8 @@
         suspicious,
         staleTimestamps,
       };
+      game._ev = result;
+      return result;
     }
     // Convert fair probability to American odds
     function fairProbToAm(prob) {
@@ -1586,9 +1653,15 @@
     function updateStats() {
       document.getElementById('stat-games').textContent = allGames.length || '—';
       if (allGames.length) {
-        const edges = allGames.map(calcEdge);
-        const maxEdge = Math.max(...edges);
-        document.getElementById('stat-edge').textContent = maxEdge > 0 ? `+${maxEdge}` : '—';
+        let topEV = null, topTeam = null;
+        for (const game of allGames) {
+          const ev = calcGameEV(game);
+          if (!ev) continue;
+          if (ev.home.ev > (topEV ?? -Infinity)) { topEV = ev.home.ev; topTeam = game.home_team; }
+          if (ev.away.ev > (topEV ?? -Infinity)) { topEV = ev.away.ev; topTeam = game.away_team; }
+        }
+        document.getElementById('stat-edge').textContent =
+          topTeam && topEV > 0 ? `${topTeam} +${topEV.toFixed(1)}%` : '—';
       } else {
         document.getElementById('stat-edge').textContent = '—';
       }
@@ -1678,7 +1751,7 @@
 
       // Verify badge
       const suspiciousHtml = ev.suspicious
-        ? `<span class="ev-verify-badge" title="EV 4-5% — verify odds are live before betting">⚠️ Verify odds</span>`
+        ? `<span class="ev-verify-badge" title="EV 4-5% — verify odds are live before betting">⚠️ Line may be stale</span>`
         : '';
 
       // EV breakdown tooltip (ⓘ)
@@ -1727,7 +1800,7 @@
             <div class="ev-badge-center ${isPositive ? '' : 'ev-neg-bg'}">
               <div class="ev-badge-pct ${isPositive ? '' : 'ev-neg-pct'}">${evStr}</div>
               <div class="ev-badge-lbl ${isPositive ? '' : 'ev-neg-lbl'}">EV ${evInfoBtn}</div>
-              ${bestSide.ev >= 3 ? '<span class="ev-conf-pill ev-conf-playable">Playable</span>' : bestSide.ev >= 1 ? '<span class="ev-conf-pill ev-conf-lean">Lean</span>' : ''}
+              ${bestSide.ev >= 4 ? '<span class="ev-conf-pill ev-conf-strong">Strong Edge</span>' : bestSide.ev >= 2 ? '<span class="ev-conf-pill ev-conf-playable">Playable</span>' : bestSide.ev > 0 ? '<span class="ev-conf-pill ev-conf-small">Small Edge</span>' : ''}
             </div>
             <div class="ev-card-sharp-col">
               <div class="ev-compare-label">Sharp Line</div>
@@ -1767,6 +1840,19 @@
         countEl.textContent = positiveOnly.length > 0
           ? `${positiveOnly.length} edge${positiveOnly.length !== 1 ? 's' : ''} found`
           : '';
+      }
+
+      // Count total h2h lines scanned: sum of bookmakers with an h2h market across all games.
+      // Falls back to games × 8 if bookmaker data isn't present.
+      const totalLines = allGames.reduce((sum, g) => {
+        const count = g.bookmakers?.filter(bk => bk.markets?.some(m => m.key === 'h2h')).length;
+        return sum + (count || 8);
+      }, 0);
+      const scanEl = document.getElementById('ev-scan-line');
+      if (scanEl) {
+        scanEl.innerHTML = positiveOnly.length > 0
+          ? `Scanning <strong>${totalLines.toLocaleString()}+</strong> lines today — only <strong>${positiveOnly.length}</strong> show a real edge vs the sharp market.`
+          : `Scanning <strong>${totalLines.toLocaleString()}+</strong> lines today — no edges vs the sharp market right now. Check back soon.`;
       }
 
       if (!positiveOnly.length) {
@@ -1942,7 +2028,19 @@
         const ev = calcGameEV(g);
         return ev && ev.refSource === 'Pinnacle' && (ev.home.ev > 0 || ev.away.ev > 0);
       });
-      if (sortMode === 'edge') return games.sort((a, b) => calcEdge(b) - calcEdge(a));
+      if (sortMode === 'edge') return games.sort((a, b) => {
+        const evA = calcGameEV(a);
+        const evB = calcGameEV(b);
+        const bestA = evA ? Math.max(evA.home.ev, evA.away.ev) : null;
+        const bestB = evB ? Math.max(evB.home.ev, evB.away.ev) : null;
+        // Three tiers: positive EV (2) > negative EV (1) > no sharp line (0)
+        const tierA = bestA === null ? 0 : bestA > 0 ? 2 : 1;
+        const tierB = bestB === null ? 0 : bestB > 0 ? 2 : 1;
+        if (tierA !== tierB) return tierB - tierA;
+        // Within a tier: EV games sort by best EV descending; no-line games by spread/ML variance
+        if (bestA !== null && bestB !== null) return bestB - bestA;
+        return calcEdge(b) - calcEdge(a);
+      });
       return games.sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
     }
     function toggleEvFilter() {
@@ -2164,14 +2262,32 @@
       }
       const sorted = getSortedGames();
       console.log('[Capy] renderGames — sorted games to render:', sorted.length);
+
+      // ── Casual gate: free users see only top 1 positive-EV game per sport ────
+      const hasAccess = userEmail || previewMode;
+      let gamesForRender = sorted;
+      if (!hasAccess) {
+        const shownSports = {};
+        gamesForRender = sorted.filter(game => {
+          const sport = game.sport_key;
+          if (shownSports[sport]) return false;
+          const ev = calcGameEV(game);
+          if (!ev) return false;
+          if (Math.max(ev.home.ev, ev.away.ev) <= 0) return false;
+          shownSports[sport] = true;
+          return true;
+        });
+        console.log('[Capy] Casual mode: showing', gamesForRender.length, 'of', sorted.length, 'games (top 1 per sport with +EV)');
+      }
+
       try {
         // ── Lazy loading (Priority 3) ───────────────────────────────────────
         // Render first LAZY_BATCH games immediately; defer the rest until the user
         // scrolls near the bottom. All data is already in memory — no extra fetches.
-        lazySortedGames    = sorted;
+        lazySortedGames    = gamesForRender;
         lazyRenderedCount  = 0;
 
-        const initialCount = Math.min(LAZY_BATCH, sorted.length);
+        const initialCount = Math.min(LAZY_BATCH, gamesForRender.length);
         const buildFn = (viewMode === 'grid2' || viewMode === 'grid4') ? buildGridCard : buildGameCard;
 
         if (viewMode === 'grid2') {
@@ -2182,14 +2298,32 @@
           container.className = 'games';
         }
 
-        container.innerHTML = sorted.slice(0, initialCount).map((game, idx) => buildFn(game, idx)).join('');
+        container.innerHTML = gamesForRender.slice(0, initialCount).map((game, idx) => buildFn(game, idx)).join('');
         lazyRenderedCount = initialCount;
 
-        if (sorted.length > initialCount) {
+        // Show upsell banner for casual users after the filtered cards
+        if (!hasAccess && gamesForRender.length > 0) {
+          container.innerHTML += `
+            <div class="casual-gate-banner">
+              <div class="casual-gate-banner-text">
+                🦫 <strong>Go Sharp</strong> — unlock all games, full EV percentages, and complete Pinnacle comparison across every sport.
+              </div>
+              <button class="casual-gate-btn" onclick="showGate()">Go Sharp →</button>
+            </div>`;
+        } else if (!hasAccess && gamesForRender.length === 0) {
+          container.innerHTML = `
+            <div class="empty">
+              <span class="empty-icon">🦫</span>
+              <div class="empty-title">No edges right now</div>
+              <div class="empty-sub">Check back soon — or <span style="color:var(--green);font-weight:600;cursor:pointer;" onclick="showGate()">Go Sharp</span> to see all games.</div>
+            </div>`;
+        }
+
+        if (gamesForRender.length > initialCount) {
           attachLazySentinel(container);
         }
 
-        console.log('[Capy] renderGames — initial render:', initialCount, 'of', sorted.length, 'games');
+        console.log('[Capy] renderGames — initial render:', initialCount, 'of', gamesForRender.length, 'games');
       } catch (err) {
         console.error('[Capy] renderGames — card build threw:', err);
         container.innerHTML = `<div class="error-state"><span class="error-icon">🦫</span><div class="error-title">Render error</div><div class="error-sub">${err.message}</div><button class="retry-btn" onclick="oddsCache={}; loadSport(currentSport)">Retry</button></div>`;
@@ -2230,116 +2364,7 @@
     }
 
     function buildGridCard(game, idx) {
-      const gameUrl = `/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
-      const sport = game.sport_key;
-      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
-      const tagClass = 'tag-' + tagKey;
-      const label = SPORT_LABELS[sport] || sport;
-      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
-      const time = fmtGameDate(game.commence_time);
-      const edgeInfo = calcEdgeInfo(game);
-      const edge = edgeInfo.value;
-      const isFirst = idx === 0;
-      const isTopEdge = idx < 3 && edge > 0;
-
-      const edgeBadge = edge > 0
-        ? edgeInfo.type === 'spread'
-          ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge ' : ''}+${edge} pts</span>`
-          : `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 ' : ''}Best ML</span>`
-        : '';
-
-      const edgeRowText = edgeInfo.type === 'spread'
-        ? `Spread edge: +${edge} pts best vs worst`
-        : edgeInfo.type === 'moneyline'
-          ? `Best ML: ${edgeInfo.bestLine} vs ${edgeInfo.worstLine}`
-          : '';
-
-      const edgeRow = edge > 0
-        ? edgeInfo.type === 'spread'
-          ? `<div class="game-edge-row"><div class="game-edge-big">+${edge} pts</div><div class="game-edge-text">${edgeRowText}</div></div>`
-          : `<div class="game-edge-row"><div class="game-edge-text" style="font-size:12px;">${edgeRowText}</div></div>`
-        : '';
-
-      const books = BOOK_KEYS.map(k =>
-        game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
-        game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)))
-      );
-
-      const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
-      const spreadRows = buildOddsRows(game, books, 'spreads', isFirst);
-
-      const legend = `<div class="odds-legend">
-        <span><span class="legend-dot legend-green"></span>Best</span>
-        <span><span class="legend-dot legend-red"></span>Worst</span>
-      </div>`;
-
-      const mktHeader = (title) =>
-        `<div class="odds-market-header"><span class="odds-market-label">${title}</span></div>`;
-
-      const mobileSnapshot = buildMobileSnapshot(game, books);
-
-      const parlayLegsGrid = loadParlayLegs();
-      const alreadyInParlayGrid = parlayLegsGrid.some(l => l.gameId === game.id);
-      const gridGameEV = calcGameEV(game);
-      const gridEVCtxLabel = getEVContextLabel(gridGameEV);
-      let gridEvBadge = '';
-      let gridVerifyBadge = '';
-      if (gridGameEV) {
-        // Game has Pinnacle line — show EV badge
-        const bestEV = gridGameEV.home.ev >= gridGameEV.away.ev ? gridGameEV.home : gridGameEV.away;
-        const evInfo = classifyEV(bestEV.ev);
-        gridEvBadge = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line beats the true probability.">${evInfo.emoji} ${evInfo.label} 📍</span>`;
-        if (gridGameEV.suspicious) {
-          gridVerifyBadge = `<span class="ev-verify-badge" title="EV 10-15% — verify odds before betting">⚠️ Verify odds</span>`;
-        }
-      } else {
-        // No Pinnacle line — flag clearly so users know EV is unavailable
-        gridEvBadge = `<span style="font-size:10px;color:var(--text-hint);font-family:'Outfit',sans-serif;">No sharp line</span>`;
-      }
-      const gridFreshness = fmtFreshness(game.sport_key);
-      const gridPinnacleRow = buildPinnacleRow(game, gridGameEV);
-      const gridPropsBadge = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(sport)
-        ? `<a href="${gameUrl}" class="props-grid-badge">🎯 Props →</a>` : '';
-      return `
-        <div class="game-card grid-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
-          <div class="game-header">
-            <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${sportEmoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;font-size:12px;">@</span> ${game.home_team}</div>
-            <div class="game-tags">
-              <span class="sport-tag ${tagClass}">${label}</span>
-              <span class="game-time">${time}</span>
-              ${gridFreshness}
-              ${gridEVCtxLabel ? `<span class="ev-badge ${gridEVCtxLabel.cls}">${gridEVCtxLabel.label}</span>` : edgeBadge}
-              ${gridEvBadge}
-              ${gridVerifyBadge}
-              ${gridPropsBadge}
-              <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlayGrid ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlayGrid ? '✓ Added' : '➕ Add to parlay'}</button>
-            </div>
-            ${gridPinnacleRow}
-          </div>
-          ${mobileSnapshot}
-          <div class="mobile-expand-body" id="mob-body-${game.id}">
-            ${edgeRow}
-            ${legend}
-            <div class="odds-table-desktop">
-              <div class="odds-table">
-                <div class="odds-grid odds-grid-6" style="padding:0 14px;">
-                  <div class="odds-col-header"></div>
-                  ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
-                  ${mktHeader('Moneyline')}
-                  ${h2hRows}
-                  <div class="odds-divider"></div>
-                  ${mktHeader('Spread')}
-                  ${spreadRows}
-                </div>
-              </div>
-            </div>
-            <div class="odds-mobile">
-              ${buildMobileOdds(game, books, isFirst)}
-            </div>
-          </div>
-          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show all books ▼</button>
-          <button class="grid-expand-btn" onclick="expandCard('${game.id}')">Show totals + full view →</button>
-        </div>`;
+      return buildGameCard(game, idx);
     }
 
     // ── Capy's Picks ─────────────────────────────────────────────────────
@@ -2425,8 +2450,8 @@
             </div>
             ${isLocked ? `<div class="lock-overlay" onclick="showGate()">
               <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <span class="lock-label" style="font-size:12px;">Pro</span>
-              <span class="lock-hint" style="bottom:6px;">Unlock with Capy Pro</span>
+              <span class="lock-label" style="font-size:12px;">Sharp</span>
+              <span class="lock-hint" style="bottom:6px;">Unlock with Capy Sharp</span>
             </div>` : ''}
           </div>
           ${!isLocked && !isLongshot ? '<div style="font-size:11px;font-weight:600;color:var(--green);margin-top:6px;">⚡ This edge is live now — lines move fast</div>' : ''}
@@ -2479,6 +2504,12 @@
       const longshotCandidates = [];
 
       for (const game of allGames) {
+        // Skip games starting within 60 min or already in progress — lines may be stale.
+        if (!isGameEligibleForPick(game)) {
+          console.log('[Picks] Skipping near-start/past game:', game.away_team, '@', game.home_team, '| commence_time:', game.commence_time);
+          continue;
+        }
+
         // calcGameEV returns null if either Pinnacle side is missing — satisfies
         // "Both Pinnacle sides present" requirement for both buckets.
         const evData = calcGameEV(game);
@@ -2507,8 +2538,8 @@
             sharpCandidates.push({ game, side, teamName, ev: sideEV, qs, bestOdds, bestBook, fairProb, evData });
           }
 
-          // ── Longshot: EV 1–5%, odds > +300 to +1500 ────────────────────
-          if (sideEV >= 1 && sideEV <= 5 && bestOdds > 300 && bestOdds <= 1500) {
+          // ── Longshot: EV 1–5%, odds > +300 to +1200 ────────────────────
+          if (sideEV >= 1 && sideEV <= 5 && bestOdds > 300 && bestOdds <= 1200) {
             longshotCandidates.push({ game, side, teamName, ev: sideEV, qs, bestOdds, bestBook, fairProb, evData });
           }
         }
@@ -2557,11 +2588,13 @@
       }
 
       // ── Save both buckets to Supabase (silent — never affects UI) ───────
-      const allPicksPayload = [
-        ...sharpPicks.map(c    => buildSavePickPayload(c, 'sharp')),
-        ...longshotPicks.map(c => buildSavePickPayload(c, 'longshot')),
-      ].filter(Boolean);
-      saveCappyPicksToSupabase(allPicksPayload);
+      if (sharpPicks.length || longshotPicks.length) {
+        const allPicksPayload = [
+          ...sharpPicks.map(c    => buildSavePickPayload(c, 'sharp')),
+          ...longshotPicks.map(c => buildSavePickPayload(c, 'longshot')),
+        ].filter(Boolean);
+        saveCappyPicksToSupabase(allPicksPayload);
+      }
 
       // ── Parlay suggestions ──────────────────────────────────────────────
       renderParlaysuggestions();
@@ -2570,9 +2603,30 @@
     // ── Shared parlay helpers ─────────────────────────────────────────────────
 
     // Returns all h2h outcomes across all games: { game, side, price, bookKey, bookName }
+    // Returns false if the game starts within 60 minutes of now or has already started.
+    // These games are ineligible for picks and parlay legs — lines may be stale or the
+    // game could already be in progress.
+    function isGameEligibleForPick(game) {
+      if (!game.commence_time) {
+        console.log('[Capy] isGameEligibleForPick — FAIL (no commence_time):', game.away_team, '@', game.home_team);
+        return false;
+      }
+      const startMs  = new Date(game.commence_time).getTime();
+      const nowMs    = Date.now();
+      const minsLeft = (startMs - nowMs) / 60000;
+      const eligible = minsLeft > 60;
+      console.log('[Capy] isGameEligibleForPick —', eligible ? 'PASS' : 'FAIL',
+        `| ${game.away_team} @ ${game.home_team}`,
+        `| starts in ${minsLeft.toFixed(0)} min`,
+        `| commence_time: ${game.commence_time}`
+      );
+      return eligible;
+    }
+
     function getAllH2HOdds() {
       const odds = [];
       allGames.forEach(game => {
+        if (!isGameEligibleForPick(game)) return;
         game.bookmakers?.forEach(bk => {
           const h2h = bk.markets?.find(m => m.key === 'h2h');
           if (!h2h) return;
@@ -2700,6 +2754,7 @@
       };
 
       const candidates = allGames
+        .filter(isGameEligibleForPick)
         .map(getBestEVForGame)
         .filter(Boolean)
         .sort((a, b) => b.ev - a.ev)
@@ -2798,132 +2853,233 @@
       }
     }
 
+    // ── Abbreviated book names for the All Books row ──────────────────────
+    const BOOK_ABBR = ['FD', 'DK', 'MGM', 'BR', 'BOL'];
+
     function buildGameCard(game, idx) {
       const gameUrl = `/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
       const sport = game.sport_key;
       const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
-      const tagClass = 'tag-' + tagKey;
       const label = SPORT_LABELS[sport] || sport;
-      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
       const time = fmtGameDate(game.commence_time);
-      const edgeInfo = calcEdgeInfo(game);
-      const edge = edgeInfo.value;
-      const isTopEdge = idx < 3 && edge > 0;
       const isFirst = idx === 0;
+      const hasAccess = userEmail || previewMode;
+      const casualMode = !hasAccess;
+      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
 
       const books = BOOK_KEYS.map(k =>
-        game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
-        game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)))
+        game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
+        game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0, 5)))
       );
 
-      const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
-      const spreadRows = buildOddsRows(game, books, 'spreads', isFirst);
-      const totalRows = buildOddsRows(game, books, 'totals', isFirst);
-
-      const edgeBadge = edge > 0
-        ? edgeInfo.type === 'spread'
-          ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge ' : ''}+${edge} pts</span>`
-          : `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 ' : ''}Best ML</span>`
-        : '';
-
-      const edgeRowText = edgeInfo.type === 'spread'
-        ? `Spread edge: best line is ${edge} pts better than worst available`
-        : edgeInfo.type === 'moneyline'
-          ? `Best moneyline: ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books — bet the better number`
-          : '';
-
-      const edgeRow = edge > 0
-        ? edgeInfo.type === 'spread'
-          ? `<div class="game-edge-row">
-              <div class="game-edge-big">+${edge} pts</div>
-              <div class="game-edge-text">${edgeRowText}</div>
-             </div>`
-          : `<div class="game-edge-row">
-              <div class="game-edge-text" style="font-size:12px;">${edgeRowText}</div>
-             </div>`
-        : '';
-
-      const mktHeader = (title, tip) =>
-        `<div class="odds-market-header"><span class="odds-market-label">${title}</span><span class="bet-type-help" data-tip="${tip}">?</span></div>`;
-
-      const legend = `<div class="odds-legend">
-        <span><span class="legend-dot legend-green"></span>Best line</span>
-        <span><span class="legend-dot legend-red"></span>Worst line</span>
-        <span><span class="legend-dot legend-neutral"></span>All equal</span>
-      </div>`;
-
-      const mobileSnapshot = buildMobileSnapshot(game, books);
-
+      const gameEV = calcGameEV(game);
       const parlayLegsNow = loadParlayLegs();
       const alreadyInParlay = parlayLegsNow.some(l => l.gameId === game.id);
-      const gameEV = calcGameEV(game);
-      const evTipText = 'EV = Expected Value. +EV means this line beats the true probability — mathematically profitable long term. Capy removes the bookmaker\'s margin to find this.';
-      const evContextLabel = getEVContextLabel(gameEV);
-      let evRowHtml = '';
-      let verifyBadge = '';
-      if (gameEV) {
-        // Game has a Pinnacle line — show full EV breakdown per side
-        const hEV = classifyEV(gameEV.home.ev);
-        const aEV = classifyEV(gameEV.away.ev);
-        const homeShort = game.home_team.split(' ').pop();
-        const awayShort = game.away_team.split(' ').pop();
-        evRowHtml = `<div class="ev-game-row">
-          <span class="ev-game-item"><span class="ev-badge ${hEV.cls}">${hEV.emoji} ${hEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${homeShort} ML at ${gameEV.home.bestBook}</span><span class="ev-tip" data-tip="${evTipText}">?</span></span>
-          <span class="ev-game-item"><span class="ev-badge ${aEV.cls}">${aEV.emoji} ${aEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${awayShort} ML at ${gameEV.away.bestBook}</span></span>
-          <span style="font-size:10px;color:var(--text-hint);font-style:italic;">📍 vs Pinnacle</span>
+
+      // Best EV side
+      const isHomeBetter = gameEV && gameEV.home.ev >= gameEV.away.ev;
+      const bestSide = gameEV ? (isHomeBetter ? gameEV.home : gameEV.away) : null;
+      const bestTeam = gameEV ? (isHomeBetter ? game.home_team : game.away_team) : game.home_team;
+      const bestTeamShort = bestTeam.split(' ').pop();
+
+      // ── SECTION 1: HEADER ──────────────────────────────────────────────
+      let evPill = '';
+      if (!casualMode && bestSide && bestSide.ev > 0) {
+        evPill = bestSide.ev >= 4
+          ? '<span class="ev-conf-pill ev-conf-strong">Strong Edge</span>'
+          : bestSide.ev >= 2
+            ? '<span class="ev-conf-pill ev-conf-playable">Playable</span>'
+            : '<span class="ev-conf-pill ev-conf-small">Small Edge</span>';
+      }
+      const verifyBadge = gameEV?.suspicious
+        ? '<span class="ev-verify-badge" title="EV 4-5% — verify odds are live before betting">⚠️ Line may be stale</span>'
+        : '';
+
+      const headerHtml = `
+        <div class="gc-header">
+          <span class="sport-tag tag-${tagKey}">${label}</span>
+          <div class="gc-matchup" onclick="window.location='${gameUrl}'">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team}</div>
+          <span class="gc-time">${time}</span>
+          ${evPill}${verifyBadge}
         </div>`;
-        if (gameEV.suspicious) {
-          verifyBadge = `<span class="ev-verify-badge" title="EV 10-15% — verify odds before betting">⚠️ Verify odds</span>`;
+
+      // ── SECTION 2: SUMMARY ─────────────────────────────────────────────
+      // Always render three columns. When no Pinnacle data, show best available
+      // price in left col and "No sharp line" label in center — never a standalone block.
+      let summaryHtml;
+      if (gameEV && bestSide) {
+        const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
+        const fairAm = fairProbToAm(bestSide.fairProb);
+        if (casualMode) {
+          summaryHtml = `
+            <div class="gc-summary">
+              <div class="gc-col">
+                <div class="gc-col-label">Best book</div>
+                <div class="gc-col-book">${bestSide.bestBook}</div>
+                <div class="gc-col-odds">${fmtAm(bestSide.bestOdds)}</div>
+                <div class="gc-col-sub">${bestTeamShort} ML</div>
+              </div>
+              <div class="gc-divider"></div>
+              <div class="gc-col gc-col-center" style="cursor:pointer;" onclick="showGate()">
+                <div class="gc-col-label">Edge</div>
+                <div style="font-size:11px;font-weight:700;color:var(--green-dark);background:var(--green-light);padding:5px 8px;border-radius:6px;margin-top:4px;line-height:1.4;text-align:center;">Go Sharp<br>to see edge</div>
+              </div>
+              <div class="gc-divider"></div>
+              <div class="gc-col gc-col-right">
+                <div class="gc-col-label">Sharp line</div>
+                <div class="gc-col-book">Pinnacle</div>
+                <div class="gc-col-odds" style="color:var(--text-hint);font-size:16px;">—</div>
+                <div class="gc-col-sub">Sharp only</div>
+              </div>
+            </div>`;
+        } else {
+          summaryHtml = `
+            <div class="gc-summary">
+              <div class="gc-col">
+                <div class="gc-col-label">Best book</div>
+                <div class="gc-col-book">${bestSide.bestBook}</div>
+                <div class="gc-col-odds">${fmtAm(bestSide.bestOdds)}</div>
+                <div class="gc-col-sub">${bestTeamShort} ML</div>
+              </div>
+              <div class="gc-divider"></div>
+              <div class="gc-col gc-col-center">
+                <div class="gc-col-label">Edge</div>
+                <div class="gc-col-odds ${bestSide.ev > 0 ? 'green' : ''}" ${bestSide.ev <= 0 ? 'style="color:var(--text-hint);"' : ''}>${evStr}</div>
+                <div class="gc-col-sub">vs Pinnacle</div>
+              </div>
+              <div class="gc-divider"></div>
+              <div class="gc-col gc-col-right">
+                <div class="gc-col-label">Sharp line</div>
+                <div class="gc-col-book">Pinnacle</div>
+                <div class="gc-col-odds">${fmtAm(fairAm)}</div>
+                <div class="gc-col-sub">Fair price</div>
+              </div>
+            </div>`;
         }
       } else {
-        // No Pinnacle line available for this game — EV cannot be calculated
-        evRowHtml = `<div style="font-size:10px;color:var(--text-hint);padding:2px 18px 6px;font-family:'Outfit',sans-serif;">No sharp line — EV unavailable</div>`;
+        // No Pinnacle data — still render three-column layout.
+        // Left col: best available ML for home team across tracked books.
+        // Center: subtle "No sharp line" note. Right: dash.
+        let noSharpBook = '—', noSharpPrice = null;
+        books.forEach((book, i) => {
+          if (!book) return;
+          const h2h = book.markets?.find(m => m.key === 'h2h');
+          const homeO = h2h?.outcomes?.find(o => o.name === game.home_team);
+          if (homeO?.price != null && (noSharpPrice === null || homeO.price > noSharpPrice)) {
+            noSharpPrice = homeO.price;
+            noSharpBook = BOOKS[i];
+          }
+        });
+        const noSharpOddsStr = noSharpPrice != null ? fmtAm(noSharpPrice) : '—';
+        const noSharpTeam = game.home_team.split(' ').pop();
+        summaryHtml = `
+          <div class="gc-summary">
+            <div class="gc-col">
+              <div class="gc-col-label">Best book</div>
+              <div class="gc-col-book">${noSharpBook}</div>
+              <div class="gc-col-odds">${noSharpOddsStr}</div>
+              <div class="gc-col-sub">${noSharpTeam} ML</div>
+            </div>
+            <div class="gc-divider"></div>
+            <div class="gc-col gc-col-center">
+              <div class="gc-col-label">Edge</div>
+              <div style="font-size:11px;color:var(--text-hint);margin-top:6px;">No sharp line</div>
+              <div class="gc-col-sub" style="margin-top:2px;">EV unavailable</div>
+            </div>
+            <div class="gc-divider"></div>
+            <div class="gc-col gc-col-right">
+              <div class="gc-col-label">Sharp line</div>
+              <div class="gc-col-book">Pinnacle</div>
+              <div class="gc-col-odds" style="color:var(--text-hint);font-size:16px;">—</div>
+              <div class="gc-col-sub">Not available</div>
+            </div>
+          </div>`;
       }
-      const freshness = fmtFreshness(game.sport_key);
-      const pinnacleRow = buildPinnacleRow(game, gameEV);
+
+      // ── SECTION 3: ALL BOOKS ───────────────────────────────────────────
+      // Show h2h ML price for best EV team across each book
+      const bookPrices = books.map((book, i) => {
+        if (!book) return null;
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        const outcome = h2h?.outcomes?.find(o => o.name === bestTeam);
+        return outcome?.price != null ? { price: outcome.price, idx: i } : null;
+      });
+
+      const validPrices = bookPrices.filter(Boolean).map(b => b.price);
+      const bestPrice  = validPrices.length ? Math.max(...validPrices) : null;
+      const worstPrice = validPrices.length > 1 ? Math.min(...validPrices) : null;
+      const hasVariance = bestPrice !== null && worstPrice !== null && bestPrice !== worstPrice;
+
+      const bookPills = books.map((book, i) => {
+        const isLocked = !previewMode && !userEmail && i > 2;
+        const abbr = BOOK_ABBR[i] || BOOK_SHORT[i];
+        if (isLocked) {
+          return `<div class="gc-book-pill">
+            <span class="gc-book-abbr">${abbr}</span>
+            <span class="gc-book-price pro-locked" onclick="showGate()">Sharp</span>
+          </div>`;
+        }
+        const entry = bookPrices[i];
+        if (!entry) {
+          return `<div class="gc-book-pill">
+            <span class="gc-book-abbr">${abbr}</span>
+            <span class="gc-book-price" style="color:var(--text-hint);">—</span>
+          </div>`;
+        }
+        const cls = hasVariance && entry.price === bestPrice ? 'best'
+          : hasVariance && entry.price === worstPrice ? 'worst' : '';
+        return `<div class="gc-book-pill">
+          <span class="gc-book-abbr">${abbr}</span>
+          <span class="gc-book-price ${cls}">${fmtAm(entry.price)}</span>
+        </div>`;
+      }).join('');
+
+      // Pinnacle reference price at end of row
+      let pinnacleBookPill = '';
+      if (gameEV) {
+        const pinnRef = gameEV.pinnacleRef || {};
+        const pinnPrice = isHomeBetter ? pinnRef.homePrice : pinnRef.awayPrice;
+        if (pinnPrice != null) {
+          pinnacleBookPill = `
+            <div class="gc-book-divider"></div>
+            <div class="gc-pinnacle-pill">
+              <span class="gc-pinnacle-abbr">Pinnacle</span>
+              <span class="gc-pinnacle-price">${fmtAm(pinnPrice)}</span>
+            </div>`;
+        }
+      }
+
+      const allBooksHtml = `
+        <div class="gc-allbooks">
+          <span class="gc-allbooks-label">All books</span>
+          ${bookPills}
+          ${pinnacleBookPill}
+        </div>`;
+
+      // ── SECTION 4: ACTIONS ─────────────────────────────────────────────
+      const isPositiveEV = bestSide && bestSide.ev > 0;
+      const betUrl = bestSide ? (getBookUrl(bestSide.bestBook) || null) : null;
+      // Negative EV: downgrade to muted "View odds" link — no green, no encouragement to bet
+      const betBtn = betUrl
+        ? isPositiveEV
+          ? `<a href="${betUrl}" target="_blank" rel="noopener" class="gc-bet-btn">Bet at ${bestSide.bestBook} →</a>`
+          : `<a href="${betUrl}" target="_blank" rel="noopener" class="gc-sec-btn">View odds</a>`
+        : '';
+      const parlayBtn = `<button id="parlay-btn-${game.id}" class="gc-sec-btn${alreadyInParlay ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlay ? '✓ Added' : '+ Parlay'}</button>`;
+      const shareBtn = `<button class="gc-sec-btn" id="share-btn-${game.id}" onclick="shareEdge('${game.id}', this)">📋 Share</button>`;
+      const actionsHtml = `
+        <div class="gc-actions">
+          ${betBtn}
+          ${parlayBtn}
+          ${shareBtn}
+        </div>`;
+
       return `
         <div class="game-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
-          <div class="game-header">
-            <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${sportEmoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team} <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:6px;">View breakdown →</span></div>
-            <div class="game-tags">
-              <span class="sport-tag ${tagClass}">${label}</span>
-              <span class="game-time">${time}</span>
-              ${freshness}
-              ${evContextLabel ? `<span class="ev-badge ${evContextLabel.cls}">${evContextLabel.label}</span>` : edgeBadge}
-              ${verifyBadge}
-              <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlay ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlay ? '✓ Added' : '➕ Add to parlay'}</button>
-            </div>
-            ${evRowHtml}
-            ${pinnacleRow}
-          </div>
-          ${mobileSnapshot}
-          <div class="mobile-expand-body" id="mob-body-${game.id}">
-            ${edgeRow}
-            ${legend}
-            <div class="odds-table-desktop">
-              <div class="odds-table">
-                <div class="odds-grid odds-grid-6" style="padding:0 16px;">
-                  <div class="odds-col-header"></div>
-                  ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
-                  ${mktHeader('Moneyline','Pick which team wins outright. Negative odds = favorite, positive odds = underdog.')}
-                  ${h2hRows}
-                  <div class="odds-divider"></div>
-                  ${mktHeader('Spread','Bet on the margin of victory. The favorite must win by more than the spread.')}
-                  ${spreadRows}
-                  <div class="odds-divider"></div>
-                  ${mktHeader('Total','Bet on the combined score of both teams going over or under a set number.')}
-                  ${totalRows}
-                </div>
-              </div>
-            </div>
-            <div class="odds-mobile">
-              ${buildMobileOdds(game, books, isFirst)}
-            </div>
-          </div>
-          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show all books ▼</button>
-          ${['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(game.sport_key) ? `
-          <button class="props-preview-btn" id="props-btn-${game.id}" onclick="event.stopPropagation();togglePropsPreview('${game.id}','${game.sport_key}')">🎯 Player Props ▼</button>
-          <div class="props-preview-panel" id="props-panel-${game.id}" style="display:none;"></div>` : ''}
+          ${headerHtml}
+          ${summaryHtml}
+          ${allBooksHtml}
+          ${actionsHtml}
         </div>`;
     }
 
@@ -2998,12 +3154,12 @@
             if (!v) return '';
             const isBest = hasVariance && v.num === best;
             const isWorst = hasVariance && v.num === worst;
-            const isLocked = !previewMode && !isFirst && !userEmail && v.idx > 2;
+            const isLocked = !previewMode && !userEmail && v.idx > 2;
             const betBtn = isBest && !isLocked && market === 'h2h' && BOOK_URLS[BOOK_KEYS[v.idx]]
               ? `<a href="${BOOK_URLS[BOOK_KEYS[v.idx]]}" target="_blank" rel="noopener" class="odds-mobile-bet-btn" onclick="event.stopPropagation()">Bet →</a>`
               : '';
             const valHtml = isLocked
-              ? `<span class="mobile-lock-icon" onclick="showGate()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Pro</span>`
+              ? `<span class="mobile-lock-icon" onclick="showGate()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Sharp</span>`
               : `<span class="odds-mobile-val ${isBest ? 'best' : isWorst ? 'worst' : ''}">${v.val}</span>`;
             return `<div class="odds-mobile-row">
               <div class="odds-mobile-book">${BOOKS[v.idx]}</div>
@@ -3079,7 +3235,7 @@
         const cells = vals.map((v, i) => {
           if (!v) return `<div class="odds-cell odds-cell-empty" title="This book doesn't offer odds on this game">—</div>`;
           const num = numVals[i];
-          const isLocked = !previewMode && !isFirst && !userEmail && i > 2;
+          const isLocked = !previewMode && !userEmail && i > 2;
           let cellClass = '';
           if (hasVariance) {
             if (num === best) cellClass = bestCount === 1 ? 'best' : 'tied-best';
@@ -3100,8 +3256,8 @@
               <span class="locked-content">${v}${betNow}${evCellHtml}</span>
               <div class="lock-overlay">
                 <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                <span class="lock-label">Pro</span>
-                <span class="lock-hint">Unlock with Capy Pro</span>
+                <span class="lock-label">Sharp</span>
+                <span class="lock-hint">Unlock with Capy Sharp</span>
               </div>
             </div>`;
           }

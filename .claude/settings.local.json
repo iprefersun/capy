@@ -23,7 +23,15 @@
       "Bash(mkdir -p backup-v40)",
       "Bash(cp odds.html parlay.html index.html backup-v40/)",
       "Bash(cp -r api backup-v40/)",
-      "Bash(grep -rn \"/parlay[''''\"\"\\\\`]\" \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New\" --include=\"*.html\" --include=\"*.js\")"
+      "Bash(grep -rn \"/parlay[''''\"\"\\\\`]\" \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New\" --include=\"*.html\" --include=\"*.js\")",
+      "Bash(mkdir -p \"C:/Users/mckid/OneDrive/Desktop/Capy New/backup-v25\")",
+      "Bash(cp \"C:/Users/mckid/OneDrive/Desktop/Capy New/odds.html\" \"C:/Users/mckid/OneDrive/Desktop/Capy New/backup-v25/odds.html\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New\\\\backup-v41\")",
+      "Bash(cp \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New\\\\odds.html\" \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New\\\\backup-v41/odds.html\")",
+      "Bash(cp \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New\\\\index.html\" \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New\\\\backup-v41/index.html\")",
+      "Bash(vercel logs:*)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New\\\\backup-v42\")",
+      "Bash(cp \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New/odds.html\" \"C:\\\\Users\\\\mckid\\\\OneDrive\\\\Desktop\\\\Capy New/backup-v42/odds.html\")"
     ]
   }
 }

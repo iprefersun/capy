@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Capy</title>
+  <meta name="description" content="Capy Privacy Policy. How we collect, use, and protect your data." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber: #BA7517;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --green: #1D9E75;
+      --green-light: #EAF3DE;
+      --green-dark: #27500A;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --text-hint: #9b9b9b;
+      --border: rgba(0,0,0,0.1);
+      --border-mid: rgba(0,0,0,0.15);
+      --surface: #fff;
+      --surface-2: #f7f6f3;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    [data-theme="dark"] {
+      --amber: #e8991e;
+      --amber-light: #2d1f08;
+      --amber-dark: #f5c87a;
+      --green: #22c48a;
+      --green-light: #0a2118;
+      --green-dark: #7dd9b4;
+      --text: #eeedf0;
+      --text-muted: #9898a4;
+      --text-hint: #505058;
+      --border: rgba(255,255,255,0.07);
+      --border-mid: rgba(255,255,255,0.13);
+      --surface: #1a1d27;
+      --surface-2: #13151f;
+    }
+    [data-theme="dark"] body { background-color: #0f1117; }
+    [data-theme="dark"] nav { background: #161920; border-color: rgba(255,255,255,0.07); }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background-color: #fafaf8;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 0.5px solid var(--border);
+      background: #fafaf8;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 1rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--amber-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover { background: var(--surface-2); color: var(--text); }
+
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary { background: var(--amber); color: #fff; }
+    .btn-primary:hover { opacity: 0.88; }
+
+    .theme-toggle-btn {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 20px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s;
+      flex-shrink: 0;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .theme-toggle-btn:hover { opacity: 0.8; }
+
+    /* CONTENT */
+    .legal-page {
+      padding: 3rem 0 4rem;
+    }
+
+    .legal-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--amber-dark);
+      background: var(--amber-light);
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .legal-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+
+    .legal-updated {
+      font-size: 13px;
+      color: var(--text-hint);
+      margin-bottom: 2.5rem;
+    }
+
+    .legal-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .legal-section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .legal-section p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 0.75rem;
+    }
+
+    .legal-section p:last-child { margin-bottom: 0; }
+
+    .legal-section ul {
+      margin: 0.5rem 0 0.75rem 1.25rem;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    .legal-section ul li { margin-bottom: 4px; }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 0.75rem 0;
+    }
+
+    .data-table th {
+      text-align: left;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text-hint);
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+
+    .data-table td:first-child {
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 0.5px solid var(--border);
+      padding: 1.5rem 0;
+    }
+
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 12px;
+      color: var(--text-hint);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--text-muted); }
+
+    .footer-copy { font-size: 11px; color: var(--text-hint); }
+  </style>
+  <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="logo-mark">🐾</div>
+        Capy
+      </a>
+      <div class="nav-links">
+        <a href="/odds.html" class="nav-link">Live Odds</a>
+        <a href="/parlay.html" class="nav-link">Parlay</a>
+        <a href="/record.html" class="nav-link">Record</a>
+        <a href="/#pricing" class="nav-link">Pricing</a>
+        <a href="/#signup" class="btn btn-primary">Go Sharp</a>
+        <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="legal-page">
+
+      <div class="legal-eyebrow">Legal</div>
+      <div class="legal-title">Privacy Policy</div>
+      <div class="legal-updated">Last updated: April 8, 2026</div>
+
+      <div class="legal-section">
+        <h2>1. Overview</h2>
+        <p>GetCapy ("we," "us," "the Service") is committed to protecting your privacy. This policy explains what data we collect, how we use it, and your rights over it. We keep this simple — we collect only what we need to run the service, and we never sell your data.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>2. Data We Collect</h2>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>How it's collected</th>
+              <th>Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Email address</td>
+              <td>When you sign up or subscribe</td>
+              <td>Account creation, picks emails, product updates</td>
+            </tr>
+            <tr>
+              <td>Usage data</td>
+              <td>Automatically via analytics</td>
+              <td>Understand how the service is used, fix bugs, improve features</td>
+            </tr>
+            <tr>
+              <td>Payment information</td>
+              <td>Via Stripe at checkout</td>
+              <td>Process subscription payments — we never store card numbers directly</td>
+            </tr>
+            <tr>
+              <td>Cookies &amp; local storage</td>
+              <td>Set by your browser when you visit</td>
+              <td>Remember your preferences (theme, sport filter, view mode)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>We do not collect your name, phone number, or location unless you voluntarily provide them.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>3. How We Use Your Data</h2>
+        <p>We use collected data solely to operate and improve GetCapy:</p>
+        <ul>
+          <li>To create and manage your account</li>
+          <li>To send Capy's Picks emails and product updates you've opted into</li>
+          <li>To process subscription payments via Stripe</li>
+          <li>To understand which features are useful and which need improvement</li>
+          <li>To detect and prevent abuse or fraud</li>
+        </ul>
+        <p>We do not use your data for advertising, sell it to third parties, or share it with data brokers. Ever.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>4. Third-Party Services</h2>
+        <p>GetCapy uses a small number of trusted third-party services to operate. Each has their own privacy practices:</p>
+        <ul>
+          <li><strong>Supabase</strong> — database for storing picks and account data</li>
+          <li><strong>Stripe</strong> — payment processing for subscriptions</li>
+          <li><strong>Resend / Beehiiv</strong> — transactional and picks email delivery</li>
+          <li><strong>Vercel</strong> — hosting and serverless functions</li>
+        </ul>
+        <p>We do not sell or rent your personal information to these or any other third parties. Data shared with these providers is limited to what is necessary to deliver the service.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>5. Cookies and Local Storage</h2>
+        <p>GetCapy uses browser cookies and local storage to remember your preferences. Specifically:</p>
+        <ul>
+          <li><strong>capy_theme</strong> — stores your dark/light mode preference</li>
+          <li><strong>capy_view</strong> — stores your preferred card layout (list, grid)</li>
+          <li><strong>capy_email</strong> — stores your email if you've signed up, to personalize access</li>
+          <li><strong>capy_parlay</strong> — stores your active parlay selections locally</li>
+        </ul>
+        <p>These are functional cookies only — no tracking pixels, no cross-site advertising cookies. You can clear them at any time in your browser settings with no impact on your account.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>6. Data Retention</h2>
+        <p>We retain your email and account data for as long as your account is active. If you cancel your subscription, we retain your data for 90 days in case you wish to reactivate, then delete it from active systems. Anonymized usage data may be retained longer for product analytics.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>7. Your Rights — Data Deletion</h2>
+        <p>You have the right to access, correct, or delete your personal data at any time. To request deletion of your account and associated data:</p>
+        <ul>
+          <li>Email <a href="mailto:support@getcapy.co" style="color:var(--amber);text-decoration:none;">support@getcapy.co</a> with the subject line "Data deletion request"</li>
+          <li>Include the email address associated with your account</li>
+          <li>We will process your request within 14 business days</li>
+        </ul>
+        <p>Deletion removes your email and account data from our active database. Anonymized, non-identifiable data may remain in aggregate analytics.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>8. Email Communications</h2>
+        <p>If you sign up, you may receive:</p>
+        <ul>
+          <li>Daily picks emails (if you opted in)</li>
+          <li>Transactional emails (subscription receipts, account notices)</li>
+          <li>Occasional product updates</li>
+        </ul>
+        <p>Every email includes an unsubscribe link. You can opt out of marketing emails at any time without affecting your account. Transactional emails (like receipts) cannot be disabled while your account is active.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>9. Security</h2>
+        <p>We use industry-standard practices to protect your data — HTTPS on all connections, server-side environment variables for sensitive keys, and row-level security on our database. No method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.</p>
+        <p>We never store payment card details — all payment data is handled directly by Stripe under their PCI-compliant infrastructure.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>10. Children's Privacy</h2>
+        <p>GetCapy is not directed at anyone under 21 years of age. We do not knowingly collect personal information from minors. If you believe a minor has provided us with their data, contact us immediately at <a href="mailto:support@getcapy.co" style="color:var(--amber);text-decoration:none;">support@getcapy.co</a>.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>11. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy as the service evolves. Material changes will be communicated via email or a notice on the site. Continued use after changes constitutes acceptance.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>12. Contact</h2>
+        <p>Privacy questions or data requests: <a href="mailto:support@getcapy.co" style="color:var(--amber);text-decoration:none;">support@getcapy.co</a>.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="/" class="footer-logo"><span>🐾</span> Capy</a>
+      <div class="footer-links">
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+      </div>
+      <div class="footer-copy">© 2026 Capy. Must be 21+ to bet. Please gamble responsibly.</div>
+    </div>
+  </footer>
+
+  <script>
+    const themeIcon = document.getElementById('theme-icon');
+    function applyThemeIcon() {
+      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeIcon) themeIcon.textContent = dark ? '🌙' : '☀️';
+    }
+    function toggleTheme() {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('capy_theme', next);
+      applyThemeIcon();
+    }
+    applyThemeIcon();
+  </script>
+
+</body>
+</html>

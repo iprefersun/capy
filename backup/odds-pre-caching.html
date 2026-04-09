@@ -1,0 +1,3100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Today's Best Betting Edges | Capy</title>
+  <meta name="description" content="Real-time odds comparison across every major sportsbook." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,900;1,900&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --amber: #BA7517;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --green: #16A34A;
+      --green-light: #F0FDF4;
+      --green-dark: #15803D;
+      --green-cell-text: #15803D;
+      --red: #DC2626;
+      --red-light: #FEF2F2;
+      --red-cell-text: #DC2626;
+      --text: #0F1117;
+      --text-muted: #6B7280;
+      --text-hint: #9CA3AF;
+      --border: #E8EBF0;
+      --border-mid: #D1D5DB;
+      --surface: #FFFFFF;
+      --surface-2: #F7F8FA;
+      --accent: #2563EB;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    body { font-family: 'Outfit', sans-serif; color: var(--text); background: #F7F8FA; line-height: 1.5; }
+
+    /* NAV */
+    nav { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1400px; margin: 0 auto; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
+    .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-badge { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
+    .btn-small { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 8px; border: none; background: var(--green); color: #fff; cursor: pointer; text-decoration: none; transition: opacity 0.15s; }
+    .btn-small:hover { opacity: 0.88; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; margin-right: 4px; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    /* PAGE LOAD ANIMATIONS */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .stats-row { animation: fadeInUp 0.3s ease both; }
+    .picks-section { animation: fadeInUp 0.3s ease 0.1s both; }
+    .game-card { animation: fadeInUp 0.3s ease both; }
+
+    /* LAYOUT */
+    .main { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0; margin-bottom: 1.25rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04); overflow: hidden; }
+    .stat-card { background: transparent; border-radius: 0; padding: 16px 20px; border: none; border-right: 1px solid var(--border); }
+    .stat-card:last-child { border-right: none; }
+    .stat-label { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); margin-bottom: 6px; }
+    .stat-value { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 600; color: var(--text); line-height: 1; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.amber { color: var(--amber); }
+
+    /* FILTER BAR */
+    .filter-wrap { margin-bottom: 1.25rem; }
+    .filter-bar { display: flex; align-items: flex-start; gap: 0; overflow-x: auto; padding-bottom: 6px; }
+    .filter-bar::-webkit-scrollbar { height: 3px; }
+    .filter-bar::-webkit-scrollbar-track { background: transparent; }
+    .filter-bar::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+    @media (max-width: 640px) {
+      .filter-bar { scrollbar-width: none; }
+      .filter-bar::-webkit-scrollbar { display: none; }
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; padding-right: 14px; border-right: 1px solid var(--border); margin-right: 14px; flex-shrink: 0; }
+    .filter-group:last-child { border-right: none; padding-right: 0; margin-right: 0; }
+    .filter-group-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); white-space: nowrap; }
+    .filter-group-btns { display: flex; gap: 5px; }
+    .filter-btn { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .filter-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+    .filter-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .filter-meta { display: flex; align-items: center; gap: 6px; font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-hint); margin-top: 8px; }
+
+    /* GAME CARDS */
+    .games { display: flex; flex-direction: column; gap: 10px; }
+    .game-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04); }
+    .game-card:hover { border-color: var(--green); box-shadow: 0 4px 20px rgba(0,0,0,0.10); transform: translateY(-1px); }
+    .game-card.best-value { border-color: var(--green); border-width: 1.5px; }
+
+    /* GRID VIEW */
+    /* 2-column grid */
+    .games.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (max-width: 700px) { .games.grid-2 { grid-template-columns: 1fr; } }
+    /* 4-column grid */
+    .games.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    @media (max-width: 1400px) { .games.grid-4 { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 1000px) { .games.grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 700px)  { .games.grid-4 { grid-template-columns: 1fr; } }
+    /* 2-col card: larger odds text, more padding, full book names already in BOOK_SHORT */
+    .games.grid-2 .game-card.grid-card .odds-cell { font-size: 14px; padding: 10px 14px 10px 4px; }
+    .games.grid-2 .game-card.grid-card .game-header { padding: 12px 18px; }
+    .games.grid-2 .game-card.grid-card .odds-grid-6 { padding: 0 18px !important; }
+    .game-card.grid-card { cursor: default; display: flex; flex-direction: column; }
+    .game-card.grid-card .game-header { padding: 10px 14px; }
+    .game-card.grid-card .game-teams { font-size: 13px; }
+    .game-card.grid-card .game-edge-row { padding: 6px 14px; min-height: 36px; }
+    .game-card.grid-card .game-edge-row .game-edge-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .game-card.grid-card .game-edge-big { font-size: 17px; }
+    .game-card.grid-card .odds-legend { padding: 4px 14px 2px; }
+    .grid-expand-btn { display: block; width: 100%; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--green-dark); background: var(--green-light); border: none; border-top: 1px solid var(--border); padding: 8px 14px; text-align: center; cursor: pointer; transition: background 0.15s; margin-top: auto; }
+    .grid-expand-btn:hover { background: var(--green); color: #fff; }
+    .add-parlay-btn { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; color: var(--green-dark); background: var(--green-light); border: none; border-radius: 20px; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: background 0.12s; }
+    .add-parlay-btn:hover { background: var(--green); color: #fff; }
+    .add-parlay-btn.added { background: var(--green); color: #fff; }
+    /* PARLAY TOAST */
+    /* EV BADGES */
+    .ev-badge { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; white-space: nowrap; position: relative; }
+    .ev-strong { background: #DCFCE7; color: #15803D; }
+    .ev-pos    { background: #DCFCE7; color: #15803D; }
+    .ev-neutral{ background: #F3F4F6; color: #6B7280; }
+    .ev-neg    { background: transparent; color: var(--text-hint); }
+    .ev-verify-badge { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: var(--amber-light); color: var(--amber-dark); white-space: nowrap; }
+    [data-theme="dark"] .ev-verify-badge { background: #3D2800; color: #FCD34D; }
+    /* ODDS FRESHNESS */
+    .freshness-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 500; color: var(--text-hint); }
+    .freshness-label.stale { color: var(--amber); font-weight: 700; }
+    .ev-cell   { font-size: 9px; line-height: 1; margin-top: 3px; border-radius: 3px; padding: 1px 3px; display: inline-block; }
+    .ev-game-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .ev-game-item { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+    /* EV tooltip */
+    .ev-tip { display: inline-flex; align-items: center; justify-content: center; width: 13px; height: 13px; background: var(--border-mid); color: var(--text-hint); border-radius: 50%; font-size: 9px; font-weight: 700; cursor: help; position: relative; flex-shrink: 0; }
+    .ev-tip::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1a1d27; color: #eeedf0; font-size: 11px; font-weight: 400; padding: 7px 10px; border-radius: 7px; white-space: normal; width: 220px; line-height: 1.4; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 500; }
+    .ev-tip:hover::after { opacity: 1; }
+    /* +EV filter active state */
+    .filter-btn.ev-active { background: var(--green); color: #fff; border-color: var(--green); }
+    .filter-btn.ev-active:hover { background: var(--green); opacity: 0.88; }
+    /* picks EV number */
+    .pick-ev-num { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 600; line-height: 1; }
+    .pick-ev-label { font-family: 'Outfit', sans-serif; font-size: 10px; color: var(--text-hint); margin-top: 2px; }
+    /* EV disclaimer */
+    .ev-disclaimer { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-hint); font-style: italic; margin-top: 0.75rem; line-height: 1.5; }
+
+    .parlay-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f1117; color: #eeedf0; font-size: 13px; font-weight: 600; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; gap: 10px; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
+    .parlay-toast.show { opacity: 1; pointer-events: auto; }
+    .parlay-toast a { color: #22c48a; text-decoration: none; font-weight: 700; }
+    .parlay-toast a:hover { text-decoration: underline; }
+
+    .game-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px; }
+    .game-teams { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); }
+    .game-time { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 400; color: var(--text-muted); }
+    .game-tags { display: flex; align-items: center; gap: 6px; }
+    .sport-tag { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 6px; }
+    .tag-nba { background: #E6F1FB; color: #185FA5; }
+    .tag-nfl { background: #FAECE7; color: #993C1D; }
+    .tag-mlb { background: #EAF3DE; color: #3B6D11; }
+    .tag-nhl { background: #EEEDFE; color: #534AB7; }
+    .tag-other { background: var(--amber-light); color: var(--amber-dark); }
+    .value-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--green-light); color: var(--green-dark); }
+
+    /* ODDS TABLE */
+    .odds-table { width: 100%; padding: 0 0 14px; overflow-x: auto; }
+    .odds-grid { display: grid; gap: 4px; min-width: 480px; }
+    .odds-grid-6 { grid-template-columns: 140px repeat(5, 1fr); }
+    .odds-col-header { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); padding: 6px 4px 2px; text-align: center; }
+    .odds-row-label { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 400; color: var(--text); display: flex; align-items: center; padding: 9px 4px; }
+    .odds-cell { background: var(--surface-2); border-radius: 6px; padding: 9px 12px 9px 4px; text-align: right; font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.12s; border: 1px solid transparent; }
+    .odds-cell:hover { border-color: var(--accent); }
+    .odds-cell.best { background: var(--green-light); color: var(--green-cell-text); border-left: 3px solid var(--green); font-size: 15px; font-weight: 500; }
+    .odds-cell.tied-best { background: var(--green-light); color: var(--green-cell-text); border-color: transparent; font-size: 15px; font-weight: 500; }
+    .odds-cell.worst { background: var(--red-light); color: var(--red-cell-text); font-size: 15px; font-weight: 500; }
+    .odds-cell.row-alt:not(.best):not(.worst):not(.tied-best):not(.odds-cell-empty) { background: #FAFAFA; }
+    .odds-row-label.row-alt { background: rgba(0,0,0,0.015); border-radius: 4px; }
+    .odds-cell.locked { position: relative; overflow: hidden; cursor: pointer; }
+    .odds-cell.locked > .locked-content { filter: blur(4px); user-select: none; pointer-events: none; display: block; }
+
+    /* LOCK OVERLAY — shared by desktop cells, mobile rows, and pick cards */
+    .lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; z-index: 2; }
+    .lock-icon { color: var(--text-hint); flex-shrink: 0; }
+    .lock-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; font-variant: small-caps; color: #16A34A; letter-spacing: 0.05em; line-height: 1; }
+    .lock-hint { font-family: 'Outfit', sans-serif; font-size: 9px; color: var(--text-hint); opacity: 0; transition: opacity 0.15s; white-space: nowrap; position: absolute; bottom: 3px; left: 0; right: 0; text-align: center; }
+    .odds-cell.locked:hover .lock-hint { opacity: 1; }
+    /* Pick card lock wrapper */
+    .pick-locked-wrap { position: relative; overflow: hidden; }
+    .pick-locked-wrap .locked-content { filter: blur(4px); user-select: none; pointer-events: none; opacity: 0.6; }
+    .pick-locked-wrap .lock-overlay { background: rgba(255,255,255,0.04); border-radius: 8px; }
+    .pick-locked-wrap .lock-icon { color: #9CA3AF; }
+    .pick-locked-wrap:hover .lock-hint { opacity: 1; }
+    /* Mobile lock indicator */
+    .mobile-lock-icon { display: inline-flex; align-items: center; gap: 4px; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; color: #16A34A; cursor: pointer; vertical-align: middle; }
+    /* PREVIEW MODE BANNER */
+    #preview-banner { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #FEF08A; color: #713F12; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; text-align: center; padding: 8px 16px; border-bottom: 1px solid #FDE047; letter-spacing: 0.01em; }
+    .odds-cell-empty { background: var(--surface-2); color: var(--text-hint); font-size: 13px; cursor: default; text-align: center; padding: 9px 4px; font-style: italic; }
+    .odds-divider { grid-column: 1 / -1; height: 1px; background: var(--border); margin: 2px 0; }
+    .odds-market-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 5px; padding: 10px 4px 3px; }
+    .odds-market-label { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); }
+
+    /* BOOK HEADERS */
+    .book-header { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); text-align: center; padding: 6px 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* BET TYPE TOOLTIP */
+    .bet-type-help { width: 14px; height: 14px; border-radius: 50%; background: var(--surface-2); border: 0.5px solid var(--border-mid); font-size: 9px; font-weight: 700; color: var(--text-hint); display: inline-flex; align-items: center; justify-content: center; cursor: default; position: relative; flex-shrink: 0; }
+    .bet-type-help:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: -8px; background: #1a1a1a; color: #fff; font-size: 11px; font-weight: 400; padding: 7px 11px; border-radius: 6px; width: 220px; z-index: 30; line-height: 1.5; font-family: 'Outfit', sans-serif; white-space: normal; pointer-events: none; }
+    .bet-type-help:hover::before { content: ''; position: absolute; bottom: calc(100% + 2px); left: 2px; border: 5px solid transparent; border-top-color: #1a1a1a; pointer-events: none; }
+
+    /* ODDS LEGEND */
+    .odds-legend { display: flex; gap: 14px; padding: 6px 18px 4px; font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); flex-wrap: wrap; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 3px; vertical-align: middle; }
+    .legend-green { background: var(--green); }
+    .legend-red { background: var(--red-light); border: 1px solid #FECACA; }
+    .legend-neutral { background: var(--surface-2); border: 1px solid var(--border); }
+
+    /* MOBILE ODDS CARD LAYOUT */
+    .odds-mobile { display: none; padding: 0 16px 8px; }
+    .odds-mobile-section { margin-bottom: 4px; }
+    .odds-mobile-market { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); padding: 10px 0 6px; display: flex; align-items: center; gap: 5px; border-top: 0.5px solid var(--border); }
+    .odds-mobile-market:first-child { border-top: none; }
+    .odds-mobile-side-label { font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 4px 0 2px; }
+    .odds-mobile-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 0.5px solid var(--border); gap: 8px; }
+    .odds-mobile-row:last-child { border-bottom: none; }
+    .odds-mobile-book { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); min-width: 96px; }
+    .odds-mobile-val { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: var(--text); }
+    .odds-mobile-val.best { color: var(--green); font-weight: 500; }
+    .odds-mobile-val.worst { color: var(--red); }
+    .odds-mobile-bet-btn { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; background: var(--green); color: #fff; text-decoration: none; white-space: nowrap; display: inline-block; }
+    @media (max-width: 640px) {
+      .odds-table-desktop { display: none; }
+      .odds-mobile { display: block; }
+      .odds-legend { padding: 6px 0 4px; }
+    }
+
+    /* MOBILE CARD COLLAPSE */
+    .mobile-snapshot { display: none; }
+    .mobile-toggle-btn { display: none; }
+
+    @media (max-width: 700px) {
+      /* Collapsed body wrapper */
+      .mobile-expand-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+      .mobile-expand-body.open { max-height: 3000px; }
+      /* Odds snapshot strip */
+      .mobile-snapshot { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 10px; gap: 8px; border-top: 0.5px solid var(--border); }
+      .mobile-snapshot-odds { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
+      .mobile-snapshot-team { font-size: 13px; font-weight: 600; color: var(--text); }
+      .mobile-snapshot-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--green); }
+      .mobile-snapshot-sep { color: var(--border-mid); font-size: 13px; font-weight: 400; padding: 0 2px; }
+      .mobile-snapshot-right { text-align: right; flex-shrink: 0; }
+      .mobile-snapshot-book { font-size: 11px; color: var(--text-hint); white-space: nowrap; }
+      /* Toggle button */
+      .mobile-toggle-btn { display: block; width: 100%; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--green-dark); background: var(--green-light); border: none; border-top: 1px solid var(--border); padding: 10px; text-align: center; cursor: pointer; transition: background 0.15s; }
+    }
+
+    /* LOADING */
+    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; gap: 12px; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--amber-light); border-top-color: var(--amber); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 13px; color: var(--text-muted); }
+
+    /* EMPTY STATE */
+    .empty { text-align: center; padding: 4rem 2rem; }
+    .empty-icon { font-size: 48px; margin-bottom: 1rem; display: block; }
+    .empty-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .empty-sub { font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-muted); }
+
+    /* SOFT GATE MODAL */
+    .gate-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+    .gate-overlay.show { display: flex; }
+    .gate-modal { background: var(--surface); border-radius: 16px; padding: 2rem; max-width: 400px; width: 100%; text-align: center; }
+    .gate-capy { font-size: 48px; display: block; margin-bottom: 12px; }
+    .gate-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+    .gate-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+    .gate-input { width: 100%; font-family: 'Outfit', sans-serif; font-size: 14px; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--border-mid); background: var(--surface); color: var(--text); outline: none; margin-bottom: 10px; }
+    .gate-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-light); }
+    .gate-btn { width: 100%; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; padding: 12px; border-radius: 8px; border: none; background: var(--green); color: #fff; cursor: pointer; margin-bottom: 10px; transition: opacity 0.15s; }
+    .gate-btn:hover { opacity: 0.88; }
+    .gate-skip { font-size: 12px; color: var(--text-hint); cursor: pointer; text-decoration: underline; }
+    .gate-skip:hover { color: var(--text-muted); }
+    .gate-success { display: none; }
+    .gate-success-text { font-size: 14px; color: var(--green); font-weight: 600; margin-bottom: 12px; }
+
+    /* AFFILIATE BAR */
+    .affiliate-bar { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 14px 18px; margin-top: 1rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .aff-text { font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-muted); flex: 1; min-width: 180px; }
+    .aff-text strong { color: var(--text); font-weight: 600; }
+    .aff-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .aff-btn { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-muted); cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .aff-btn:hover { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+
+    /* FOOTER */
+    .dash-footer { font-family: 'Outfit', sans-serif; text-align: center; padding: 1.5rem; font-size: 12px; color: var(--text-hint); margin-top: 1rem; }
+
+    /* SKELETON */
+    .skeleton-card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
+    .skeleton-header { padding: 12px 16px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .skeleton-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .skeleton-line { background: linear-gradient(90deg, #ededeb 25%, #f5f4f1 50%, #ededeb 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 4px; height: 14px; }
+    .skeleton-line.short { width: 40%; }
+    .skeleton-line.medium { width: 65%; }
+    .skeleton-line.full { width: 100%; }
+    .skeleton-line.tall { height: 22px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* METHODOLOGY BANNER — compact pill */
+    .method-banner { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px 14px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+    .method-banner-icon { font-size: 14px; flex-shrink: 0; line-height: 1; }
+    .method-banner-text { font-family: 'Outfit', sans-serif; font-size: 13px; color: #64748B; line-height: 1.4; }
+    .method-banner-text strong { color: #475569; font-size: 13px; display: inline; font-weight: 600; }
+
+    /* CAPY'S PICKS */
+    .picks-section { margin-bottom: 1.5rem; }
+    .picks-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
+    .picks-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 600; color: var(--text); }
+    .picks-sub { font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-muted); }
+    .picks-scroll { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pick-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.25rem; display: flex; flex-direction: column; gap: 8px; position: relative; transition: box-shadow 0.15s, transform 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04); }
+    .pick-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-2px); }
+    /* Locked cards: game header always visible, only the rec/body blurred */
+    .pick-card.locked-card { border-color: var(--border); }
+    .pick-game-header { /* always clear */ }
+    .pick-body-blurred { filter: blur(4px); user-select: none; pointer-events: none; opacity: 0.6; }
+    .pick-lock-badge { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; color: var(--text-hint); background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; display: inline-block; align-self: flex-start; }
+    /* Single unlock banner below picks grid */
+    .picks-unlock-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--amber-light); border: 1px solid var(--amber); border-radius: var(--radius-sm); padding: 12px 18px; margin-top: 10px; flex-wrap: wrap; }
+    .picks-unlock-banner span { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: var(--amber-dark); }
+    .picks-unlock-btn { background: var(--amber); color: #fff; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 8px; text-decoration: none; white-space: nowrap; transition: opacity 0.15s; }
+    .picks-unlock-btn:hover { opacity: 0.88; }
+    .pick-game { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); }
+    .pick-rec { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .pick-confidence { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px; display: inline-block; }
+    .pick-conf-strong { background: #DCFCE7; color: #15803D; }
+    .pick-conf-good { background: #DCFCE7; color: #15803D; }
+    .pick-conf-look { background: var(--amber-light); color: var(--amber-dark); }
+    /* "vs Pinnacle" context badge */
+    .vs-pinnacle-badge { display: inline-block; background: #EFF6FF; color: #2563EB; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+    .pick-edge-num { font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 600; color: var(--green); line-height: 1; }
+    .pick-edge-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); }
+    .pick-reason { font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-muted); line-height: 1.55; }
+    .pick-bet-btn { display: block; background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; padding: 10px 16px; border-radius: 8px; text-decoration: none; text-align: center; transition: opacity 0.15s; margin-top: 8px; }
+    .pick-bet-btn:hover { opacity: 0.88; }
+    /* Long Shot card: amber left-border accent to visually distinguish from sharp picks */
+    .longshot-card { border-left: 3px solid var(--amber); }
+    .picks-section-divider { display: flex; align-items: center; gap: 10px; margin: 1.5rem 0 1rem; }
+    .picks-section-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .picks-section-divider-label { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); white-space: nowrap; }
+    .longshot-section-note { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--amber-dark); background: var(--amber-light); border: 1px solid var(--amber); border-radius: 6px; padding: 7px 12px; margin-top: 10px; }
+
+    /* PARLAY SUGGESTIONS SECTION */
+    .parlay-suggestions-section { margin-bottom: 1.5rem; }
+    .parlay-suggestions-header { margin-bottom: 1rem; }
+    .parlay-suggestions-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+    .parlay-suggestions-sub { font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+    /* Desktop: 3-column grid, equal height */
+    .parlay-suggestions-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; align-items: stretch; }
+
+    /* Mobile: horizontal swipe carousel */
+    @media (max-width: 768px) {
+      .parlay-suggestions-row { display: flex; flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
+      .parlay-suggestions-row::-webkit-scrollbar { height: 3px; }
+      .parlay-suggestions-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+      .parlay-card { min-width: 78vw; scroll-snap-align: start; flex-shrink: 0; }
+    }
+
+    /* Base parlay card */
+    .parlay-card { border-radius: var(--radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 8px; }
+    .parlay-card-title { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; }
+    .parlay-card-sub { font-family: 'Outfit', sans-serif; font-size: 12px; line-height: 1.45; }
+    .parlay-payout-num { font-family: 'DM Mono', monospace; font-size: 30px; font-weight: 700; line-height: 1; }
+    .parlay-payout-label { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
+    .parlay-legs { display: flex; flex-direction: column; gap: 5px; margin: 4px 0; flex: 1; }
+    .parlay-leg { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; line-height: 1.4; }
+    .parlay-badge { display: inline-block; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .parlay-add-btn { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 9px 14px; border-radius: 8px; border: none; cursor: pointer; text-align: center; transition: opacity 0.15s; margin-top: auto; }
+    .parlay-add-btn:hover { opacity: 0.85; }
+    .parlay-ev-row { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600; margin-top: 2px; }
+
+    /* Safe parlay — blue */
+    .parlay-card--safe { background: #EFF6FF; border: 1.5px solid #93C5FD; }
+    [data-theme="dark"] .parlay-card--safe { background: #0D1B2E; border-color: #1E3A5F; }
+    .parlay-card--safe .parlay-card-title { color: #1E40AF; }
+    [data-theme="dark"] .parlay-card--safe .parlay-card-title { color: #60A5FA; }
+    .parlay-card--safe .parlay-card-sub { color: #3B82F6; }
+    [data-theme="dark"] .parlay-card--safe .parlay-card-sub { color: #93C5FD; }
+    .parlay-card--safe .parlay-payout-num { color: #1E40AF; }
+    [data-theme="dark"] .parlay-card--safe .parlay-payout-num { color: #60A5FA; }
+    .parlay-card--safe .parlay-payout-label { color: #3B82F6; }
+    [data-theme="dark"] .parlay-card--safe .parlay-payout-label { color: #93C5FD; }
+    .parlay-card--safe .parlay-leg { color: #1E40AF; }
+    [data-theme="dark"] .parlay-card--safe .parlay-leg { color: #93C5FD; }
+    .parlay-badge--safe { background: #DBEAFE; color: #1D4ED8; }
+    [data-theme="dark"] .parlay-badge--safe { background: #1E3A5F; color: #60A5FA; }
+    .parlay-add-btn--safe { background: #2563EB; color: #fff; }
+
+    /* Value parlay — green */
+    .parlay-card--value { background: var(--green-light); border: 1.5px solid var(--green); }
+    [data-theme="dark"] .parlay-card--value { background: #052E16; border-color: #166534; }
+    .parlay-card--value .parlay-card-title { color: var(--green-dark); }
+    [data-theme="dark"] .parlay-card--value .parlay-card-title { color: #4ADE80; }
+    .parlay-card--value .parlay-card-sub { color: var(--green); }
+    [data-theme="dark"] .parlay-card--value .parlay-card-sub { color: #86EFAC; }
+    .parlay-card--value .parlay-payout-num { color: var(--green-dark); }
+    [data-theme="dark"] .parlay-card--value .parlay-payout-num { color: #4ADE80; }
+    .parlay-card--value .parlay-payout-label { color: var(--green); }
+    [data-theme="dark"] .parlay-card--value .parlay-payout-label { color: #86EFAC; }
+    .parlay-card--value .parlay-leg { color: var(--green-dark); }
+    [data-theme="dark"] .parlay-card--value .parlay-leg { color: #86EFAC; }
+    .parlay-badge--value { background: #DCFCE7; color: #15803D; }
+    [data-theme="dark"] .parlay-badge--value { background: #052E16; color: #4ADE80; }
+    .parlay-add-btn--value { background: var(--green); color: #fff; }
+    .parlay-ev-row--value { color: var(--green-dark); }
+    [data-theme="dark"] .parlay-ev-row--value { color: #4ADE80; }
+
+    /* High upside parlay — amber (replaces .longshot-card) */
+    .parlay-card--upside { background: var(--amber-light); border: 1.5px solid var(--amber); }
+    .parlay-card--upside .parlay-card-title { color: var(--amber-dark); }
+    .parlay-card--upside .parlay-card-sub { color: var(--amber); }
+    .parlay-card--upside .parlay-payout-num { color: var(--amber-dark); }
+    .parlay-card--upside .parlay-payout-label { color: var(--amber); }
+    .parlay-card--upside .parlay-leg { color: var(--amber-dark); }
+    .parlay-badge--upside { background: #f5c26b; color: var(--amber-dark); }
+    .parlay-add-btn--upside { background: var(--amber); color: #fff; }
+
+    /* Legacy longshot styles kept for backwards compat */
+    .longshot-section .picks-title { color: var(--amber-dark); }
+    .longshot-payout-num { font-family: 'DM Mono', monospace; font-size: 30px; font-weight: 700; color: var(--amber-dark); line-height: 1; }
+    .longshot-payout-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--amber); }
+    .longshot-neg-ev { display: inline-block; font-size: 11px; font-weight: 700; background: #f5c26b; color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; }
+    .longshot-disclaimer { font-size: 12px; color: var(--amber-dark); line-height: 1.55; margin-top: 4px; }
+    .longshot-legs { display: flex; flex-direction: column; gap: 6px; margin: 4px 0; }
+    .longshot-leg { font-size: 13px; font-weight: 600; color: var(--amber-dark); }
+
+    @media (max-width: 700px) {
+      .picks-scroll { grid-template-columns: none; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+      .picks-scroll::-webkit-scrollbar { height: 3px; }
+      .pick-card { min-width: 82vw; scroll-snap-align: start; }
+    }
+
+    /* EDGE BADGE */
+    .edge-badge { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 6px; background: #DCFCE7; color: #15803D; }
+    .top-edge-badge { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: var(--green); color: #fff; animation: edge-scale 2s ease-in-out infinite; }
+    @keyframes edge-scale { 0%,100% { transform: scale(1.0); } 50% { transform: scale(1.03); } }
+
+    /* BET NOW LINK */
+    .bet-now-link { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; color: var(--green-dark); background: var(--green-light); padding: 2px 8px; border-radius: 6px; text-decoration: none; white-space: nowrap; transition: background 0.15s; }
+    .bet-now-link:hover { background: var(--green); color: #fff; }
+
+    /* LIVE COUNTER */
+    .live-counter { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-hint); }
+
+    /* SORT TOGGLE — segmented control */
+    .sort-toggle { display: flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+    .sort-toggle-btn { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .sort-toggle-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .sort-toggle-btn:hover:not(.active) { color: var(--text); }
+
+    /* VIEW TOGGLE — segmented control */
+    .view-toggle { display: flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+    .view-toggle-btn { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 4px; }
+    .view-toggle-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .view-toggle-btn:hover:not(.active) { color: var(--text); }
+
+    /* ERROR STATE */
+    .error-state { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--red-light); padding: 2rem; text-align: center; }
+    .error-icon { font-size: 36px; display: block; margin-bottom: 8px; }
+    .error-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .error-sub { font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-muted); margin-bottom: 1rem; }
+    .retry-btn { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 20px; border-radius: 8px; border: none; background: var(--green); color: #fff; cursor: pointer; transition: opacity 0.15s; }
+    .retry-btn:hover { opacity: 0.88; }
+
+    /* EDGE SCORE PROMINENT ON CARD */
+    .game-edge-row { display: flex; align-items: center; gap: 10px; padding: 8px 18px; background: linear-gradient(90deg, rgba(22,163,74,0.06), transparent); border-top: 1px solid rgba(22,163,74,0.12); }
+    .game-edge-big { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 600; color: var(--green); line-height: 1; }
+    .game-edge-text { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--green-dark); font-weight: 600; }
+    .game-edge-row.no-edge { display: none; }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .nav-inner { padding: 0.75rem 1rem; }
+      .main { padding: 1rem; overflow-x: hidden; }
+      .odds-grid { min-width: 400px; }
+      .game-card { border-radius: var(--radius-sm); }
+      .game-card:hover { transform: none; }
+      .pick-bet-btn { width: 100%; }
+      .ev-bet-btn { width: 100%; text-align: center; }
+      .ev-share-btn { width: 100%; text-align: center; }
+      .ev-card-actions { flex-direction: column; }
+      .hero-edge-actions { flex-direction: column; }
+    }
+
+    /* ── PINNACLE ROW ────────────────────────────────────── */
+    .pinnacle-row { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--text-hint); padding: 3px 16px 6px; line-height: 1.4; }
+    /* ── CLV TEASER ──────────────────────────────────────── */
+    .clv-teaser { background: var(--surface-2); border: 1.5px dashed var(--border-mid); border-radius: var(--radius-sm); padding: 14px 18px; margin-top: 1rem; display: flex; align-items: center; gap: 12px; opacity: 0.8; }
+    .clv-teaser-icon { font-size: 22px; flex-shrink: 0; }
+    .clv-teaser-body { flex: 1; }
+    .clv-teaser-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px; }
+    .clv-teaser-desc { font-size: 11px; color: var(--text-hint); line-height: 1.4; }
+    /* ── PROPS PREVIEW ───────────────────────────────────── */
+    .props-preview-btn { display: block; width: 100%; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-muted); background: var(--surface-2); border: none; border-top: 1px solid var(--border); padding: 7px 14px; text-align: center; cursor: pointer; transition: background 0.15s; }
+    .props-preview-btn:hover { background: var(--amber); color: #fff; }
+    .props-preview-panel { padding: 10px 14px 12px; border-top: 0.5px solid var(--border); background: var(--surface-2); }
+    .props-preview-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); margin-bottom: 8px; }
+    .prop-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 0.5px solid var(--border); gap: 6px; }
+    .prop-row:last-child { border-bottom: none; }
+    .prop-player { font-size: 12px; font-weight: 600; color: var(--text); }
+    .prop-type { font-size: 10px; color: var(--text-hint); }
+    .prop-line { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .prop-odds { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700; }
+    .prop-odds.best { color: var(--green-dark); }
+    .prop-book { font-size: 10px; color: var(--text-hint); }
+    .props-grid-badge { font-size: 10px; font-weight: 700; color: var(--amber-dark); background: var(--amber-light); border-radius: 10px; padding: 2px 8px; text-decoration: none; white-space: nowrap; transition: background 0.12s; }
+    .props-grid-badge:hover { background: var(--amber); color: #fff; }
+    .props-skeleton { font-size: 12px; color: var(--text-hint); padding: 8px 0; }
+
+    /* ── DARK MODE ────────────────────────────────────────── */
+    body, nav, .game-card, .stat-card, .pick-card, .affiliate-bar, .gate-modal,
+    .method-banner, .filter-btn, .sort-toggle-btn, .view-toggle-btn,
+    .odds-cell, .skeleton-card, .aff-btn, .pick-lock-badge, .grid-expand-btn { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+
+    [data-theme="dark"] {
+      --amber: #e8991e;
+      --amber-light: #2d1f08;
+      --amber-dark: #f5c87a;
+      --green: #22C55E;
+      --green-light: #052E16;
+      --green-dark: #4ADE80;
+      --green-cell-text: #4ADE80;
+      --red: #F87171;
+      --red-light: #2D0A0A;
+      --red-cell-text: #F87171;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --text-hint: #64748B;
+      --border: #1F2330;
+      --border-mid: rgba(255,255,255,0.13);
+      --surface: #111318;
+      --surface-2: #0D0F15;
+      --accent: #3B82F6;
+    }
+    [data-theme="dark"] body { background: #0A0C10; }
+    [data-theme="dark"] nav { background: #0F1117; border-color: #1F2330; }
+    [data-theme="dark"] .stats-row { background: #111318; border-color: #1F2330; box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2); }
+    [data-theme="dark"] .stat-card { border-color: #1F2330; }
+    [data-theme="dark"] .game-card { box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2); }
+    [data-theme="dark"] .pick-card { box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2); }
+    [data-theme="dark"] .skeleton-line { background: linear-gradient(90deg, #1e2130 25%, #252838 50%, #1e2130 75%); background-size: 200% 100%; }
+    [data-theme="dark"] .method-banner { background: #0D0F15; border-color: #1F2330; }
+    [data-theme="dark"] .method-banner-text { color: #64748B; }
+    [data-theme="dark"] .method-banner-text strong { color: #94A3B8; }
+    [data-theme="dark"] .odds-cell.best { background: #052E16; color: #4ADE80; border-left-color: #22C55E; }
+    [data-theme="dark"] .odds-cell.tied-best { background: #052E16; color: #4ADE80; }
+    [data-theme="dark"] .odds-cell.worst { background: #2D0A0A; color: #F87171; }
+    [data-theme="dark"] .odds-cell.row-alt:not(.best):not(.worst):not(.tied-best):not(.odds-cell-empty) { background: rgba(255,255,255,0.025); }
+    [data-theme="dark"] .odds-row-label.row-alt { background: rgba(255,255,255,0.02); }
+    [data-theme="dark"] .ev-strong, [data-theme="dark"] .ev-pos { background: #052E16; color: #4ADE80; }
+    [data-theme="dark"] .ev-neutral { background: #1E2330; color: #64748B; }
+    [data-theme="dark"] .edge-badge { background: #052E16; color: #4ADE80; }
+    [data-theme="dark"] .top-edge-badge { background: #22C55E; color: #fff; }
+    [data-theme="dark"] .tag-nba { background: #0d1e30; color: #5badee; }
+    [data-theme="dark"] .tag-nfl { background: #2a1009; color: #f09070; }
+    [data-theme="dark"] .tag-mlb { background: #0a1f0d; color: #6dbf70; }
+    [data-theme="dark"] .tag-nhl { background: #1a1640; color: #9d96ee; }
+    [data-theme="dark"] .legend-red { background: #2D0A0A; border-color: #7f1d1d; }
+    [data-theme="dark"] .legend-neutral { background: var(--surface-2); border-color: rgba(255,255,255,0.1); }
+    [data-theme="dark"] .gate-overlay { background: rgba(0,0,0,0.75); }
+    [data-theme="dark"] .gate-input { background: var(--surface-2); }
+    [data-theme="dark"] .grid-expand-btn { background: #1e2535; color: #4ADE80; }
+    [data-theme="dark"] .grid-expand-btn:hover { background: #22C55E; color: #fff; }
+    [data-theme="dark"] .champion-banner { background: linear-gradient(135deg, #2d1f08, #1a1305); }
+    [data-theme="dark"] .sort-toggle, [data-theme="dark"] .view-toggle { background: #0D0F15; border-color: #1F2330; }
+    [data-theme="dark"] .sort-toggle-btn.active, [data-theme="dark"] .view-toggle-btn.active { background: #1a1d27; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    [data-theme="dark"] .pick-conf-strong, [data-theme="dark"] .pick-conf-good { background: #052E16; color: #4ADE80; }
+    [data-theme="dark"] .vs-pinnacle-badge { background: #1e3a8a; color: #93c5fd; }
+    [data-theme="dark"] .affiliate-bar { box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    [data-theme="dark"] .picks-unlock-banner { background: var(--amber-light); border-color: var(--amber); }
+
+    .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
+    .theme-toggle-btn:hover { opacity: 0.8; }
+
+    /* LIVE ODDS BADGE — polished green pill */
+    .live-odds-badge { display: inline-flex; align-items: center; gap: 5px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--green); background: var(--green-light); border: 1px solid rgba(22,163,74,0.25); padding: 4px 12px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+    [data-theme="dark"] .live-odds-badge { color: #22C55E; background: #052E16; border-color: rgba(34,197,94,0.2); }
+
+    /* NAV — hide non-essential links on small screens */
+    @media (max-width: 640px) {
+      .nav-link { display: none !important; }
+      .nav-badge { display: none; }
+    }
+
+    /* ══ COMPACT STICKY EV FILTER BAR ══════════════════════════════════ */
+    .ev-filter-bar { position: sticky; top: 56px; z-index: 90; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .ev-filter-inner { max-width: 1400px; margin: 0 auto; padding: 9px 1.5rem; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .ev-filter-group { display: flex; align-items: center; gap: 7px; }
+    .ev-filter-label { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); white-space: nowrap; }
+    .ev-filter-select { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-mid); background: var(--surface); color: var(--text); cursor: pointer; outline: none; transition: border-color 0.15s; }
+    .ev-filter-select:focus { border-color: var(--green); }
+    .ev-filter-divider { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; }
+    .ev-pill-group { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .ev-pill { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .ev-pill:hover { border-color: var(--green); color: var(--green); }
+    .ev-pill.active { background: var(--green); color: #fff; border-color: var(--green); }
+    @media (max-width: 600px) {
+      .ev-filter-inner { padding: 8px 1rem; gap: 10px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .ev-filter-inner::-webkit-scrollbar { display: none; }
+      .ev-filter-divider { display: none; }
+      .ev-pill-group { flex-wrap: nowrap; }
+    }
+
+    /* ══ EV EDGES SECTION ══════════════════════════════════════════════ */
+    .ev-section { margin-bottom: 1.5rem; }
+    .ev-section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+    .ev-section-title { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); }
+    .ev-section-sub { font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .ev-section-count { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+    .ev-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+    @media (max-width: 700px) { .ev-cards-grid { grid-template-columns: 1fr; } }
+
+    /* ── EV Edge Card ─────────────────────────────────────────────────── */
+    .ev-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04); transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s; animation: fadeInUp 0.3s ease both; }
+    .ev-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); transform: translateY(-1px); border-color: var(--green); }
+    .ev-card.ev-positive { border-left: 3px solid var(--green); }
+    .ev-card.ev-suspicious { border-left: 3px solid var(--amber); }
+    .ev-card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 16px 10px; gap: 10px; }
+    .ev-card-meta { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+    .ev-card-tags { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .ev-card-matchup { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ev-card-matchup:hover { color: var(--green); }
+    .ev-card-time { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+    /* ── 3-column comparison — the hero element ───────────────────────── */
+    .ev-card-compare { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 0; margin: 0 16px 14px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .ev-card-book-col { padding: 14px 16px; display: flex; flex-direction: column; gap: 3px; background: var(--surface-2); }
+    .ev-card-sharp-col { padding: 14px 16px; text-align: right; display: flex; flex-direction: column; gap: 3px; align-items: flex-end; background: var(--surface-2); }
+    .ev-compare-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); }
+    .ev-compare-book { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 1px; }
+    .ev-compare-odds { font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 600; line-height: 1; margin-top: 4px; }
+    .ev-compare-odds.ev-pos-odds { color: var(--green); }
+    .ev-compare-odds.ev-neu-odds { color: var(--text); }
+    .ev-compare-side { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); margin-top: 3px; }
+
+    /* Center EV badge */
+    .ev-badge-center { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 12px; min-width: 80px; background: var(--green-light); border-left: 1px solid rgba(22,163,74,0.18); border-right: 1px solid rgba(22,163,74,0.18); }
+    .ev-badge-center.ev-neg-bg { background: var(--surface-2); border-color: var(--border); }
+    .ev-badge-pct { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1; color: var(--green); white-space: nowrap; }
+    .ev-badge-pct.ev-neg-pct { color: var(--text-muted); }
+    .ev-badge-lbl { font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin-top: 4px; white-space: nowrap; }
+    .ev-badge-lbl.ev-neg-lbl { color: var(--text-hint); }
+
+    /* Card actions row */
+    .ev-card-actions { display: flex; align-items: center; gap: 8px; padding: 0 16px 14px; flex-wrap: wrap; }
+    .ev-bet-btn { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px; background: var(--green); color: #fff; text-decoration: none; border: none; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+    .ev-bet-btn:hover { opacity: 0.88; }
+    .ev-share-btn { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; padding: 7px 13px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .ev-share-btn:hover { border-color: var(--border-mid); color: var(--text); }
+    .ev-share-btn.copied { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+
+    /* ── No edges empty state ─────────────────────────────────────────── */
+    .no-edges-state { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 3rem 2rem; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .no-edges-icon { font-size: 40px; display: block; margin-bottom: 14px; }
+    .no-edges-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .no-edges-sub { font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 420px; margin: 0 auto; }
+
+    /* ── Section divider ──────────────────────────────────────────────── */
+    .section-divider { display: flex; align-items: center; gap: 12px; margin: 1.75rem 0 1.25rem; }
+    .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .section-divider-label { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.09em; white-space: nowrap; }
+    .parlay-section-sub { font-family: 'Outfit', sans-serif; font-size: 12px; color: var(--text-hint); font-style: italic; margin-bottom: 1rem; line-height: 1.5; }
+
+    /* ── All Games section header ─────────────────────────────────────── */
+    .all-games-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+    .all-games-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: var(--text-muted); }
+
+    /* ══ DARK MODE ADDITIONS ══════════════════════════════════════════════ */
+    [data-theme="dark"] .ev-filter-bar { background: #0F1117; border-color: #1F2330; }
+    [data-theme="dark"] .ev-filter-select { background: #111318; border-color: rgba(255,255,255,0.1); color: var(--text); }
+    [data-theme="dark"] .ev-card { box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2); }
+    [data-theme="dark"] .ev-card.ev-positive { border-left-color: #22C55E; }
+    [data-theme="dark"] .ev-card-book-col, [data-theme="dark"] .ev-card-sharp-col { background: #0D0F15; }
+    [data-theme="dark"] .ev-badge-center { background: #052E16; border-color: rgba(34,197,94,0.2); }
+    [data-theme="dark"] .ev-badge-center.ev-neg-bg { background: #0D0F15; border-color: rgba(255,255,255,0.06); }
+    [data-theme="dark"] .ev-badge-pct { color: #4ADE80; }
+    [data-theme="dark"] .ev-badge-lbl { color: #4ADE80; }
+    [data-theme="dark"] .ev-compare-odds.ev-pos-odds { color: #4ADE80; }
+    [data-theme="dark"] .ev-share-btn { background: #111318; border-color: #1F2330; }
+    [data-theme="dark"] .ev-share-btn.copied { background: #052E16; border-color: #22C55E; color: #4ADE80; }
+    [data-theme="dark"] .no-edges-state { box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+    /* ══ HERO EDGE CARD ══════════════════════════════════════════════════ */
+    .hero-edge-section { margin-bottom: 1.5rem; }
+    .hero-edge-card { background: var(--surface); border-radius: var(--radius); border: 2px solid var(--green); box-shadow: 0 4px 24px rgba(22,163,74,0.10), 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; animation: fadeInUp 0.3s ease both; }
+    .hero-edge-label { background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; padding: 6px 16px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .hero-edge-header { padding: 14px 16px 4px; }
+    .hero-edge-matchup { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-top: 6px; }
+    .hero-edge-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .hero-edge-body { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; margin: 14px 16px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .hero-book-col { padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; background: var(--surface-2); }
+    .hero-sharp-col { padding: 18px 20px; text-align: right; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; background: var(--surface-2); }
+    .hero-compare-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); }
+    .hero-compare-book { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 1px; }
+    .hero-compare-odds { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 600; line-height: 1; color: var(--green); margin-top: 6px; }
+    .hero-compare-odds.neutral { color: var(--text); }
+    .hero-compare-side { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); margin-top: 5px; }
+    .hero-ev-center { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px 20px; min-width: 110px; background: var(--green-light); border-left: 1px solid rgba(22,163,74,0.18); border-right: 1px solid rgba(22,163,74,0.18); }
+    .hero-ev-pct { font-family: 'DM Mono', monospace; font-size: 30px; font-weight: 700; color: var(--green); line-height: 1; }
+    .hero-ev-lbl { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin-top: 6px; white-space: nowrap; }
+    .hero-edge-note { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); padding: 0 16px 8px; line-height: 1.5; }
+    .hero-edge-actions { display: flex; align-items: center; gap: 10px; padding: 0 16px 16px; flex-wrap: wrap; }
+    @media (max-width: 600px) {
+      .hero-edge-body { grid-template-columns: 1fr; }
+      .hero-ev-center { border-left: none; border-right: none; border-top: 1px solid rgba(22,163,74,0.18); border-bottom: 1px solid rgba(22,163,74,0.18); }
+      .hero-sharp-col { text-align: left; align-items: flex-start; }
+      .hero-compare-odds { font-size: 28px; }
+      .hero-ev-pct { font-size: 24px; }
+    }
+    [data-theme="dark"] .hero-edge-card { border-color: #22C55E; box-shadow: 0 4px 24px rgba(34,197,94,0.08); }
+    [data-theme="dark"] .hero-book-col, [data-theme="dark"] .hero-sharp-col { background: #0D0F15; }
+    [data-theme="dark"] .hero-ev-center { background: #052E16; border-color: rgba(34,197,94,0.2); }
+    [data-theme="dark"] .hero-ev-pct { color: #4ADE80; }
+    [data-theme="dark"] .hero-ev-lbl { color: #4ADE80; }
+    [data-theme="dark"] .hero-compare-odds { color: #4ADE80; }
+    [data-theme="dark"] .hero-compare-odds.neutral { color: var(--text); }
+
+    /* ── EV floor label + "why this exists" blurb ─────────────────────── */
+    .ev-floor-label { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); padding: 4px 1.5rem 2px; max-width: 1400px; margin: 0 auto; }
+    .ev-why-blurb { font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text-hint); line-height: 1.6; margin-bottom: 1.5rem; padding: 0 2px; }
+    @media (max-width: 600px) { .ev-floor-label { padding: 4px 1rem 2px; } }
+  </style>
+  <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+</head>
+<body>
+<div id="preview-banner">Preview Mode — not visible to users</div>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="logo-mark">🐾</div>
+        Capy
+      </a>
+      <div class="nav-right">
+        <a href="/parlay.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">Parlay</a>
+        <a href="/record.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">Record</a>
+        <a href="/stats.html" class="nav-link" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f3'" onmouseout="this.style.background='none'">Stats</a>
+        <span class="live-odds-badge"><span class="live-dot"></span>Live odds</span>
+        <a href="/parlay.html" id="parlay-nav-count" style="display:none;font-size:12px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:4px 10px;border-radius:20px;text-decoration:none;">🎰 Parlay (<span id="parlay-count">0</span>)</a>
+        <a href="/#pricing" class="nav-badge">⚡ Founding rate — $7/mo</a>
+        <a href="/#signup" class="btn-small">Go Pro</a>
+        <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- COMPACT STICKY EV FILTER BAR -->
+  <div class="ev-filter-bar" id="ev-filter-bar">
+    <div class="ev-filter-inner">
+      <div class="ev-filter-group">
+        <span class="ev-filter-label">Min EV</span>
+        <select class="ev-filter-select" id="min-ev-select" onchange="setMinEvFilter(+this.value)">
+          <option value="0">1%+ (default)</option>
+          <option value="2">2%+</option>
+          <option value="3">3%+</option>
+        </select>
+      </div>
+      <div class="ev-filter-divider"></div>
+      <div class="ev-pill-group" id="ev-sport-pills">
+        <button class="ev-pill active" onclick="setEvSportFilter('all', this)">All</button>
+        <button class="ev-pill" onclick="setEvSportFilter('basketball_nba', this)">NBA</button>
+        <button class="ev-pill" onclick="setEvSportFilter('baseball_mlb', this)">MLB</button>
+        <button class="ev-pill" onclick="setEvSportFilter('americanfootball_nfl', this)">NFL</button>
+        <button class="ev-pill" onclick="setEvSportFilter('icehockey_nhl', this)">NHL</button>
+      </div>
+    </div>
+    <div class="ev-floor-label">Showing edges ≥ 1% vs Pinnacle sharp line</div>
+  </div>
+
+  <div class="main">
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Games today</div>
+        <div class="stat-value" id="stat-games">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Books tracked</div>
+        <div class="stat-value amber">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Best edge</div>
+        <div class="stat-value green" id="stat-edge">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last updated</div>
+        <div class="stat-value" id="stat-time" style="font-size:14px;">—</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:0.5rem;">⏱ Today's edges expire at game time. Check back tomorrow for new opportunities.</div>
+    <p class="ev-disclaimer">EV calculations are estimates based on market-implied probabilities. Past performance does not guarantee future results. Bet responsibly.</p>
+
+    <div class="filter-wrap">
+      <div class="filter-bar">
+        <div class="filter-group">
+          <div class="filter-group-label">&nbsp;</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn active" onclick="filterSport('all', this)">All</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">American Football</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('americanfootball_nfl', this)">NFL</button>
+            <button class="filter-btn" onclick="filterSport('americanfootball_ncaaf', this)">NCAAF</button>
+            <button class="filter-btn" onclick="filterSport('americanfootball_ufl', this)">UFL</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Basketball</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('basketball_nba', this)">NBA</button>
+            <button class="filter-btn" onclick="filterSport('basketball_ncaab', this)">NCAAB</button>
+            <button class="filter-btn" onclick="filterSport('basketball_wncaab', this)">WNCAAB</button>
+            <button class="filter-btn" onclick="filterSport('basketball_euroleague', this)">Euroleague</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Baseball</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('baseball_mlb', this)">MLB</button>
+            <button class="filter-btn" onclick="filterSport('baseball_ncaa', this)">NCAA Baseball</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Ice Hockey</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('icehockey_nhl', this)">NHL</button>
+            <button class="filter-btn" onclick="filterSport('icehockey_ahl', this)">AHL</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Soccer</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('soccer_epl', this)">EPL</button>
+            <button class="filter-btn" onclick="filterSport('soccer_uefa_champs_league', this)">UCL</button>
+            <button class="filter-btn" onclick="filterSport('soccer_spain_la_liga', this)">La Liga</button>
+            <button class="filter-btn" onclick="filterSport('soccer_germany_bundesliga', this)">Bundesliga</button>
+            <button class="filter-btn" onclick="filterSport('soccer_italy_serie_a', this)">Serie A</button>
+            <button class="filter-btn" onclick="filterSport('soccer_france_ligue_one', this)">Ligue 1</button>
+            <button class="filter-btn" onclick="filterSport('soccer_usa_mls', this)">MLS</button>
+            <button class="filter-btn" onclick="filterSport('soccer_fifa_world_cup', this)">World Cup</button>
+            <button class="filter-btn" onclick="filterSport('soccer_mexico_ligamx', this)">Liga MX</button>
+            <button class="filter-btn" onclick="filterSport('soccer_conmebol_copa_libertadores', this)">Copa Lib.</button>
+            <button class="filter-btn" onclick="filterSport('soccer_netherlands_eredivisie', this)">Eredivisie</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Combat</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('mma_mixed_martial_arts', this)">MMA</button>
+            <button class="filter-btn" onclick="filterSport('boxing_boxing', this)">Boxing</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Cricket</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('cricket_ipl', this)">IPL</button>
+            <button class="filter-btn" onclick="filterSport('cricket_psl', this)">PSL</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Rugby</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('rugbyleague_nrl', this)">NRL</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Golf</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('golf_masters_tournament_winner', this)">Masters</button>
+            <button class="filter-btn" onclick="filterSport('golf_pga_championship_winner', this)">PGA Champ.</button>
+            <button class="filter-btn" onclick="filterSport('golf_us_open_winner', this)">US Open</button>
+            <button class="filter-btn" onclick="filterSport('golf_the_open_championship_winner', this)">The Open</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Other</div>
+          <div class="filter-group-btns">
+            <button class="filter-btn" onclick="filterSport('aussierules_afl', this)">AFL</button>
+            <button class="filter-btn" onclick="filterSport('lacrosse_ncaa', this)">NCAA Lacrosse</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-meta" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <span><span class="live-dot"></span>Auto-refreshes every 5 min &nbsp;·&nbsp; <span class="live-counter" id="live-counter">Updated just now</span></span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <button id="btn-ev-filter" class="filter-btn" onclick="toggleEvFilter()" style="margin-right:4px;">Show +EV only</button>
+          <button id="btn-pinnacle-filter" class="filter-btn" onclick="togglePinnacleFilter()" style="margin-right:6px;">📍 +EV vs Pinnacle only</button>
+          <div class="sort-toggle">
+            <button class="sort-toggle-btn active" onclick="setSortMode('edge', this)">Sort: Best edge</button>
+            <button class="sort-toggle-btn" onclick="setSortMode('time', this)">Sort: Time</button>
+          </div>
+          <div class="view-toggle" id="view-toggle">
+            <button class="view-toggle-btn" id="btn-list" onclick="setViewMode('list')" title="List view">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="1" width="14" height="2" rx="1" fill="currentColor"/><rect x="0" y="6" width="14" height="2" rx="1" fill="currentColor"/><rect x="0" y="11" width="14" height="2" rx="1" fill="currentColor"/></svg>
+              List
+            </button>
+            <button class="view-toggle-btn" id="btn-grid2" onclick="setViewMode('grid2')" title="2-column grid">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="14" rx="1" fill="currentColor"/><rect x="8" y="0" width="6" height="14" rx="1" fill="currentColor"/></svg>
+              2 Grid
+            </button>
+            <button class="view-toggle-btn" id="btn-grid4" onclick="setViewMode('grid4')" title="4-column grid">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="6" rx="1" fill="currentColor"/><rect x="8" y="0" width="6" height="6" rx="1" fill="currentColor"/><rect x="0" y="8" width="6" height="6" rx="1" fill="currentColor"/><rect x="8" y="8" width="6" height="6" rx="1" fill="currentColor"/></svg>
+              4 Grid
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EV EDGES SECTION — primary above-fold content -->
+    <div class="ev-section" id="ev-section">
+      <div class="ev-section-header">
+        <div>
+          <div class="ev-section-title">📍 Today's Edges</div>
+          <div class="ev-section-sub">Bets where the sharpest market offers a better price than fair value.</div>
+        </div>
+        <span class="ev-section-count" id="ev-section-count"></span>
+      </div>
+      <div id="ev-cards-container">
+        <!-- populated by renderEvSection() -->
+      </div>
+    </div>
+
+    <!-- TOP EDGE HERO — populated by renderTopEdgeHero() -->
+    <div id="top-edge-hero-section" style="display:none;"></div>
+
+    <!-- HIGH UPSIDE PARLAYS — below EV section -->
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-label">🎰 High Upside Parlays</span>
+      <div class="section-divider-line"></div>
+    </div>
+    <div class="picks-section parlay-suggestions-section" id="parlay-suggestions-section" style="display:none;">
+      <div class="parlay-section-sub">For entertainment — parlays carry negative expected value long term.</div>
+      <div class="parlay-suggestions-row" id="parlay-suggestions-row">
+        <div id="safe-parlay-container"></div>
+        <div id="value-parlay-container"></div>
+        <div id="upside-parlay-container"></div>
+      </div>
+    </div>
+
+    <!-- CAPY'S SHARP PICKS -->
+    <div class="picks-section" id="sharp-picks-section" style="display:none;">
+      <div class="picks-header">
+        <div>
+          <div class="picks-title">🎯 Capy's Sharp Picks</div>
+          <div class="picks-sub">High probability, positive EV vs Pinnacle — real pricing gaps across the best US books.</div>
+        </div>
+      </div>
+      <div class="picks-scroll" id="sharp-picks-container"></div>
+      <div class="picks-unlock-banner" id="sharp-unlock-banner" style="display:none;">
+        <span>🔒 You're missing some of today's best edges. Unlock with Pro — $7/mo → One better line pays for a year.</span>
+        <a href="/#pricing" class="picks-unlock-btn">Unlock Pro →</a>
+      </div>
+    </div>
+
+    <!-- LONG SHOT PLAYS -->
+    <div class="picks-section" id="longshot-picks-section" style="display:none;">
+      <div class="picks-header">
+        <div>
+          <div class="picks-title">🎲 Long Shot Plays</div>
+          <div class="picks-sub">Lower probability, high upside — positive EV underdogs with the best available odds.</div>
+        </div>
+      </div>
+      <div class="picks-scroll" id="longshot-picks-container"></div>
+      <div class="longshot-section-note" id="longshot-note" style="display:none;">
+        ⚠️ Long shots hit less often but pay significantly more when they do. Expected hit rate ~15–25% — value comes from the odds.
+      </div>
+    </div>
+
+    <!-- ALL GAMES — full odds table -->
+    <p class="ev-why-blurb">Books move at different speeds. We compare them to Pinnacle — the sharp market — to find mispriced odds before they close.</p>
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-label">All Games</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <div class="method-banner">
+      <span class="method-banner-icon">📍</span>
+      <div class="method-banner-text">
+        <strong>Capy compares every major US book against Pinnacle — the sharpest market in the world.</strong> When a US book offers better odds than Pinnacle's fair price, that's a genuine edge. Green = beating the sharp line. Everything else = you're paying the house.
+      </div>
+    </div>
+
+    <div class="games" id="games-container">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Fetching live odds across all books...</div>
+      </div>
+    </div>
+
+    <div class="affiliate-bar">
+      <div class="aff-text"><strong>Ready to bet?</strong> Open an account at the book with the best line and claim your signup bonus.</div>
+      <div class="aff-links">
+        <a href="https://record.betonlineaffiliates.ag/_otQU8R9fzqnYJMJFEJBL7mNd7ZgqdRLk/1/" target="_blank" class="aff-btn">BetOnline</a>
+        <a href="https://record.sportsbettingaffiliates.ag/_otQU8R9fzqmh_7RUBh20pWNd7ZgqdRLk/1/" target="_blank" class="aff-btn">SportsBetting.ag</a>
+        <a href="https://record.tigergamingaffiliates.com/_otQU8R9fzqklN6TbhFfl5GNd7ZgqdRLk/1/" target="_blank" class="aff-btn">TigerGaming</a>
+      </div>
+    </div>
+
+    <div class="clv-teaser">
+      <div class="clv-teaser-icon">📈</div>
+      <div class="clv-teaser-body">
+        <div class="clv-teaser-title">📊 Closing Line Value Tracker <span style="font-size:10px;font-weight:600;background:rgba(0,0,0,0.06);color:var(--text-hint);padding:2px 7px;border-radius:20px;margin-left:6px;">Coming soon</span></div>
+        <div class="clv-teaser-desc">CLV is how pros measure edge. If your picks consistently close better than where you bet, you're beating the market — even when individual bets lose. <a href="/#pricing" style="color:var(--amber);font-weight:600;text-decoration:none;">Available in Sharp tier →</a></div>
+      </div>
+    </div>
+
+    <div class="dash-footer">
+      Must be 21+ to bet. Gambling problem? Call 1-800-GAMBLER. Odds subject to change. &nbsp;·&nbsp; <a href="/" style="color:var(--amber);">Back to Capy</a>
+    </div>
+
+  </div>
+
+  <!-- SOFT GATE MODAL -->
+  <div class="gate-overlay" id="gate-overlay">
+    <div class="gate-modal">
+      <div class="gate-form" id="gate-form">
+        <span class="gate-capy">🦫</span>
+        <div class="gate-title">Join the herd to unlock</div>
+        <p class="gate-sub">Enter your email for free access to line movement history, best bet alerts, and more.</p>
+        <input type="email" class="gate-input" id="gate-email" placeholder="your@email.com" />
+        <button class="gate-btn" onclick="handleGateSubmit()">Get free access</button>
+        <div class="gate-skip" onclick="closeGate()">Maybe later</div>
+      </div>
+      <div class="gate-success" id="gate-success">
+        <span class="gate-capy">🦫</span>
+        <div class="gate-success-text">You're in the herd!</div>
+        <div class="gate-title">Welcome to Capy</div>
+        <p class="gate-sub" style="margin-bottom:1rem;">Check your email — we just sent you a confirmation. Full access unlocked.</p>
+        <button class="gate-btn" onclick="closeGate()">Start exploring</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BOOKS = ['FanDuel','DraftKings','BetMGM','BetRivers','BetOnline.ag'];
+    const BOOK_KEYS = ['fanduel','draftkings','betmgm','betrivers','betonlineag'];
+    const BOOK_SHORT = ['FanDuel','DraftKings','BetMGM','BetRivers','BetOnline'];
+    const BOOK_URLS = {
+      'fanduel': 'https://fanduel.com',
+      'draftkings': 'https://draftkings.com',
+      'betmgm': 'https://betmgm.com',
+      'betrivers': 'https://betrivers.com',
+      'betonlineag': 'https://record.betonlineaffiliates.ag/_otQU8R9fzqnYJMJFEJBL7mNd7ZgqdRLk/1/',
+    };
+    function fmtGameDate(isoString) {
+      const gameDate = new Date(isoString);
+      const now = new Date();
+      const todayStr = now.toDateString();
+      const tomorrowDate = new Date(now); tomorrowDate.setDate(now.getDate() + 1);
+      const tomorrowStr = tomorrowDate.toDateString();
+      const timeStr = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      if (gameDate.toDateString() === todayStr) return `Today, ${timeStr}`;
+      if (gameDate.toDateString() === tomorrowStr) return `Tomorrow, ${timeStr}`;
+      const datePart = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      return `${datePart}, ${timeStr}`;
+    }
+
+    const ALL_SPORTS = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
+    const SPORT_EMOJIS = {
+      basketball_nba:'🏀', basketball_ncaab:'🏀', basketball_wncaab:'🏀', basketball_euroleague:'🏀',
+      americanfootball_nfl:'🏈', americanfootball_ncaaf:'🏈', americanfootball_ufl:'🏈',
+      baseball_mlb:'⚾', baseball_ncaa:'⚾',
+      icehockey_nhl:'🏒', icehockey_ahl:'🏒',
+      soccer_epl:'⚽', soccer_uefa_champs_league:'⚽', soccer_spain_la_liga:'⚽',
+      soccer_germany_bundesliga:'⚽', soccer_italy_serie_a:'⚽', soccer_france_ligue_one:'⚽',
+      soccer_usa_mls:'⚽', soccer_fifa_world_cup:'⚽', soccer_mexico_ligamx:'⚽',
+      mma_mixed_martial_arts:'🥊', boxing_boxing:'🥊',
+      cricket_ipl:'🏏', cricket_psl:'🏏',
+      rugbyleague_nrl:'🏉', aussierules_afl:'🏉',
+      golf_masters_tournament_winner:'⛳', golf_pga_championship_winner:'⛳',
+      golf_us_open_winner:'⛳', golf_the_open_championship_winner:'⛳',
+      lacrosse_ncaa:'🥍',
+    };
+    const SPORT_LABELS = {
+      americanfootball_nfl:'NFL', americanfootball_ncaaf:'NCAAF', americanfootball_ufl:'UFL',
+      basketball_nba:'NBA', basketball_ncaab:'NCAAB', basketball_wncaab:'WNCAAB', basketball_euroleague:'Euroleague',
+      baseball_mlb:'MLB', baseball_ncaa:'NCAA Baseball',
+      icehockey_nhl:'NHL', icehockey_ahl:'AHL',
+      soccer_epl:'EPL', soccer_uefa_champs_league:'Champions League', soccer_spain_la_liga:'La Liga',
+      soccer_germany_bundesliga:'Bundesliga', soccer_italy_serie_a:'Serie A', soccer_france_ligue_one:'Ligue 1',
+      soccer_usa_mls:'MLS', soccer_fifa_world_cup:'FIFA World Cup', soccer_mexico_ligamx:'Liga MX',
+      soccer_conmebol_copa_libertadores:'Copa Libertadores', soccer_netherlands_eredivisie:'Eredivisie',
+      mma_mixed_martial_arts:'MMA', boxing_boxing:'Boxing',
+      cricket_ipl:'IPL', cricket_psl:'PSL',
+      rugbyleague_nrl:'NRL',
+      golf_masters_tournament_winner:'Masters', golf_pga_championship_winner:'PGA Championship',
+      golf_us_open_winner:'US Open', golf_the_open_championship_winner:'The Open',
+      aussierules_afl:'AFL', lacrosse_ncaa:'NCAA Lacrosse',
+    };
+
+    let allGames = [];
+    let currentSport = 'all';
+    let oddsCache = {};
+    let oddsFetchedAt = {}; // keyed by sport, value: timestamp ms
+    let pinnacleCache = {}; // keyed by sport, then "home|away"
+    let propsCache = {};    // keyed by eventId, value: { data, ts }
+    let userEmail = localStorage.getItem('capy_email') || null;
+    const previewMode = new URLSearchParams(window.location.search).get('preview') === 'true';
+    if (previewMode) {
+      document.getElementById('preview-banner').style.display = 'block';
+      document.body.style.paddingTop = '36px';
+    }
+    let gateShown = false;
+    let viewMode = (() => {
+      if (window.innerWidth < 768) return 'list';
+      return localStorage.getItem('capy_view') || 'grid2';
+    })();
+    let sortMode = 'edge';
+    let showEvOnly = false;
+    let showPinnacleOnly = false;
+    let lastUpdatedTime = null;
+
+    // EV filter bar state — client-side only, no re-fetch
+    let minEvFilter = 0;       // 0 = any, 1 = 1%+, 2 = 2%+, 3 = 3%+
+    let evSportFilter = 'all'; // 'all' or a sport_key
+
+    // Returns the affiliate/direct URL for a book name, or null
+    function getBookUrl(bookName) {
+      const idx = BOOKS.indexOf(bookName);
+      if (idx < 0) return null;
+      return BOOK_URLS[BOOK_KEYS[idx]] || null;
+    }
+
+    // ── Live counter ──────────────────────────────────────────────────
+    function startLiveCounter() {
+      setInterval(() => {
+        if (!lastUpdatedTime) return;
+        const secs = Math.floor((Date.now() - lastUpdatedTime) / 1000);
+        const el = document.getElementById('live-counter');
+        if (!el) return;
+        if (secs < 10) el.textContent = 'Updated just now';
+        else if (secs < 60) el.textContent = `Updated ${secs}s ago`;
+        else el.textContent = `Updated ${Math.floor(secs / 60)}m ago`;
+      }, 5000);
+    }
+
+    // ── Skeleton loading ──────────────────────────────────────────────
+    function showSkeleton() {
+      const container = document.getElementById('games-container');
+      const cards = Array.from({length: 4}, () => `
+        <div class="skeleton-card">
+          <div class="skeleton-header">
+            <div class="skeleton-line medium tall"></div>
+            <div class="skeleton-line short" style="height:18px;width:80px;"></div>
+          </div>
+          <div class="skeleton-body">
+            <div class="skeleton-line full"></div>
+            <div class="skeleton-line full"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line full"></div>
+          </div>
+        </div>`).join('');
+      container.innerHTML = cards;
+    }
+
+    // ── Edge calculation ──────────────────────────────────────────────
+    // ── EV Calculations ──────────────────────────────────────────────────────
+    function amToImpliedProb(american) {
+      if (american > 0) return 100 / (american + 100);
+      return Math.abs(american) / (Math.abs(american) + 100);
+    }
+    function amToDecimal(american) {
+      if (american > 0) return american / 100 + 1;
+      return 100 / Math.abs(american) + 1;
+    }
+    function classifyEV(evPct) {
+      const sign = evPct > 0 ? '+' : '';
+      const label = `${sign}${evPct.toFixed(1)}%`;
+      if (evPct > 3)  return { label, cls: 'ev-strong', emoji: '🔥', full: `🔥 Strong +EV` };
+      if (evPct >= 1) return { label, cls: 'ev-pos',    emoji: '✅', full: `✅ +EV` };
+      if (evPct >= -1)return { label, cls: 'ev-neutral', emoji: '➖', full: `➖ Neutral` };
+      return           { label, cls: 'ev-neg',    emoji: '',    full: label };
+    }
+    function calcEVFromOdds(americanOdds, fairProb) {
+      const decimal = americanOdds > 0 ? americanOdds/100 + 1 : 100/Math.abs(americanOdds) + 1;
+      return parseFloat((((fairProb * (decimal - 1)) - (1 - fairProb)) * 100).toFixed(1));
+    }
+    function calcKellyPct(americanOdds, fairProb) {
+      const decimal = americanOdds > 0 ? americanOdds/100 + 1 : 100/Math.abs(americanOdds) + 1;
+      const kelly = (fairProb * (decimal - 1) - (1 - fairProb)) / (decimal - 1);
+      return Math.min(parseFloat((kelly * 100).toFixed(1)), 25);
+    }
+    // Reference book priority for no-vig fair prob: sharpest/most liquid first
+    const EV_REF_PRIORITY = ['draftkings','fanduel','betmgm','betrivers','betonlineag'];
+
+    // Find the highest-priority book that has BOTH sides of h2h for a game
+    function getRefBook(game) {
+      for (const refKey of EV_REF_PRIORITY) {
+        const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(refKey)) ||
+                     game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(refKey.slice(0,5)));
+        if (!book) continue;
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        if (!h2h) continue;
+        const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
+        const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
+        if (homeO?.price != null && awayO?.price != null)
+          return { homePrice: homeO.price, awayPrice: awayO.price, bookName: book.title || refKey };
+      }
+      return null;
+    }
+
+    // Returns Pinnacle sharp reference for a game, or null if Pinnacle not available.
+    // Never falls back to US books — EV is only meaningful vs a vig-free sharp line.
+    function getSharpRef(game) {
+      const sport = game.sport_key;
+      const pk = pinnacleCache[sport] || {};
+      // Primary lookup by game.id (avoids team name mismatch), fallback to name key
+      const pinnacleGame = (game.id && pk[game.id]) || pk[`${game.home_team}|${game.away_team}`];
+      if (!pinnacleGame) return null;
+      const h2h = pinnacleGame.bookmakers?.[0]?.markets?.find(m => m.key === 'h2h');
+      if (!h2h) return null;
+      const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
+      const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
+      if (homeO?.price != null && awayO?.price != null) {
+        return { homePrice: homeO.price, awayPrice: awayO.price, bookName: 'Pinnacle', source: 'Pinnacle' };
+      }
+      return null;
+    }
+
+    // No-vig fair odds method
+    // Requires BOTH sides of Pinnacle market
+    // p1 = implied(pinnacleA), p2 = implied(pinnacleB)
+    // fair_prob = p1 / (p1 + p2)
+    // DO NOT calculate EV with only one side — results in inflated EV on underdogs
+    // because a small error in implied probability amplifies through the large
+    // decimal multiplier (e.g. 1% error × 11.0 decimal = 11% EV inflation).
+    //
+    // @param {number} bookOdds         American odds from the US book being evaluated
+    // @param {number} pinnacleHomeOdds Pinnacle American odds for the home team  ← REQUIRED
+    // @param {number} pinnacleAwayOdds Pinnacle American odds for the away team  ← REQUIRED
+    // @param {boolean} isHome          Whether bookOdds is for the home team
+    // @returns {{ ev, fairProb, fairOdds }} or null if either Pinnacle side is missing
+    function calculateEV(bookOdds, pinnacleHomeOdds, pinnacleAwayOdds, isHome) {
+      // Hard requirement: both sides of Pinnacle market must be present
+      if (bookOdds == null || pinnacleHomeOdds == null || pinnacleAwayOdds == null) {
+        if (pinnacleHomeOdds == null || pinnacleAwayOdds == null) {
+          console.warn('[Capy EV] calculateEV called with missing Pinnacle side — refusing to calculate.', {
+            pinnacleHomeOdds, pinnacleAwayOdds,
+          });
+        }
+        return null;
+      }
+      const impH = amToImpliedProb(pinnacleHomeOdds);
+      const impA = amToImpliedProb(pinnacleAwayOdds);
+      const total = impH + impA;
+      // Sanity check: vig total should be slightly above 1.0 for a real market
+      if (total <= 0 || total < 0.9 || total > 1.2) {
+        console.warn('[Capy EV] calculateEV: abnormal vig total', total.toFixed(4), '— skipping.', { pinnacleHomeOdds, pinnacleAwayOdds });
+        return null;
+      }
+      const fairH = impH / total;  // home fair probability (vig removed)
+      const fairA = impA / total;  // away fair probability (vig removed)
+      const fairProb = isHome ? fairH : fairA;
+      const decimal = amToDecimal(bookOdds);
+      const ev = parseFloat(((fairProb * decimal - 1) * 100).toFixed(2));
+      const fairOdds = fairProbToAm(fairProb);
+      return { ev, fairProb, fairOdds };
+    }
+
+    // Returns { home, away, pinnacleRef, refSource, suspicious } or null.
+    // Requires Pinnacle — never falls back to US books. Games without a Pinnacle line show no EV.
+    function calcGameEV(game) {
+      const ref = getSharpRef(game);
+      if (!ref) return null;
+
+      // Large underdog guard: if Pinnacle prices a side at +400 or worse, require fresh data (<10 min)
+      const maxUnderdogPrice = Math.max(ref.homePrice, ref.awayPrice);
+      if (maxUnderdogPrice >= 400) {
+        const fetchedAt = oddsFetchedAt[game.sport_key] || 0;
+        const ageMin = (Date.now() - fetchedAt) / 60000;
+        if (ageMin > 10) {
+          console.warn('[Capy EV] Skipping +400 underdog — Pinnacle data is stale (' + ageMin.toFixed(1) + ' min). Refresh to recalculate.', {
+            game: `${game.away_team} @ ${game.home_team}`,
+            pinnacleHome: ref.homePrice, pinnacleAway: ref.awayPrice,
+          });
+          return null;
+        }
+      }
+
+      // Find best available moneyline price per side across all tracked books
+      let bestHome = null, bestAway = null;
+      BOOK_KEYS.forEach((k, i) => {
+        const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
+                     game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
+        if (!book) return;
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        if (!h2h) return;
+        const homeO = h2h.outcomes?.find(o => o.name === game.home_team);
+        const awayO = h2h.outcomes?.find(o => o.name === game.away_team);
+        if (homeO?.price != null && (bestHome === null || homeO.price > bestHome.price))
+          bestHome = { price: homeO.price, bookName: BOOKS[i] };
+        if (awayO?.price != null && (bestAway === null || awayO.price > bestAway.price))
+          bestAway = { price: awayO.price, bookName: BOOKS[i] };
+      });
+      if (!bestHome || !bestAway) return null;
+
+      const homeResult = calculateEV(bestHome.price, ref.homePrice, ref.awayPrice, true);
+      const awayResult = calculateEV(bestAway.price, ref.homePrice, ref.awayPrice, false);
+      if (!homeResult || !awayResult) return null;
+
+      const maxEV = Math.max(homeResult.ev, awayResult.ev);
+
+      // Part 4 — Large underdog (+500) detailed breakdown log
+      // Underdogs amplify any remaining error in fair prob through the large decimal multiplier,
+      // so we log the full breakdown to make it easy to spot if the math is still off.
+      const isLargeUnderdog = Math.max(ref.homePrice, ref.awayPrice) >= 500;
+      if (isLargeUnderdog) {
+        const impH = amToImpliedProb(ref.homePrice);
+        const impA = amToImpliedProb(ref.awayPrice);
+        console.log('[Capy EV] +500 underdog breakdown:', {
+          game: `${game.away_team} @ ${game.home_team}`,
+          pinnacleA: ref.homePrice, pinnacleB: ref.awayPrice,
+          p1: impH.toFixed(4), p2: impA.toFixed(4),
+          vigTotal: (impH + impA).toFixed(4),
+          fairProbHome: homeResult.fairProb.toFixed(4), fairOddsHome: homeResult.fairOdds,
+          fairProbAway: awayResult.fairProb.toFixed(4), fairOddsAway: awayResult.fairOdds,
+          bookOddsHome: bestHome.price, bookOddsAway: bestAway.price,
+          evHome: homeResult.ev.toFixed(2) + '%', evAway: awayResult.ev.toFixed(2) + '%',
+          finalEV: maxEV.toFixed(2) + '%',
+        });
+      }
+
+      // Discard: >5% EV vs Pinnacle after two-sided de-vig is almost certainly stale/mismatched data.
+      // Real market inefficiencies rarely exceed 4% — anything above 5% filters out.
+      if (maxEV > 5) {
+        console.warn('[Capy EV] Discarding — EV > 5% vs Pinnacle. Likely stale or mismatched line.', {
+          game: `${game.away_team} @ ${game.home_team}`,
+          sport: game.sport_key,
+          bookOddsHome: bestHome.price, bookOddsAway: bestAway.price,
+          pinnacleHome: ref.homePrice, pinnacleAway: ref.awayPrice,
+          fairProbHome: homeResult.fairProb.toFixed(4), fairProbAway: awayResult.fairProb.toFixed(4),
+          calculatedEV: { home: homeResult.ev.toFixed(2) + '%', away: awayResult.ev.toFixed(2) + '%' },
+          filtered: true,
+        });
+        return null;
+      }
+
+      // Verify badge: 4-5% EV is unusual even with clean data — flag for manual review
+      const suspicious = maxEV > 4;
+      if (suspicious) {
+        console.warn('[Capy EV] Suspicious EV (4-5%) — verify odds are live before betting.', {
+          game: `${game.away_team} @ ${game.home_team}`,
+          homeEV: homeResult.ev.toFixed(2) + '%', awayEV: awayResult.ev.toFixed(2) + '%',
+        });
+      }
+
+      return {
+        home: { ev: homeResult.ev, fairProb: homeResult.fairProb, fairOdds: homeResult.fairOdds, bestOdds: bestHome.price, bestBook: bestHome.bookName },
+        away: { ev: awayResult.ev, fairProb: awayResult.fairProb, fairOdds: awayResult.fairOdds, bestOdds: bestAway.price, bestBook: bestAway.bookName },
+        pinnacleRef: { homePrice: ref.homePrice, awayPrice: ref.awayPrice },
+        refSource: 'Pinnacle',
+        suspicious,
+      };
+    }
+    // Convert fair probability to American odds
+    function fairProbToAm(prob) {
+      if (prob <= 0 || prob >= 1) return 0;
+      if (prob >= 0.5) return -Math.round((prob / (1 - prob)) * 100);
+      return Math.round(((1 - prob) / prob) * 100);
+    }
+
+    // Context-aware EV label for game cards (replaces raw "Top Edge" labels)
+    function getEVContextLabel(ev) {
+      if (!ev) return null;
+      const bestEV = Math.max(ev.home.ev, ev.away.ev);
+      if (bestEV > 2)  return { label: '🔥 +EV vs Pinnacle', cls: 'ev-strong' };
+      if (bestEV > 0.5) return { label: '✅ Edge vs Sharp Line', cls: 'ev-pos' };
+      if (bestEV >= 0)  return { label: '➖ Marginal Edge', cls: 'ev-neutral' };
+      return              { label: '📊 Best Available (Negative EV)', cls: 'ev-neg' };
+    }
+
+    // Build the "vs Pinnacle" comparison row for a game card
+    function buildPinnacleRow(game, ev) {
+      if (!ev) return '';
+      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
+      const isPinnacle = ev.refSource === 'Pinnacle';
+      const refLabel = isPinnacle ? 'Pinnacle fair' : 'Market fair';
+      const bestSide = ev.home.ev >= ev.away.ev ? ev.home : ev.away;
+      const fairAm = fairProbToAm(bestSide.fairProb);
+      const evSign = bestSide.ev >= 0 ? '+' : '';
+      const evColor = bestSide.ev > 0 ? 'var(--green)' : 'var(--text-hint)';
+      return `<div class="pinnacle-row" style="color:${evColor};">
+        ${bestSide.bestBook} ${fmtAm(bestSide.bestOdds)} vs ${refLabel} ${fmtAm(fairAm)} → ${evSign}${bestSide.ev.toFixed(1)}% EV
+      </div>`;
+    }
+
+    // Returns true if the game has any positive EV line
+    function gameHasPositiveEV(game) {
+      const ev = calcGameEV(game);
+      return ev && (ev.home.ev > 0 || ev.away.ev > 0);
+    }
+
+    // Returns raw numeric edge (used for sorting — always positive, bigger = better)
+    function calcEdge(game) {
+      return calcEdgeInfo(game).value;
+    }
+
+    // Returns { value, type, bestLine, worstLine, bestBook, label }
+    // Prefers spread edge (more meaningful to casual bettors). Falls back to ML.
+    function calcEdgeInfo(game) {
+      const books = BOOK_KEYS.map(k =>
+        game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
+        game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)))
+      );
+
+      // Try spread edge first
+      const spreadPrices = [];
+      books.forEach(book => {
+        if (!book) return;
+        const mkt = book.markets?.find(m => m.key === 'spreads');
+        const outcome = mkt?.outcomes?.find(o => o.name === game.home_team);
+        if (outcome?.point != null) spreadPrices.push(outcome.point);
+      });
+      if (spreadPrices.length >= 2) {
+        const best = Math.max(...spreadPrices);
+        const worst = Math.min(...spreadPrices);
+        const diff = parseFloat((best - worst).toFixed(1));
+        if (diff > 0) return { value: diff, type: 'spread', bestLine: best > 0 ? `+${best}` : `${best}`, worstLine: worst > 0 ? `+${worst}` : `${worst}`, label: `Spread edge: +${diff} pts` };
+      }
+
+      // Fall back to moneyline edge
+      const mlPrices = [];
+      books.forEach(book => {
+        if (!book) return;
+        const mkt = book.markets?.find(m => m.key === 'h2h');
+        const outcome = mkt?.outcomes?.find(o => o.name === game.home_team);
+        if (outcome?.price != null) mlPrices.push(outcome.price);
+      });
+      if (mlPrices.length >= 2) {
+        const best = Math.max(...mlPrices);
+        const worst = Math.min(...mlPrices);
+        const diff = best - worst;
+        if (diff > 0) {
+          const bestStr = best > 0 ? `+${best}` : `${best}`;
+          const worstStr = worst > 0 ? `+${worst}` : `${worst}`;
+          return { value: diff, type: 'moneyline', bestLine: bestStr, worstLine: worstStr, label: `Moneyline edge: ${bestStr} vs ${worstStr}` };
+        }
+      }
+
+      return { value: 0, type: 'none', bestLine: null, worstLine: null, label: '' };
+    }
+
+    async function fetchForSport(key) {
+      if (oddsCache[key]) return oddsCache[key];
+      const data = await fetch(`/api/odds?sport=${key}`).then(r => r.json()).catch(() => ({}));
+      // Handle both new { usOdds, pinnacleOdds } format and legacy array fallback
+      const usGames = Array.isArray(data.usOdds) ? data.usOdds : (Array.isArray(data) ? data : []);
+      const games = usGames.filter(g => g && g.bookmakers?.length);
+      oddsCache[key] = games;
+      oddsFetchedAt[key] = Date.now();
+      // Cache Pinnacle data — keyed by game.id (primary) and "home|away" (fallback)
+      if (Array.isArray(data.pinnacleOdds) && data.pinnacleOdds.length) {
+        if (!pinnacleCache[key]) pinnacleCache[key] = {};
+        data.pinnacleOdds.forEach(g => {
+          pinnacleCache[key][`${g.home_team}|${g.away_team}`] = g;
+          if (g.id) pinnacleCache[key][g.id] = g;
+        });
+        console.log('[Capy] Pinnacle lines cached for', data.pinnacleOdds.length, 'games');
+      }
+      return games;
+    }
+
+    async function loadSport(sport) {
+      showSkeleton();
+      try {
+        const results = sport === 'all'
+          ? await Promise.all(ALL_SPORTS.map(s => fetchForSport(s)))
+          : [await fetchForSport(sport)];
+        allGames = results.flat();
+        lastUpdatedTime = Date.now();
+        renderGames();
+        updateStats();
+        updateClock();
+      } catch(e) {
+        showError();
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('stat-games').textContent = allGames.length || '—';
+      if (allGames.length) {
+        const edges = allGames.map(calcEdge);
+        const maxEdge = Math.max(...edges);
+        document.getElementById('stat-edge').textContent = maxEdge > 0 ? `+${maxEdge}` : '—';
+      } else {
+        document.getElementById('stat-edge').textContent = '—';
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('stat-time').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+    }
+
+    // Returns freshness label HTML for a sport's cached odds (stale threshold: 10 min)
+    function fmtFreshness(sportKey) {
+      const ts = oddsFetchedAt[sportKey];
+      if (!ts) return '';
+      const mins = Math.floor((Date.now() - ts) / 60000);
+      if (mins < 5) return `<span class="freshness-label">Odds fetched ${mins < 1 ? 'just now' : mins + 'm ago'}</span>`;
+      if (mins < 10) return `<span class="freshness-label">${mins}m ago</span>`;
+      return `<span class="freshness-label stale">⚠️ ${mins}m ago — may be stale</span>`;
+    }
+
+    // Returns freshness label text (no HTML) for inline use in EV cards
+    function getFreshnessInfo(sportKey) {
+      const ts = oddsFetchedAt[sportKey];
+      if (!ts) return { text: '', stale: false };
+      const mins = Math.floor((Date.now() - ts) / 60000);
+      const text = mins < 1 ? 'just now' : `${mins}m ago`;
+      return { text, stale: mins >= 10 };
+    }
+
+    // ── EV Filter Bar ──────────────────────────────────────────────────────
+    function setMinEvFilter(val) {
+      minEvFilter = val;
+      renderEvSection();
+    }
+
+    function setEvSportFilter(sport, el) {
+      evSportFilter = sport;
+      document.querySelectorAll('.ev-pill').forEach(b => b.classList.remove('active'));
+      if (el) el.classList.add('active');
+      renderEvSection();
+    }
+
+    function getEvFilteredGames() {
+      const floor = Math.max(1, minEvFilter); // hard floor at 1% — below this is noise, not signal
+      return allGames.filter(g => {
+        if (evSportFilter !== 'all' && g.sport_key !== evSportFilter) return false;
+        const ev = calcGameEV(g);
+        if (!ev) return false;
+        const best = Math.max(ev.home.ev, ev.away.ev);
+        return best >= floor;
+      });
+    }
+
+    // ── EV Edge Card (new premium card layout) ────────────────────────────
+    function buildEvCard(game) {
+      const ev = calcGameEV(game);
+      if (!ev) return '';
+
+      const isHomeBetter = ev.home.ev >= ev.away.ev;
+      const bestSide = isHomeBetter ? ev.home : ev.away;
+      const bestTeam  = isHomeBetter ? game.home_team : game.away_team;
+
+      const sport = game.sport_key;
+      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
+      const label = SPORT_LABELS[sport] || sport;
+      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
+      const time = fmtGameDate(game.commence_time);
+      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
+
+      const isPositive = bestSide.ev > 0;
+      const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
+      const fairAm = fairProbToAm(bestSide.fairProb);
+      const refLabel = ev.refSource === 'Pinnacle' ? 'Pinnacle' : 'Market';
+      const teamShort = bestTeam.split(' ').pop();
+      const gameUrl = `/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${sport}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
+
+      // Freshness
+      const fresh = getFreshnessInfo(sport);
+      const freshnessHtml = fresh.text
+        ? `<span class="freshness-label${fresh.stale ? ' stale' : ''}">Updated ${fresh.text}</span>`
+        : '';
+
+      // Verify badge
+      const suspiciousHtml = ev.suspicious
+        ? `<span class="ev-verify-badge" title="EV 10-15% — verify odds are live before betting">⚠️ Verify odds</span>`
+        : '';
+
+      // EV breakdown tooltip (ⓘ)
+      const pinnRef = ev.pinnacleRef || {};
+      const tipLines = [
+        `Book odds: ${fmtAm(bestSide.bestOdds)} (${bestSide.bestBook})`,
+        `Pinnacle home: ${fmtAm(pinnRef.homePrice || 0)} / away: ${fmtAm(pinnRef.awayPrice || 0)}`,
+        `No-vig fair prob: ${(bestSide.fairProb * 100).toFixed(1)}%`,
+        `Fair odds: ${fmtAm(bestSide.fairOdds)}`,
+        `EV: ${evStr}`,
+      ].join(' | ');
+      const evInfoBtn = `<span class="ev-tip" data-tip="${tipLines}" style="margin-left:4px;">i</span>`;
+
+      // Bet link
+      const betUrl = getBookUrl(bestSide.bestBook);
+      const betBtn = betUrl
+        ? `<a href="${betUrl}" target="_blank" rel="noopener" class="ev-bet-btn">Bet at ${bestSide.bestBook} →</a>`
+        : '';
+
+      // Parlay button
+      const parlayLegsNow = loadParlayLegs();
+      const alreadyInParlay = parlayLegsNow.some(l => l.gameId === game.id);
+      const parlayBtn = `<button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlay ? ' added' : ''}" onclick="addToParlayFromGame('${game.id}')">${alreadyInParlay ? '✓ Added' : '+ Parlay'}</button>`;
+
+      return `
+        <div class="ev-card ${isPositive ? 'ev-positive' : ''}${ev.suspicious ? ' ev-suspicious' : ''}" data-gameid="${game.id}">
+          <div class="ev-card-header">
+            <div class="ev-card-meta">
+              <div class="ev-card-tags">
+                <span class="sport-tag tag-${tagKey}">${sportEmoji} ${label}</span>
+                ${freshnessHtml}
+                ${suspiciousHtml}
+              </div>
+              <div class="ev-card-matchup" onclick="window.location='${gameUrl}'">${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team}</div>
+            </div>
+            <span class="ev-card-time">${time}</span>
+          </div>
+          <div class="ev-card-compare">
+            <div class="ev-card-book-col">
+              <div class="ev-compare-label">Best Book</div>
+              <div class="ev-compare-book">${bestSide.bestBook}</div>
+              <div class="ev-compare-odds ${isPositive ? 'ev-pos-odds' : 'ev-neu-odds'}">${fmtAm(bestSide.bestOdds)}</div>
+              <div class="ev-compare-side">${teamShort} ML</div>
+            </div>
+            <div class="ev-badge-center ${isPositive ? '' : 'ev-neg-bg'}">
+              <div class="ev-badge-pct ${isPositive ? '' : 'ev-neg-pct'}">${evStr}</div>
+              <div class="ev-badge-lbl ${isPositive ? '' : 'ev-neg-lbl'}">EV ${evInfoBtn}</div>
+            </div>
+            <div class="ev-card-sharp-col">
+              <div class="ev-compare-label">Sharp Line</div>
+              <div class="ev-compare-book">${refLabel}</div>
+              <div class="ev-compare-odds ev-neu-odds">${fmtAm(fairAm)}</div>
+              <div class="ev-compare-side">Fair price</div>
+              <div style="font-family:'Outfit',sans-serif;font-size:9px;color:var(--text-hint);margin-top:6px;line-height:1.3;">Based on live<br>Pinnacle odds</div>
+            </div>
+          </div>
+          <div class="ev-card-actions">
+            ${betBtn}
+            <button class="ev-share-btn" id="share-btn-${game.id}" onclick="shareEdge('${game.id}', this)">📋 Share</button>
+            ${parlayBtn}
+          </div>
+        </div>`;
+    }
+
+    // ── Render the EV Edges section ────────────────────────────────────────
+    function renderEvSection() {
+      const container = document.getElementById('ev-cards-container');
+      const countEl = document.getElementById('ev-section-count');
+      if (!container) return;
+
+      if (!allGames.length) return; // skeleton still showing, don't overwrite
+
+      const positiveOnly = getEvFilteredGames()
+        .filter(g => {
+          const ev = calcGameEV(g);
+          return ev && Math.max(ev.home.ev, ev.away.ev) > 0;
+        })
+        .sort((a, b) => {
+          const evA = calcGameEV(a), evB = calcGameEV(b);
+          return Math.max(evB.home.ev, evB.away.ev) - Math.max(evA.home.ev, evA.away.ev);
+        });
+
+      if (countEl) {
+        countEl.textContent = positiveOnly.length > 0
+          ? `${positiveOnly.length} edge${positiveOnly.length !== 1 ? 's' : ''} found`
+          : '';
+      }
+
+      if (!positiveOnly.length) {
+        container.innerHTML = `
+          <div class="no-edges-state">
+            <span class="no-edges-icon">📊</span>
+            <div class="no-edges-title">No edges above 1% right now</div>
+            <div class="no-edges-sub">Most books are efficiently priced at the moment. Check back soon — lines move fast.</div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `<div class="ev-cards-grid">${positiveOnly.map(g => buildEvCard(g)).join('')}</div>`;
+      renderTopEdgeHero();
+    }
+
+    // ── Top Edge Hero card ────────────────────────────────────────────────
+    function renderTopEdgeHero() {
+      const section = document.getElementById('top-edge-hero-section');
+      if (!section) return;
+
+      // Best candidate: highest EV game ≥1% (safety cap already applied by calcGameEV)
+      const candidates = allGames
+        .map(g => ({ game: g, ev: calcGameEV(g) }))
+        .filter(({ ev }) => ev && Math.max(ev.home.ev, ev.away.ev) >= 1)
+        .sort((a, b) => Math.max(b.ev.home.ev, b.ev.away.ev) - Math.max(a.ev.home.ev, a.ev.away.ev));
+
+      if (!candidates.length) {
+        section.style.display = 'none';
+        section.innerHTML = '';
+        return;
+      }
+
+      const { game, ev } = candidates[0];
+      const isHomeBetter = ev.home.ev >= ev.away.ev;
+      const bestSide = isHomeBetter ? ev.home : ev.away;
+      const bestTeam = isHomeBetter ? game.home_team : game.away_team;
+      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
+      const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
+      const fairAm = fairProbToAm(bestSide.fairProb);
+      const teamShort = bestTeam.split(' ').pop();
+      const time = fmtGameDate(game.commence_time);
+      const sport = game.sport_key;
+      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
+      const label = SPORT_LABELS[sport] || sport;
+      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
+      const betUrl = getBookUrl(bestSide.bestBook);
+      const betBtn = betUrl
+        ? `<a href="${betUrl}" target="_blank" rel="noopener" class="ev-bet-btn">Bet at ${bestSide.bestBook} →</a>`
+        : '';
+      const fresh = getFreshnessInfo(sport);
+      const freshnessHtml = fresh.text
+        ? `<span class="freshness-label${fresh.stale ? ' stale' : ''}">Updated ${fresh.text}</span>`
+        : '';
+
+      section.style.display = 'block';
+      section.innerHTML = `
+        <div class="hero-edge-section">
+          <div class="hero-edge-card">
+            <div class="hero-edge-label">Top Edge Right Now</div>
+            <div class="hero-edge-header">
+              <div class="hero-edge-meta">
+                <span class="sport-tag tag-${tagKey}">${sportEmoji} ${label}</span>
+                <span class="game-time">${time}</span>
+                ${freshnessHtml}
+              </div>
+              <div class="hero-edge-matchup">${game.away_team} <span style="color:var(--text-hint);font-weight:400;font-size:14px;">@</span> ${game.home_team}</div>
+            </div>
+            <div class="hero-edge-body">
+              <div class="hero-book-col">
+                <div class="hero-compare-label">Best Book</div>
+                <div class="hero-compare-book">${bestSide.bestBook}</div>
+                <div class="hero-compare-odds">${fmtAm(bestSide.bestOdds)}</div>
+                <div class="hero-compare-side">${teamShort} ML</div>
+              </div>
+              <div class="hero-ev-center">
+                <div class="hero-ev-pct">${evStr}</div>
+                <div class="hero-ev-lbl">EV Edge</div>
+              </div>
+              <div class="hero-sharp-col">
+                <div class="hero-compare-label">Pinnacle Fair Odds</div>
+                <div class="hero-compare-book">Pinnacle</div>
+                <div class="hero-compare-odds neutral">${fmtAm(fairAm)}</div>
+                <div class="hero-compare-side">Fair price (no vig)</div>
+              </div>
+            </div>
+            <div class="hero-edge-note">Based on live Pinnacle sharp line &nbsp;·&nbsp; Pinnacle is the sharpest market in the world — used by professionals to benchmark fair value.</div>
+            <div class="hero-edge-actions">
+              ${betBtn}
+              <button class="ev-share-btn" id="hero-share-btn-${game.id}" onclick="shareEdge('${game.id}', this)">Share</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Share button: copy edge text to clipboard ─────────────────────────
+    function shareEdge(gameId, btn) {
+      const game = allGames.find(g => g.id === gameId);
+      if (!game) return;
+      const ev = calcGameEV(game);
+      if (!ev) return;
+      const isHomeBetter = ev.home.ev >= ev.away.ev;
+      const bestSide = isHomeBetter ? ev.home : ev.away;
+      const bestTeam  = isHomeBetter ? game.home_team : game.away_team;
+      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
+      const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
+      const text = `${bestTeam} ${fmtAm(bestSide.bestOdds)} (${bestSide.bestBook})\n${evStr} edge vs Pinnacle\ngetcapy.co`;
+
+      const markCopied = () => {
+        if (!btn) return;
+        const orig = btn.textContent;
+        btn.textContent = '✅ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+      };
+
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).then(markCopied).catch(() => {
+          // fallback
+          const ta = document.createElement('textarea');
+          ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;';
+          document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+          document.body.removeChild(ta); markCopied();
+        });
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta); markCopied();
+      }
+    }
+
+    function setSortMode(mode, el) {
+      sortMode = mode;
+      document.querySelectorAll('.sort-toggle-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      renderGames();
+    }
+
+    function filterSport(sport, el) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      currentSport = sport;
+      oddsCache = {};
+      loadSport(sport);
+    }
+
+    function getSortedGames() {
+      let games = [...allGames];
+      if (showEvOnly) games = games.filter(gameHasPositiveEV);
+      if (showPinnacleOnly) games = games.filter(g => {
+        const ev = calcGameEV(g);
+        return ev && ev.refSource === 'Pinnacle' && (ev.home.ev > 0 || ev.away.ev > 0);
+      });
+      if (sortMode === 'edge') return games.sort((a, b) => calcEdge(b) - calcEdge(a));
+      return games.sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
+    }
+    function toggleEvFilter() {
+      showEvOnly = !showEvOnly;
+      const btn = document.getElementById('btn-ev-filter');
+      if (btn) {
+        btn.classList.toggle('ev-active', showEvOnly);
+        btn.textContent = showEvOnly ? '✅ +EV Only (on)' : 'Show +EV only';
+      }
+      renderGames();
+    }
+    function togglePinnacleFilter() {
+      showPinnacleOnly = !showPinnacleOnly;
+      const btn = document.getElementById('btn-pinnacle-filter');
+      if (btn) {
+        btn.classList.toggle('ev-active', showPinnacleOnly);
+        btn.textContent = showPinnacleOnly ? '📍 +EV vs Pinnacle (on)' : '📍 +EV vs Pinnacle only';
+      }
+      renderGames();
+    }
+
+    // ── Player Props ──────────────────────────────────────────────────────
+    const PROPS_CACHE_TTL = 5 * 60 * 1000; // 5 min
+
+    async function fetchPropsData(eventId, sport) {
+      console.log('[Props] Fetching props for eventId:', eventId, '| sport:', sport);
+      if (!eventId || eventId === 'undefined') {
+        console.error('[Props] Invalid eventId:', eventId);
+        return { fetchError: 'Invalid game ID' };
+      }
+      const cached = propsCache[eventId];
+      if (cached && Date.now() - cached.ts < PROPS_CACHE_TTL) {
+        console.log('[Props] Returning cached data for eventId:', eventId);
+        return cached.data;
+      }
+      const url = `/api/props?sport=${encodeURIComponent(sport)}&eventId=${encodeURIComponent(eventId)}`;
+      console.log('[Props] Calling:', url);
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        console.log('[Props] Status:', res.status, '| bookmakers:', data?.bookmakers?.length ?? 0, '| error:', data?.error ?? 'none');
+        if (res.status === 404 || data?.error?.toLowerCase().includes('not found')) {
+          return { notFound: true };
+        }
+        if (!res.ok) {
+          return { fetchError: data?.error || `HTTP ${res.status}` };
+        }
+        propsCache[eventId] = { data, ts: Date.now() };
+        return data;
+      } catch (e) {
+        console.error('[Props] Network error for eventId:', eventId, e.message);
+        return { fetchError: e.message };
+      }
+    }
+
+    function parsePropsData(apiData) {
+      if (!apiData?.bookmakers?.length) {
+        console.log('[Props] parsePropsData: no bookmakers in response');
+        return [];
+      }
+      const MARKET_LABELS = {
+        player_points: 'Points', player_rebounds: 'Rebounds', player_assists: 'Assists',
+        player_threes: '3-Pointers', player_blocks: 'Blocks', player_steals: 'Steals',
+        player_pass_tds: 'Pass TDs', player_pass_yards: 'Pass Yards', player_rush_yards: 'Rush Yards',
+        player_reception_yards: 'Rec Yards', player_receptions: 'Receptions',
+        player_hits: 'Hits', player_home_runs: 'Home Runs', player_rbis: 'RBIs',
+        player_strikeouts_thrown: 'Strikeouts', player_goals: 'Goals',
+      };
+      const propMap = {};
+      apiData.bookmakers.forEach(book => {
+        book.markets?.forEach(mkt => {
+          const marketLabel = MARKET_LABELS[mkt.key] || mkt.key;
+          mkt.outcomes?.forEach(o => {
+            // Odds API player prop outcomes: name = player name, description = "Over" | "Under"
+            const desc = (o.description || '').toLowerCase();
+            const isOver = desc === 'over';
+            const isUnder = desc === 'under';
+            if (!isOver && !isUnder) return; // skip if not Over/Under
+            const k = `${o.name}|${mkt.key}|${o.point}`;
+            if (!propMap[k]) propMap[k] = { player: o.name, market: marketLabel, marketKey: mkt.key, line: o.point, over: null, under: null, overBook: null, underBook: null };
+            if (isOver && (propMap[k].over === null || o.price > propMap[k].over)) {
+              propMap[k].over = o.price; propMap[k].overBook = book.title;
+            }
+            if (isUnder && (propMap[k].under === null || o.price > propMap[k].under)) {
+              propMap[k].under = o.price; propMap[k].underBook = book.title;
+            }
+          });
+        });
+      });
+      const result = Object.values(propMap).filter(p => p.over !== null || p.under !== null);
+      console.log('[Props] parsePropsData: found', result.length, 'props across', apiData.bookmakers.length, 'books');
+      return result;
+    }
+
+    async function togglePropsPreview(gameId, sport) {
+      console.log('[Props] togglePropsPreview clicked | gameId:', gameId, '| sport:', sport);
+      const panel = document.getElementById(`props-panel-${gameId}`);
+      const btn = document.getElementById(`props-btn-${gameId}`);
+      if (!panel) { console.error('[Props] Panel element not found for gameId:', gameId); return; }
+
+      if (panel.style.display !== 'none') {
+        panel.style.display = 'none';
+        if (btn) btn.textContent = '🎯 Player Props ▼';
+        return;
+      }
+
+      panel.style.display = 'block';
+      if (btn) btn.textContent = '🎯 Player Props ▲';
+      panel.innerHTML = '<div class="props-skeleton">Loading props...</div>';
+
+      const game = allGames.find(g => g.id === gameId);
+      if (!game) {
+        console.error('[Props] Game not found in allGames for id:', gameId, '| allGames count:', allGames.length);
+        panel.innerHTML = '<div class="props-skeleton">Game not found — try refreshing the page.</div>';
+        return;
+      }
+      console.log('[Props] Found game:', game.away_team, '@', game.home_team, '| eventId:', game.id);
+
+      const data = await fetchPropsData(gameId, sport);
+      if (!data || data.fetchError) {
+        panel.innerHTML = `<div class="props-skeleton">⚠️ Could not load props${data?.fetchError ? `: ${data.fetchError}` : ''}. Check console for details.</div>`;
+        return;
+      }
+      if (data.notFound) {
+        panel.innerHTML = '<div class="props-skeleton">No props available for this game yet.</div>';
+        return;
+      }
+      const props = parsePropsData(data);
+
+      if (!props.length) {
+        panel.innerHTML = '<div class="props-skeleton">No props available for this game yet.</div>';
+        return;
+      }
+
+      // Show top 3 props by best odds (most favorable over line)
+      const top3 = props.filter(p => p.over !== null).sort((a, b) => b.over - a.over).slice(0, 3);
+
+      const fmtOdds = o => o == null ? '—' : (o > 0 ? `+${o}` : `${o}`);
+      panel.innerHTML = `
+        <div class="props-preview-title">🎯 Top Props — Best Available Lines</div>
+        ${top3.map(p => `
+          <div class="prop-row">
+            <div><div class="prop-player">${p.player}</div><div class="prop-type">${p.market}</div></div>
+            <div class="prop-line">O/U ${p.line}</div>
+            <div><div class="prop-odds best">Over ${fmtOdds(p.over)}</div><div class="prop-book">${p.overBook || ''}</div></div>
+            <div><div class="prop-odds">Under ${fmtOdds(p.under)}</div><div class="prop-book">${p.underBook || ''}</div></div>
+          </div>`).join('')}
+        <div style="font-size:10px;color:var(--text-hint);margin-top:6px;text-align:right;"><a href="/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${sport}&time=${encodeURIComponent(game.commence_time)}&id=${gameId}" style="color:var(--amber);">See all props →</a></div>`;
+    }
+
+    function renderGames() {
+      const container = document.getElementById('games-container');
+      if (!container) { console.error('[Capy] renderGames: #games-container not found'); return; }
+      console.log('[Capy] renderGames — allGames:', allGames.length, '| viewMode:', viewMode, '| sortMode:', sortMode);
+      renderPicks();
+      renderEvSection();
+      if (!allGames.length) {
+        // Empty state only fires when the API returned zero games — not when EV is unavailable
+        container.innerHTML = `
+          <div class="empty">
+            <span class="empty-icon">🦫</span>
+            <div class="empty-title">No games right now</div>
+            <div class="empty-sub">Check back closer to game time — we update every 5 minutes.</div>
+          </div>`;
+        container.className = 'games';
+        return;
+      }
+      const sorted = getSortedGames();
+      console.log('[Capy] renderGames — sorted games to render:', sorted.length);
+      try {
+        if (viewMode === 'grid2') {
+          container.className = 'games grid-2';
+          container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
+        } else if (viewMode === 'grid4') {
+          container.className = 'games grid-4';
+          container.innerHTML = sorted.map((game, idx) => buildGridCard(game, idx)).join('');
+        } else {
+          container.className = 'games';
+          container.innerHTML = sorted.map((game, idx) => buildGameCard(game, idx)).join('');
+        }
+        console.log('[Capy] renderGames — DOM updated, cards in container:', container.children.length);
+      } catch (err) {
+        console.error('[Capy] renderGames — card build threw:', err);
+        container.innerHTML = `<div class="error-state"><span class="error-icon">🦫</span><div class="error-title">Render error</div><div class="error-sub">${err.message}</div><button class="retry-btn" onclick="oddsCache={}; loadSport(currentSport)">Retry</button></div>`;
+      }
+      updateViewToggleUI();
+    }
+
+    function setViewMode(mode) {
+      if (window.innerWidth < 768) mode = 'list';
+      viewMode = mode;
+      localStorage.setItem('capy_view', mode);
+      renderGames();
+    }
+
+    function updateViewToggleUI() {
+      document.getElementById('btn-list')?.classList.toggle('active', viewMode === 'list');
+      document.getElementById('btn-grid2')?.classList.toggle('active', viewMode === 'grid2');
+      document.getElementById('btn-grid4')?.classList.toggle('active', viewMode === 'grid4');
+    }
+
+    const expandedCards = new Set();
+
+    function expandCard(gameId) {
+      expandedCards.add(gameId);
+      // Re-render in grid mode — expanded cards use full buildGameCard
+      const sorted = getSortedGames();
+      const container = document.getElementById('games-container');
+      container.innerHTML = sorted.map((game, idx) => {
+        if (expandedCards.has(game.id)) return buildGameCard(game, idx);
+        return buildGridCard(game, idx);
+      }).join('');
+    }
+
+    function buildGridCard(game, idx) {
+      const gameUrl = `/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
+      const sport = game.sport_key;
+      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
+      const tagClass = 'tag-' + tagKey;
+      const label = SPORT_LABELS[sport] || sport;
+      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
+      const time = fmtGameDate(game.commence_time);
+      const edgeInfo = calcEdgeInfo(game);
+      const edge = edgeInfo.value;
+      const isFirst = idx === 0;
+      const isTopEdge = idx < 3 && edge > 0;
+
+      const edgeBadge = edge > 0
+        ? edgeInfo.type === 'spread'
+          ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge ' : ''}+${edge} pts</span>`
+          : `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 ' : ''}Best ML</span>`
+        : '';
+
+      const edgeRowText = edgeInfo.type === 'spread'
+        ? `Spread edge: +${edge} pts best vs worst`
+        : edgeInfo.type === 'moneyline'
+          ? `Best ML: ${edgeInfo.bestLine} vs ${edgeInfo.worstLine}`
+          : '';
+
+      const edgeRow = edge > 0
+        ? edgeInfo.type === 'spread'
+          ? `<div class="game-edge-row"><div class="game-edge-big">+${edge} pts</div><div class="game-edge-text">${edgeRowText}</div></div>`
+          : `<div class="game-edge-row"><div class="game-edge-text" style="font-size:12px;">${edgeRowText}</div></div>`
+        : '';
+
+      const books = BOOK_KEYS.map(k =>
+        game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
+        game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)))
+      );
+
+      const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
+      const spreadRows = buildOddsRows(game, books, 'spreads', isFirst);
+
+      const legend = `<div class="odds-legend">
+        <span><span class="legend-dot legend-green"></span>Best</span>
+        <span><span class="legend-dot legend-red"></span>Worst</span>
+      </div>`;
+
+      const mktHeader = (title) =>
+        `<div class="odds-market-header"><span class="odds-market-label">${title}</span></div>`;
+
+      const mobileSnapshot = buildMobileSnapshot(game, books);
+
+      const parlayLegsGrid = loadParlayLegs();
+      const alreadyInParlayGrid = parlayLegsGrid.some(l => l.gameId === game.id);
+      const gridGameEV = calcGameEV(game);
+      const gridEVCtxLabel = getEVContextLabel(gridGameEV);
+      let gridEvBadge = '';
+      let gridVerifyBadge = '';
+      if (gridGameEV) {
+        // Game has Pinnacle line — show EV badge
+        const bestEV = gridGameEV.home.ev >= gridGameEV.away.ev ? gridGameEV.home : gridGameEV.away;
+        const evInfo = classifyEV(bestEV.ev);
+        gridEvBadge = `<span class="ev-badge ${evInfo.cls}" title="EV = Expected Value. +EV means this line beats the true probability.">${evInfo.emoji} ${evInfo.label} 📍</span>`;
+        if (gridGameEV.suspicious) {
+          gridVerifyBadge = `<span class="ev-verify-badge" title="EV 10-15% — verify odds before betting">⚠️ Verify odds</span>`;
+        }
+      } else {
+        // No Pinnacle line — flag clearly so users know EV is unavailable
+        gridEvBadge = `<span style="font-size:10px;color:var(--text-hint);font-family:'Outfit',sans-serif;">No sharp line</span>`;
+      }
+      const gridFreshness = fmtFreshness(game.sport_key);
+      const gridPinnacleRow = buildPinnacleRow(game, gridGameEV);
+      const gridPropsBadge = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(sport)
+        ? `<a href="${gameUrl}" class="props-grid-badge">🎯 Props →</a>` : '';
+      return `
+        <div class="game-card grid-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
+          <div class="game-header">
+            <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${sportEmoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;font-size:12px;">@</span> ${game.home_team}</div>
+            <div class="game-tags">
+              <span class="sport-tag ${tagClass}">${label}</span>
+              <span class="game-time">${time}</span>
+              ${gridFreshness}
+              ${gridEVCtxLabel ? `<span class="ev-badge ${gridEVCtxLabel.cls}">${gridEVCtxLabel.label}</span>` : edgeBadge}
+              ${gridEvBadge}
+              ${gridVerifyBadge}
+              ${gridPropsBadge}
+              <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlayGrid ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlayGrid ? '✓ Added' : '➕ Add to parlay'}</button>
+            </div>
+            ${gridPinnacleRow}
+          </div>
+          ${mobileSnapshot}
+          <div class="mobile-expand-body" id="mob-body-${game.id}">
+            ${edgeRow}
+            ${legend}
+            <div class="odds-table-desktop">
+              <div class="odds-table">
+                <div class="odds-grid odds-grid-6" style="padding:0 14px;">
+                  <div class="odds-col-header"></div>
+                  ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
+                  ${mktHeader('Moneyline')}
+                  ${h2hRows}
+                  <div class="odds-divider"></div>
+                  ${mktHeader('Spread')}
+                  ${spreadRows}
+                </div>
+              </div>
+            </div>
+            <div class="odds-mobile">
+              ${buildMobileOdds(game, books, isFirst)}
+            </div>
+          </div>
+          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show all books ▼</button>
+          <button class="grid-expand-btn" onclick="expandCard('${game.id}')">Show totals + full view →</button>
+        </div>`;
+    }
+
+    // ── Capy's Picks ─────────────────────────────────────────────────────
+
+    // getBestBookForGame: returns the best h2h price across all tracked books for any side.
+    // Used by parlay builder and other non-picks features.
+    function getBestBookForGame(game) {
+      let best = null;
+      BOOK_KEYS.forEach((k, i) => {
+        const book = game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
+                     game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)));
+        if (!book) return;
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        if (!h2h) return;
+        h2h.outcomes?.forEach(outcome => {
+          if (!best || outcome.price > best.price) {
+            best = { bookKey: k, bookName: BOOKS[i], bookUrl: BOOK_URLS[k] || '#', price: outcome.price, side: outcome.name };
+          }
+        });
+      });
+      return best;
+    }
+
+    // Quality score formula:
+    //   quality = (ev * 0.5) + (freshnessScore * 0.3) + (oddsConsistencyScore * 0.2)
+    // freshnessScore: 1.0 if odds < 5 min old, 0.5 if < 15 min, 0 otherwise
+    // oddsConsistencyScore: 1.0 if book decimal within 15% of fair decimal, 0.5 within 25%, else 0
+    function calcPickQualityScore(ev, game, bestOdds, fairProb) {
+      const fetchedAt = oddsFetchedAt[game.sport_key] || 0;
+      const ageMin = (Date.now() - fetchedAt) / 60000;
+      const freshnessScore = ageMin < 5 ? 1.0 : ageMin < 15 ? 0.5 : 0.0;
+
+      const bookDecimal = bestOdds > 0 ? (bestOdds / 100) + 1 : 1 + (100 / Math.abs(bestOdds));
+      const fairDecimal = fairProb > 0 ? 1 / fairProb : 1;
+      const pctDiff = Math.abs(bookDecimal - fairDecimal) / fairDecimal;
+      const oddsConsistencyScore = pctDiff <= 0.15 ? 1.0 : pctDiff <= 0.25 ? 0.5 : 0.0;
+
+      return parseFloat(((ev * 0.5) + (freshnessScore * 0.3) + (oddsConsistencyScore * 0.2)).toFixed(3));
+    }
+
+    // Builds a single pick card HTML string for sharp or longshot picks.
+    function buildPickCard(c, pickType, isLocked) {
+      const game = c.game;
+      const label = SPORT_LABELS[game.sport_key] || game.sport_key;
+      const sportEmoji = SPORT_EMOJIS[game.sport_key] || '🎯';
+      const oddsStr = c.bestOdds > 0 ? `+${c.bestOdds}` : `${c.bestOdds}`;
+      const bookUrl = getBookUrl(c.bestBook) || '#';
+      const isLongshot = pickType === 'longshot';
+      const gameDateTime = fmtGameDate(game.commence_time);
+      const confLabel = isLongshot
+        ? '🎲 +EV Long Shot vs Pinnacle'
+        : c.ev > 3 ? '🔥 Strong +EV vs Pinnacle' : '✅ +EV vs Pinnacle';
+      const confCls = isLongshot ? 'pick-conf-look' : c.ev > 3 ? 'pick-conf-strong' : 'pick-conf-good';
+      const evColor = isLongshot ? 'var(--amber)' : 'var(--green)';
+      const fairOddsRaw = c.evData[c.side].fairOdds;
+      const fairOddsStr = fairOddsRaw > 0 ? `+${fairOddsRaw}` : `${fairOddsRaw}`;
+
+      const reason = isLongshot
+        ? `Fair odds vs Pinnacle: ${fairOddsStr}. At ${oddsStr} this is genuine positive EV — but expect to hit ~15–25% of the time. Value comes from the size of the payoff when it lands.`
+        : `Fair odds vs Pinnacle: ${fairOddsStr}. ${c.bestBook} is offering better than fair value — ${c.ev.toFixed(1)}% edge on a real pricing gap.`;
+
+      return `
+        <div class="pick-card${isLongshot ? ' longshot-card' : ''}${isLocked ? ' locked-card' : ''}">
+          <div class="pick-game-header">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;background:var(--surface-2);color:var(--text-hint);padding:2px 7px;border-radius:10px;">${sportEmoji} ${label}</span>
+              ${isLongshot ? '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--amber-light);color:var(--amber-dark);">Long Shot</span>' : ''}
+            </div>
+            <div class="pick-game">${game.away_team} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">vs</span> ${game.home_team}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);margin-top:2px;">${gameDateTime}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+              <span class="pick-confidence ${confCls}">${confLabel}</span>
+              <span style="font-family:'DM Mono',monospace;font-size:11px;color:${evColor};">${c.ev > 0 ? '+' : ''}${c.ev.toFixed(1)}% EV</span>
+            </div>
+          </div>
+          <div class="${isLocked ? 'pick-locked-wrap' : ''}">
+            <div class="pick-body${isLocked ? ' locked-content' : ''}">
+              <div style="margin-top:10px;">
+                <div class="pick-rec">Take ${c.teamName} ${oddsStr} at ${c.bestBook}</div>
+              </div>
+              <div class="pick-reason">${reason}</div>
+              ${!isLocked ? `<a href="${bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn" style="${isLongshot ? 'background:var(--amber);' : ''}">Bet at ${c.bestBook} →</a>` : ''}
+            </div>
+            ${isLocked ? `<div class="lock-overlay" onclick="showGate()">
+              <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span class="lock-label" style="font-size:12px;">Pro</span>
+              <span class="lock-hint" style="bottom:6px;">Unlock with Capy Pro</span>
+            </div>` : ''}
+          </div>
+          ${!isLocked && !isLongshot ? '<div style="font-size:11px;font-weight:600;color:var(--green);margin-top:6px;">⚡ This edge is live now — lines move fast</div>' : ''}
+        </div>`;
+    }
+
+    // Builds the Supabase save payload for a pick candidate.
+    function buildSavePickPayload(c, pickType) {
+      const qs           = calcPickQualityScore(c.ev, c.game, c.bestOdds, c.fairProb);
+      const pinnacleRef  = c.evData?.pinnacleRef || {};
+      const isHome       = c.side === 'home';
+      return {
+        game_id:            c.game.id,
+        sport:              c.game.sport_key,
+        home_team:          c.game.home_team,
+        away_team:          c.game.away_team,
+        pick:               c.teamName,
+        bet_type:           'ml',
+        pick_type:          pickType,   // 'sharp' | 'longshot'
+        line:               null,
+        odds:               c.bestOdds,
+        book:               c.bestBook,
+        ev_percent:         c.ev,
+        edge:               null,
+        game_time:          c.game.commence_time,
+        quality_score:      qs,
+        // Bets table fields — Pinnacle reference line and fair probability
+        pinnacle_odds:      isHome ? (pinnacleRef.homePrice ?? null) : (pinnacleRef.awayPrice ?? null),
+        pinnacle_away_odds: isHome ? (pinnacleRef.awayPrice ?? null) : (pinnacleRef.homePrice ?? null),
+        true_probability:   c.fairProb ?? null,
+      };
+    }
+
+    function renderPicks() {
+      const sharpSection      = document.getElementById('sharp-picks-section');
+      const longshotSection   = document.getElementById('longshot-picks-section');
+      const sharpContainer    = document.getElementById('sharp-picks-container');
+      const longshotContainer = document.getElementById('longshot-picks-container');
+
+      console.log('[Picks] Total games available:', allGames.length,
+        'Sports:', [...new Set(allGames.map(g => g.sport_key))]);
+
+      if (!allGames.length) {
+        sharpSection.style.display = 'none';
+        longshotSection.style.display = 'none';
+        return;
+      }
+
+      const sharpCandidates    = [];
+      const longshotCandidates = [];
+
+      for (const game of allGames) {
+        // calcGameEV returns null if either Pinnacle side is missing — satisfies
+        // "Both Pinnacle sides present" requirement for both buckets.
+        const evData = calcGameEV(game);
+        if (!evData) continue;
+
+        for (const side of ['home', 'away']) {
+          const sideEV   = evData[side].ev;
+          const bestOdds = evData[side].bestOdds;
+          const bestBook = evData[side].bestBook;
+          const fairProb = evData[side].fairProb;
+          const teamName = side === 'home' ? game.home_team : game.away_team;
+
+          if (!bestOdds || !bestBook) continue;
+
+          const qs = calcPickQualityScore(sideEV, game, bestOdds, fairProb);
+
+          // ── Sharp: EV 1.5–5%, odds –200 to +300 ────────────────────────
+          if (sideEV >= 1.5 && sideEV <= 5 && bestOdds >= -200 && bestOdds <= 300) {
+            sharpCandidates.push({ game, side, teamName, ev: sideEV, qs, bestOdds, bestBook, fairProb, evData });
+          }
+
+          // ── Longshot: EV 1–5%, odds > +300 to +1500 ────────────────────
+          if (sideEV >= 1 && sideEV <= 5 && bestOdds > 300 && bestOdds <= 1500) {
+            longshotCandidates.push({ game, side, teamName, ev: sideEV, qs, bestOdds, bestBook, fairProb, evData });
+          }
+        }
+      }
+
+      // Sharp: max 1 pick per sport, sorted by quality score, top 3
+      const sharpBySport = {};
+      const sharpPicks = [];
+      for (const c of [...sharpCandidates].sort((a, b) => b.qs - a.qs)) {
+        if (sharpBySport[c.game.sport_key]) continue;
+        sharpBySport[c.game.sport_key] = true;
+        sharpPicks.push(c);
+        if (sharpPicks.length >= 3) break;
+      }
+
+      // Longshot: highest EV wins, top 2
+      const longshotPicks = [...longshotCandidates].sort((a, b) => b.ev - a.ev).slice(0, 2);
+
+      console.log('[Picks] Sharp candidates:', sharpCandidates.length, '→ selected:', sharpPicks.length,
+        '| Longshot candidates:', longshotCandidates.length, '→ selected:', longshotPicks.length);
+
+      const hasAccess = !!userEmail;
+
+      // ── Render sharp picks ──────────────────────────────────────────────
+      if (sharpPicks.length) {
+        sharpSection.style.display = 'block';
+        sharpContainer.innerHTML = sharpPicks.map((c, idx) =>
+          buildPickCard(c, 'sharp', !previewMode && !hasAccess && idx > 0)
+        ).join('');
+        const banner = document.getElementById('sharp-unlock-banner');
+        if (banner) banner.style.display = !hasAccess ? 'flex' : 'none';
+      } else {
+        sharpSection.style.display = 'none';
+      }
+
+      // ── Render longshot picks ───────────────────────────────────────────
+      if (longshotPicks.length) {
+        longshotSection.style.display = 'block';
+        longshotContainer.innerHTML = longshotPicks.map((c, idx) =>
+          buildPickCard(c, 'longshot', !previewMode && !hasAccess && idx > 0)
+        ).join('');
+        const note = document.getElementById('longshot-note');
+        if (note) note.style.display = 'block';
+      } else {
+        longshotSection.style.display = 'none';
+      }
+
+      // ── Save both buckets to Supabase (silent — never affects UI) ───────
+      const allPicksPayload = [
+        ...sharpPicks.map(c    => buildSavePickPayload(c, 'sharp')),
+        ...longshotPicks.map(c => buildSavePickPayload(c, 'longshot')),
+      ].filter(Boolean);
+      saveCappyPicksToSupabase(allPicksPayload);
+
+      // ── Parlay suggestions ──────────────────────────────────────────────
+      renderParlaysuggestions();
+    }
+
+    // ── Shared parlay helpers ─────────────────────────────────────────────────
+
+    // Returns all h2h outcomes across all games: { game, side, price, bookKey, bookName }
+    function getAllH2HOdds() {
+      const odds = [];
+      allGames.forEach(game => {
+        game.bookmakers?.forEach(bk => {
+          const h2h = bk.markets?.find(m => m.key === 'h2h');
+          if (!h2h) return;
+          h2h.outcomes?.forEach(o => {
+            odds.push({ game, side: o.name, price: o.price, bookKey: bk.key, bookName: bk.title });
+          });
+        });
+      });
+      return odds;
+    }
+
+    function combinedOddsInfo(legs) {
+      const decimal = legs.reduce((acc, l) => {
+        const d = l.price > 0 ? 1 + l.price / 100 : 1 + 100 / Math.abs(l.price);
+        return acc * d;
+      }, 1);
+      const american = decimal >= 2 ? Math.round((decimal - 1) * 100) : Math.round(-100 / (decimal - 1));
+      const payout10 = ((decimal - 1) * 10).toFixed(2);
+      const display = american > 0 ? `+${american}` : `${american}`;
+      return { decimal, american, payout10, display };
+    }
+
+    function fmtOddsAm(price) {
+      return price > 0 ? `+${price}` : `${price}`;
+    }
+
+    // Saves legs to localStorage so parlay.html can pick them up
+    function addParlayToBuilder(legs) {
+      const payload = legs.map(l => {
+        const ev = calcGameEV(l.game);
+        const isHome = l.side === l.game.home_team;
+        const fairProb = ev ? (isHome ? ev.home.fairProb : ev.away.fairProb) : null;
+        return {
+          gameId: l.game.id,
+          side: l.side,
+          price: l.price,
+          bookName: l.bookName,
+          homeTeam: l.game.home_team,
+          awayTeam: l.game.away_team,
+          sportKey: l.game.sport_key,
+          commenceTime: l.game.commence_time,
+          fairProb,
+        };
+      });
+      localStorage.setItem('capy_parlay_import', JSON.stringify(payload));
+      window.open('/parlay.html', '_blank');
+    }
+
+    // ── Render all three parlay suggestion cards ──────────────────────────────
+
+    function renderParlaysuggestions() {
+      const section = document.getElementById('parlay-suggestions-section');
+      if (!allGames.length) { section.style.display = 'none'; return; }
+
+      const allOdds = getAllH2HOdds();
+      if (!allOdds.length) { section.style.display = 'none'; return; }
+
+      const safeHtml  = buildSafeParlayCard(allOdds);
+      const valueHtml = buildValueParlayCard();
+      const upsideHtml = buildUpsideParlayCard(allOdds);
+
+      document.getElementById('safe-parlay-container').innerHTML   = safeHtml;
+      document.getElementById('value-parlay-container').innerHTML  = valueHtml;
+      document.getElementById('upside-parlay-container').innerHTML = upsideHtml;
+
+      const hasAny = safeHtml || valueHtml || upsideHtml;
+      section.style.display = hasAny ? 'block' : 'none';
+    }
+
+    function buildSafeParlayCard(allOdds) {
+      // Heaviest favorites, odds between -200 and -600, one per game
+      const seenGames = new Set();
+      const legs = [];
+      [...allOdds]
+        .filter(o => o.price <= -200 && o.price >= -600)
+        .sort((a, b) => a.price - b.price) // most negative first
+        .forEach(o => {
+          if (seenGames.has(o.game.id) || legs.length >= 3) return;
+          seenGames.add(o.game.id);
+          legs.push(o);
+        });
+
+      if (legs.length < 2) return '';
+
+      const { payout10, display } = combinedOddsInfo(legs);
+      const legsHtml = legs.map(l => {
+        const emoji = SPORT_EMOJIS[l.game.sport_key] || '🎯';
+        return `<div class="parlay-leg">${emoji} ${l.side} ML <span style="font-family:'DM Mono',monospace;">${fmtOddsAm(l.price)}</span><br><span style="font-weight:400;opacity:0.75;">${l.game.away_team} vs ${l.game.home_team}</span></div>`;
+      }).join('');
+
+      const idx = Date.now(); // unique enough for onclick
+      // store legs ref for onclick
+      window._safeParlayLegs = legs;
+
+      return `
+        <div class="parlay-card parlay-card--safe">
+          <span class="parlay-badge parlay-badge--safe">✅ High Win Probability</span>
+          <div class="parlay-card-title">🛡️ Safe Play — Heavy Favorites</div>
+          <div class="parlay-card-sub">High probability, low payout. Best for conservative bettors.</div>
+          <div class="parlay-legs">${legsHtml}</div>
+          <div style="margin-top:6px;">
+            <div class="parlay-payout-label" style="color:#3B82F6;">Combined odds · $10 bet pays</div>
+            <div style="display:flex;align-items:baseline;gap:10px;">
+              <div class="parlay-payout-num">$${payout10}</div>
+              <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:#2563EB;">${display}</div>
+            </div>
+          </div>
+          <button class="parlay-add-btn parlay-add-btn--safe" onclick="addParlayToBuilder(window._safeParlayLegs)">Add to builder →</button>
+        </div>`;
+    }
+
+    function buildValueParlayCard() {
+      // Best EV vs Pinnacle legs, one per game, up to 3
+      const getBestEVForGame = g => {
+        const ev = calcGameEV(g);
+        if (!ev) return null;
+        const isHome = ev.home.ev >= ev.away.ev;
+        return {
+          game: g,
+          side: isHome ? g.home_team : g.away_team,
+          ev: isHome ? ev.home.ev : ev.away.ev,
+          bestBook: isHome ? ev.home.bestBook : ev.away.bestBook,
+          price: isHome ? ev.home.bestOdds : ev.away.bestOdds
+        };
+      };
+
+      const candidates = allGames
+        .map(getBestEVForGame)
+        .filter(Boolean)
+        .sort((a, b) => b.ev - a.ev)
+        .slice(0, 3);
+
+      if (candidates.length < 2) return '';
+
+      // Build legs in getAllH2HOdds format for addParlayToBuilder
+      const legs = candidates.map(c => ({
+        game: c.game,
+        side: c.side,
+        price: c.price,
+        bookKey: '',
+        bookName: c.bestBook
+      }));
+
+      const { payout10, display } = combinedOddsInfo(legs);
+      const avgEV = (candidates.reduce((s, c) => s + c.ev, 0) / candidates.length).toFixed(1);
+      const evSign = parseFloat(avgEV) > 0 ? '+' : '';
+
+      const legsHtml = candidates.map(c => {
+        const emoji = SPORT_EMOJIS[c.game.sport_key] || '🎯';
+        const evSign = c.ev > 0 ? '+' : '';
+        return `<div class="parlay-leg">${emoji} ${c.side} ML <span style="font-family:'DM Mono',monospace;">${fmtOddsAm(c.price)}</span> @ ${c.bestBook}<br><span style="font-weight:400;opacity:0.75;">${evSign}${c.ev.toFixed(1)}% EV · ${c.game.away_team} vs ${c.game.home_team}</span></div>`;
+      }).join('');
+
+      window._valueParlayLegs = legs;
+
+      return `
+        <div class="parlay-card parlay-card--value">
+          <span class="parlay-badge parlay-badge--value">📍 EV-Optimized</span>
+          <div class="parlay-card-title">📊 Value Play — Best EV Legs</div>
+          <div class="parlay-card-sub">Mathematically selected. Best legs by EV vs Pinnacle sharp line.</div>
+          <div class="parlay-legs">${legsHtml}</div>
+          <div class="parlay-ev-row parlay-ev-row--value">Avg EV: ${evSign}${avgEV}% vs Pinnacle</div>
+          <div style="margin-top:6px;">
+            <div class="parlay-payout-label">Combined odds · $10 bet pays</div>
+            <div style="display:flex;align-items:baseline;gap:10px;">
+              <div class="parlay-payout-num">$${payout10}</div>
+              <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--green);">${display}</div>
+            </div>
+          </div>
+          <button class="parlay-add-btn parlay-add-btn--value" onclick="addParlayToBuilder(window._valueParlayLegs)">Add to builder →</button>
+        </div>`;
+    }
+
+    function buildUpsideParlayCard(allOdds) {
+      // Biggest underdogs by highest moneyline odds, one per game, 3 legs
+      const seenGames = new Set();
+      const legs = [];
+      [...allOdds]
+        .filter(o => o.price > 0)
+        .sort((a, b) => b.price - a.price)
+        .forEach(o => {
+          if (seenGames.has(o.game.id) || legs.length >= 3) return;
+          seenGames.add(o.game.id);
+          legs.push(o);
+        });
+
+      if (legs.length < 2) return '';
+
+      const { payout10, display } = combinedOddsInfo(legs);
+      const legsHtml = legs.map(l => {
+        const emoji = SPORT_EMOJIS[l.game.sport_key] || '🎯';
+        return `<div class="parlay-leg">${emoji} ${l.side} ML <span style="font-family:'DM Mono',monospace;">${fmtOddsAm(l.price)}</span><br><span style="font-weight:400;opacity:0.75;">${l.game.away_team} vs ${l.game.home_team}</span></div>`;
+      }).join('');
+
+      window._upsideParlayLegs = legs;
+
+      return `
+        <div class="parlay-card parlay-card--upside">
+          <span class="parlay-badge parlay-badge--upside">⚠️ Negative EV — entertainment only</span>
+          <div class="parlay-card-title">🎰 High Upside — Long Shot Parlay</div>
+          <div class="parlay-card-sub">Maximum potential payout. Not a smart bet — but if it hits... 🤑</div>
+          <div class="parlay-legs">${legsHtml}</div>
+          <div style="margin-top:6px;">
+            <div class="parlay-payout-label">Combined odds · $10 bet pays</div>
+            <div style="display:flex;align-items:baseline;gap:10px;">
+              <div class="parlay-payout-num">$${payout10}</div>
+              <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--amber);">${display}</div>
+            </div>
+          </div>
+          <button class="parlay-add-btn parlay-add-btn--upside" onclick="addParlayToBuilder(window._upsideParlayLegs)">Add to builder →</button>
+        </div>`;
+    }
+
+    async function saveCappyPicksToSupabase(picks) {
+      try {
+        await fetch('/api/save-picks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ picks })
+        });
+      } catch (err) {
+        console.log('[Capy] Could not save picks to database:', err.message);
+      }
+    }
+
+    function buildGameCard(game, idx) {
+      const gameUrl = `/game.html?home=${encodeURIComponent(game.home_team)}&away=${encodeURIComponent(game.away_team)}&sport=${game.sport_key}&time=${encodeURIComponent(game.commence_time)}&id=${game.id}`;
+      const sport = game.sport_key;
+      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
+      const tagClass = 'tag-' + tagKey;
+      const label = SPORT_LABELS[sport] || sport;
+      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
+      const time = fmtGameDate(game.commence_time);
+      const edgeInfo = calcEdgeInfo(game);
+      const edge = edgeInfo.value;
+      const isTopEdge = idx < 3 && edge > 0;
+      const isFirst = idx === 0;
+
+      const books = BOOK_KEYS.map(k =>
+        game.bookmakers?.find(bk => bk.key && bk.key.toLowerCase().includes(k)) ||
+        game.bookmakers?.find(bk => bk.title && bk.title.toLowerCase().includes(k.slice(0,5)))
+      );
+
+      const h2hRows = buildOddsRows(game, books, 'h2h', isFirst);
+      const spreadRows = buildOddsRows(game, books, 'spreads', isFirst);
+      const totalRows = buildOddsRows(game, books, 'totals', isFirst);
+
+      const edgeBadge = edge > 0
+        ? edgeInfo.type === 'spread'
+          ? `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 Top Edge ' : ''}+${edge} pts</span>`
+          : `<span class="${isTopEdge ? 'top-edge-badge' : 'edge-badge'}">${isTopEdge ? '🔥 ' : ''}Best ML</span>`
+        : '';
+
+      const edgeRowText = edgeInfo.type === 'spread'
+        ? `Spread edge: best line is ${edge} pts better than worst available`
+        : edgeInfo.type === 'moneyline'
+          ? `Best moneyline: ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books — bet the better number`
+          : '';
+
+      const edgeRow = edge > 0
+        ? edgeInfo.type === 'spread'
+          ? `<div class="game-edge-row">
+              <div class="game-edge-big">+${edge} pts</div>
+              <div class="game-edge-text">${edgeRowText}</div>
+             </div>`
+          : `<div class="game-edge-row">
+              <div class="game-edge-text" style="font-size:12px;">${edgeRowText}</div>
+             </div>`
+        : '';
+
+      const mktHeader = (title, tip) =>
+        `<div class="odds-market-header"><span class="odds-market-label">${title}</span><span class="bet-type-help" data-tip="${tip}">?</span></div>`;
+
+      const legend = `<div class="odds-legend">
+        <span><span class="legend-dot legend-green"></span>Best line</span>
+        <span><span class="legend-dot legend-red"></span>Worst line</span>
+        <span><span class="legend-dot legend-neutral"></span>All equal</span>
+      </div>`;
+
+      const mobileSnapshot = buildMobileSnapshot(game, books);
+
+      const parlayLegsNow = loadParlayLegs();
+      const alreadyInParlay = parlayLegsNow.some(l => l.gameId === game.id);
+      const gameEV = calcGameEV(game);
+      const evTipText = 'EV = Expected Value. +EV means this line beats the true probability — mathematically profitable long term. Capy removes the bookmaker\'s margin to find this.';
+      const evContextLabel = getEVContextLabel(gameEV);
+      let evRowHtml = '';
+      let verifyBadge = '';
+      if (gameEV) {
+        // Game has a Pinnacle line — show full EV breakdown per side
+        const hEV = classifyEV(gameEV.home.ev);
+        const aEV = classifyEV(gameEV.away.ev);
+        const homeShort = game.home_team.split(' ').pop();
+        const awayShort = game.away_team.split(' ').pop();
+        evRowHtml = `<div class="ev-game-row">
+          <span class="ev-game-item"><span class="ev-badge ${hEV.cls}">${hEV.emoji} ${hEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${homeShort} ML at ${gameEV.home.bestBook}</span><span class="ev-tip" data-tip="${evTipText}">?</span></span>
+          <span class="ev-game-item"><span class="ev-badge ${aEV.cls}">${aEV.emoji} ${aEV.label}</span><span style="font-size:10px;color:var(--text-hint);">${awayShort} ML at ${gameEV.away.bestBook}</span></span>
+          <span style="font-size:10px;color:var(--text-hint);font-style:italic;">📍 vs Pinnacle</span>
+        </div>`;
+        if (gameEV.suspicious) {
+          verifyBadge = `<span class="ev-verify-badge" title="EV 10-15% — verify odds before betting">⚠️ Verify odds</span>`;
+        }
+      } else {
+        // No Pinnacle line available for this game — EV cannot be calculated
+        evRowHtml = `<div style="font-size:10px;color:var(--text-hint);padding:2px 18px 6px;font-family:'Outfit',sans-serif;">No sharp line — EV unavailable</div>`;
+      }
+      const freshness = fmtFreshness(game.sport_key);
+      const pinnacleRow = buildPinnacleRow(game, gameEV);
+      return `
+        <div class="game-card ${isFirst ? 'best-value' : ''}" data-gameid="${game.id}">
+          <div class="game-header">
+            <div class="game-teams" style="cursor:pointer;" onclick="window.location='${gameUrl}'">${sportEmoji} ${game.away_team} <span style="color:var(--text-hint);font-weight:400;">@</span> ${game.home_team} <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:6px;">View breakdown →</span></div>
+            <div class="game-tags">
+              <span class="sport-tag ${tagClass}">${label}</span>
+              <span class="game-time">${time}</span>
+              ${freshness}
+              ${evContextLabel ? `<span class="ev-badge ${evContextLabel.cls}">${evContextLabel.label}</span>` : edgeBadge}
+              ${verifyBadge}
+              <button id="parlay-btn-${game.id}" class="add-parlay-btn${alreadyInParlay ? ' added' : ''}" onclick="event.stopPropagation();addToParlayFromGame('${game.id}')">${alreadyInParlay ? '✓ Added' : '➕ Add to parlay'}</button>
+            </div>
+            ${evRowHtml}
+            ${pinnacleRow}
+          </div>
+          ${mobileSnapshot}
+          <div class="mobile-expand-body" id="mob-body-${game.id}">
+            ${edgeRow}
+            ${legend}
+            <div class="odds-table-desktop">
+              <div class="odds-table">
+                <div class="odds-grid odds-grid-6" style="padding:0 16px;">
+                  <div class="odds-col-header"></div>
+                  ${BOOK_SHORT.map(b => `<div class="book-header">${b}</div>`).join('')}
+                  ${mktHeader('Moneyline','Pick which team wins outright. Negative odds = favorite, positive odds = underdog.')}
+                  ${h2hRows}
+                  <div class="odds-divider"></div>
+                  ${mktHeader('Spread','Bet on the margin of victory. The favorite must win by more than the spread.')}
+                  ${spreadRows}
+                  <div class="odds-divider"></div>
+                  ${mktHeader('Total','Bet on the combined score of both teams going over or under a set number.')}
+                  ${totalRows}
+                </div>
+              </div>
+            </div>
+            <div class="odds-mobile">
+              ${buildMobileOdds(game, books, isFirst)}
+            </div>
+          </div>
+          <button class="mobile-toggle-btn" id="mob-btn-${game.id}" onclick="toggleMobileCard('${game.id}')">Show all books ▼</button>
+          ${['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'].includes(game.sport_key) ? `
+          <button class="props-preview-btn" id="props-btn-${game.id}" onclick="event.stopPropagation();togglePropsPreview('${game.id}','${game.sport_key}')">🎯 Player Props ▼</button>
+          <div class="props-preview-panel" id="props-panel-${game.id}" style="display:none;"></div>` : ''}
+        </div>`;
+    }
+
+    // ── Mobile odds snapshot (collapsed card summary) ───────────────────
+    function buildMobileSnapshot(game, books) {
+      let awayBest = null, homeBest = null, bestBookName = null, bestBookPrice = null;
+      books.forEach((book, i) => {
+        if (!book) return;
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        if (!h2h) return;
+        h2h.outcomes?.forEach(outcome => {
+          if (outcome.name === game.away_team && (awayBest === null || outcome.price > awayBest)) {
+            awayBest = outcome.price;
+          }
+          if (outcome.name === game.home_team && (homeBest === null || outcome.price > homeBest)) {
+            homeBest = outcome.price;
+          }
+          if (bestBookPrice === null || outcome.price > bestBookPrice) {
+            bestBookPrice = outcome.price;
+            bestBookName = BOOKS[i];
+          }
+        });
+      });
+      if (awayBest === null && homeBest === null) return '';
+      const awayShort = game.away_team.split(' ').pop();
+      const homeShort = game.home_team.split(' ').pop();
+      const fmt = p => p > 0 ? `+${p}` : `${p}`;
+      const awayStr = awayBest !== null ? fmt(awayBest) : '—';
+      const homeStr = homeBest !== null ? fmt(homeBest) : '—';
+      return `<div class="mobile-snapshot">
+        <div class="mobile-snapshot-odds">
+          <span class="mobile-snapshot-team">${awayShort}</span>
+          <span class="mobile-snapshot-val">${awayStr}</span>
+          <span class="mobile-snapshot-sep">·</span>
+          <span class="mobile-snapshot-team">${homeShort}</span>
+          <span class="mobile-snapshot-val">${homeStr}</span>
+        </div>
+        ${bestBookName ? `<div class="mobile-snapshot-right"><span class="mobile-snapshot-book">Best at ${bestBookName}</span></div>` : ''}
+      </div>`;
+    }
+
+    const MARKET_TIPS = {
+      h2h: 'Pick which team wins outright. Negative odds = favorite, positive odds = underdog.',
+      spreads: 'Bet on the margin of victory. The favorite must win by more than the spread.',
+      totals: 'Bet on the combined score of both teams going over or under a set number.'
+    };
+    const MARKET_NAMES = { h2h: 'Moneyline', spreads: 'Spread', totals: 'Total (O/U)' };
+
+    function buildMobileOdds(game, books, isFirst) {
+      return ['h2h','spreads','totals'].map(market => {
+        const sides = market === 'totals' ? ['Over','Under'] : [game.away_team, game.home_team];
+        const rows = sides.map((side, ri) => {
+          const vals = books.map((book, i) => {
+            if (!book) return null;
+            const mkt = book.markets?.find(m => m.key === market);
+            const outcome = mkt?.outcomes?.find(o => o.name === side);
+            if (!outcome) return null;
+            let val;
+            if (market === 'spreads') val = `${outcome.point >= 0 ? '+' : ''}${outcome.point}`;
+            else if (market === 'totals') val = `${ri === 0 ? 'o' : 'u'}${outcome.point}`;
+            else val = outcome.price >= 0 ? `+${outcome.price}` : `${outcome.price}`;
+            return { val, num: parseFloat(val.replace(/[ou+]/g,'')), idx: i };
+          });
+          const validNums = vals.filter(Boolean).map(v => v.num);
+          const best = validNums.length ? Math.max(...validNums) : null;
+          const worst = validNums.length ? Math.min(...validNums) : null;
+          const hasVariance = best !== null && best !== worst && validNums.length > 1;
+          const sideLabel = market === 'h2h' ? side.split(' ').pop() + ' to win'
+            : market === 'spreads' ? side.split(' ').pop() + ' (spread)'
+            : side;
+          const bookRows = vals.map(v => {
+            if (!v) return '';
+            const isBest = hasVariance && v.num === best;
+            const isWorst = hasVariance && v.num === worst;
+            const isLocked = !previewMode && !isFirst && !userEmail && v.idx > 2;
+            const betBtn = isBest && !isLocked && market === 'h2h' && BOOK_URLS[BOOK_KEYS[v.idx]]
+              ? `<a href="${BOOK_URLS[BOOK_KEYS[v.idx]]}" target="_blank" rel="noopener" class="odds-mobile-bet-btn" onclick="event.stopPropagation()">Bet →</a>`
+              : '';
+            const valHtml = isLocked
+              ? `<span class="mobile-lock-icon" onclick="showGate()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Pro</span>`
+              : `<span class="odds-mobile-val ${isBest ? 'best' : isWorst ? 'worst' : ''}">${v.val}</span>`;
+            return `<div class="odds-mobile-row">
+              <div class="odds-mobile-book">${BOOKS[v.idx]}</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                ${valHtml}
+                ${betBtn}
+              </div>
+            </div>`;
+          }).join('');
+          return `<div class="odds-mobile-side-label">${sideLabel}</div>${bookRows}`;
+        }).join('');
+        return `<div class="odds-mobile-section">
+          <div class="odds-mobile-market">${MARKET_NAMES[market]}<span class="bet-type-help" data-tip="${MARKET_TIPS[market]}">?</span></div>
+          ${rows}
+        </div>`;
+      }).join('');
+    }
+
+    function buildOddsRows(game, books, market, isFirst) {
+      const sides = market === 'totals' ? ['Over','Under'] : [game.away_team, game.home_team];
+      if (!sides[0]) return '';
+
+      // Pre-compute fair probs for EV cell badges (h2h only) — Pinnacle-only, no US book fallback
+      const fairProbs = {};
+      if (market === 'h2h') {
+        const gameEVData = calcGameEV(game);
+        if (gameEVData) {
+          fairProbs[game.home_team] = gameEVData.home.fairProb;
+          fairProbs[game.away_team] = gameEVData.away.fairProb;
+        }
+      }
+
+      return sides.map((side, ri) => {
+        const vals = books.map(book => {
+          if (!book) return null;
+          const mkt = book.markets?.find(m => m.key === market);
+          const outcome = mkt?.outcomes?.find(o => o.name === side);
+          if (!outcome) return null;
+          if (market === 'spreads') return `${outcome.point >= 0 ? '+' : ''}${outcome.point}`;
+          if (market === 'totals') return `${ri === 0 ? 'o' : 'u'}${outcome.point}`;
+          return outcome.price >= 0 ? `+${outcome.price}` : `${outcome.price}`;
+        });
+
+        // Get first available point value to use in the row label
+        let firstPoint = null;
+        for (const book of books) {
+          if (!book) continue;
+          const mkt = book.markets?.find(m => m.key === market);
+          const outcome = mkt?.outcomes?.find(o => o.name === side);
+          if (outcome?.point != null) { firstPoint = outcome.point; break; }
+        }
+
+        const teamShort = side.split(' ').pop();
+        let label;
+        if (market === 'h2h') {
+          label = `${teamShort} to win`;
+        } else if (market === 'spreads') {
+          const pt = firstPoint != null ? (firstPoint >= 0 ? `+${firstPoint}` : `${firstPoint}`) : '';
+          label = `${teamShort} ${pt} (spread)`;
+        } else {
+          label = firstPoint != null ? `${side} ${firstPoint} pts` : side;
+        }
+
+        const numVals = vals.map(v => v ? parseFloat(v.replace(/[ou+]/g,'')) : null);
+        const validNums = numVals.filter(v => v !== null);
+        const best = validNums.length ? Math.max(...validNums) : null;
+        const worst = validNums.length ? Math.min(...validNums) : null;
+        const allEqual = best !== null && best === worst && validNums.length > 1;
+        const hasVariance = !allEqual && validNums.length > 1;
+        const bestCount = hasVariance ? validNums.filter(v => v === best).length : 0;
+        const altClass = ri % 2 === 1 ? 'row-alt' : '';
+
+        const cells = vals.map((v, i) => {
+          if (!v) return `<div class="odds-cell odds-cell-empty" title="This book doesn't offer odds on this game">—</div>`;
+          const num = numVals[i];
+          const isLocked = !previewMode && !isFirst && !userEmail && i > 2;
+          let cellClass = '';
+          if (hasVariance) {
+            if (num === best) cellClass = bestCount === 1 ? 'best' : 'tied-best';
+            else if (num === worst) cellClass = 'worst';
+          }
+          const betNow = (cellClass === 'best' && market === 'h2h' && BOOK_KEYS[i])
+            ? `<a href="${BOOK_URLS[BOOK_KEYS[i]] || '#'}" target="_blank" rel="noopener" class="bet-now-link" style="display:block;margin-top:3px;text-align:center;" onclick="event.stopPropagation()">Bet →</a>`
+            : '';
+          // EV indicator for moneyline cells only
+          let evCellHtml = '';
+          if (market === 'h2h' && !isLocked && fairProbs[side] != null) {
+            const cellEV = calcEVFromOdds(num, fairProbs[side]);
+            const evC = classifyEV(cellEV);
+            evCellHtml = `<span class="ev-badge ev-cell ${evC.cls}">${evC.label}</span>`;
+          }
+          if (isLocked) {
+            return `<div class="odds-cell ${cellClass} ${altClass} locked" onclick="showGate()">
+              <span class="locked-content">${v}${betNow}${evCellHtml}</span>
+              <div class="lock-overlay">
+                <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span class="lock-label">Pro</span>
+                <span class="lock-hint">Unlock with Capy Pro</span>
+              </div>
+            </div>`;
+          }
+          return `<div class="odds-cell ${cellClass} ${altClass}">${v}${betNow}${evCellHtml}</div>`;
+        });
+
+        const allEqualNote = allEqual
+          ? `<div style="grid-column:1/-1;font-size:10px;color:var(--text-hint);text-align:center;padding:1px 0 3px;letter-spacing:0.2px;">All books equal</div>`
+          : '';
+
+        return `<div class="odds-row-label ${altClass}">${label}</div>${cells.join('')}${allEqualNote}`;
+      }).join('');
+    }
+
+    function showError() {
+      document.getElementById('games-container').innerHTML = `
+        <div class="error-state">
+          <span class="error-icon">🦫</span>
+          <div class="error-title">Couldn't load odds</div>
+          <div class="error-sub">Something went wrong fetching live data. Check your connection and try again.</div>
+          <button class="retry-btn" onclick="oddsCache={}; loadSport(currentSport)">Retry</button>
+        </div>`;
+    }
+
+    function showGate() {
+      if (gateShown) return;
+      document.getElementById('gate-overlay').classList.add('show');
+    }
+
+    function closeGate() {
+      document.getElementById('gate-overlay').classList.remove('show');
+      gateShown = true;
+    }
+
+    function handleGateSubmit() {
+      const email = document.getElementById('gate-email').value;
+      if (!email || !email.includes('@')) {
+        document.getElementById('gate-email').style.borderColor = '#D85A30';
+        setTimeout(() => { document.getElementById('gate-email').style.borderColor = ''; }, 1500);
+        return;
+      }
+      userEmail = email;
+      localStorage.setItem('capy_email', email);
+      document.getElementById('gate-form').style.display = 'none';
+      document.getElementById('gate-success').style.display = 'block';
+      window.open(`https://getcapy.beehiiv.com/subscribe?email=${encodeURIComponent(email)}`, '_blank');
+      renderGames();
+    }
+
+    document.getElementById('gate-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleGateSubmit();
+    });
+
+    setTimeout(() => {
+      if (!userEmail) showGate();
+    }, 45000);
+
+    startLiveCounter();
+    loadSport('all');
+    setInterval(() => { oddsCache = {}; loadSport(currentSport); }, 300000);
+
+    // Init view toggle UI on page load
+    updateViewToggleUI();
+
+    // ── Mobile card collapse ─────────────────────────────────────────────
+    function toggleMobileCard(gameId) {
+      if (window.innerWidth >= 700) return;
+      const body = document.getElementById('mob-body-' + gameId);
+      const btn = document.getElementById('mob-btn-' + gameId);
+      if (!body) return;
+      const isOpen = body.classList.contains('open');
+      // Collapse all other cards
+      document.querySelectorAll('.mobile-expand-body.open').forEach(el => {
+        el.classList.remove('open');
+        const id = el.id.replace('mob-body-', '');
+        const b = document.getElementById('mob-btn-' + id);
+        if (b) b.textContent = 'Show all books ▼';
+      });
+      // Open this one if it was closed
+      if (!isOpen) {
+        body.classList.add('open');
+        if (btn) btn.textContent = 'Hide ▲';
+      }
+    }
+
+    function togglePickCard(gameId) {
+      if (window.innerWidth >= 700) return;
+      const body = document.getElementById('pick-mob-' + gameId);
+      const btn = document.getElementById('pick-btn-' + gameId);
+      if (!body) return;
+      const isOpen = body.classList.contains('open');
+      // Collapse all other pick cards
+      document.querySelectorAll('.pick-mobile-body.open').forEach(el => {
+        el.classList.remove('open');
+        const id = el.id.replace('pick-mob-', '');
+        const b = document.getElementById('pick-btn-' + id);
+        if (b) b.textContent = 'Show details ▼';
+      });
+      if (!isOpen) {
+        body.classList.add('open');
+        if (btn) btn.textContent = 'Hide ▲';
+      }
+    }
+
+    // ── Parlay integration ────────────────────────────────────────────────
+    function loadParlayLegs() {
+      try { return JSON.parse(localStorage.getItem('capy_parlay') || '[]'); } catch { return []; }
+    }
+    function saveParlayLegs(legs) {
+      localStorage.setItem('capy_parlay', JSON.stringify(legs));
+    }
+    function updateParlayNavCount() {
+      const legs = loadParlayLegs();
+      const count = legs.length;
+      const el = document.getElementById('parlay-nav-count');
+      const countEl = document.getElementById('parlay-count');
+      if (el) el.style.display = count > 0 ? 'inline-flex' : 'none';
+      if (countEl) countEl.textContent = count;
+    }
+    function showParlayToast(awayTeam, homeTeam) {
+      const toast = document.getElementById('parlay-toast');
+      if (!toast) return;
+      toast.querySelector('.toast-teams').textContent = `${awayTeam.split(' ').pop()} @ ${homeTeam.split(' ').pop()} added`;
+      toast.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+    function addToParlayFromGame(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      if (!game) return;
+      const bestBook = getBestBookForGame(game);
+      if (!bestBook) return;
+
+      // Get the other side's odds for EV calculation
+      let otherSideOdds = null;
+      BOOK_KEYS.forEach((k, i) => {
+        const book = game.bookmakers?.find(bk => bk.key?.toLowerCase().includes(k)) ||
+                     game.bookmakers?.find(bk => bk.title?.toLowerCase().includes(k.slice(0,5)));
+        if (!book) return;
+        const h2h = book.markets?.find(m => m.key === 'h2h');
+        const other = h2h?.outcomes?.find(o => o.name !== bestBook.side);
+        if (other && (otherSideOdds === null || other.price > otherSideOdds)) otherSideOdds = other.price;
+      });
+
+      // Attach no-vig fair probability for accurate parlay EV on the receiving page
+      const evForLeg = calcGameEV(game);
+      const isHome = bestBook.side === game.home_team;
+      const fairProb = evForLeg ? (isHome ? evForLeg.home.fairProb : evForLeg.away.fairProb) : null;
+
+      const leg = {
+        gameId: game.id,
+        sideType: isHome ? 'home_ml' : 'away_ml',
+        side: bestBook.side,
+        market: 'h2h',
+        odds: bestBook.price,
+        point: null,
+        homeTeam: game.home_team,
+        awayTeam: game.away_team,
+        sportKey: game.sport_key,
+        commenceTime: game.commence_time,
+        bookName: bestBook.bookName,
+        otherSideOdds,
+        fairProb,
+      };
+
+      let legs = loadParlayLegs();
+      legs = legs.filter(l => l.gameId !== gameId);
+      if (legs.length < 10) {
+        legs.push(leg);
+        saveParlayLegs(legs);
+        updateParlayNavCount();
+        showParlayToast(game.away_team, game.home_team);
+        // Update button state
+        const btn = document.getElementById('parlay-btn-' + gameId);
+        if (btn) { btn.textContent = '✓ Added'; btn.classList.add('added'); }
+      }
+    }
+    // Init parlay count on load
+    updateParlayNavCount();
+
+    // ── Theme toggle ─────────────────────────────────────────────────────
+    function toggleTheme() {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('capy_theme', next);
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = next === 'dark' ? '☀️' : '🌙';
+    }
+    (function() {
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    })();
+  </script>
+
+  <div class="parlay-toast" id="parlay-toast">
+    🎰 <span class="toast-teams"></span> · <a href="/parlay.html">View parlay →</a>
+  </div>
+
+</body>
+</html>

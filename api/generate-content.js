@@ -80,18 +80,30 @@ module.exports = async (req, res) => {
     });
 
     // ── 5. Format pick data for the prompt ────────────────────────────────────
+    // Returns null for picks missing required fields — callers must filter(Boolean).
     const fmtPick = (p, label) => {
-      const ev   = p.ev_percent != null ? `+${parseFloat(p.ev_percent).toFixed(1)}%` : 'EV unknown';
-      const odds = p.odds > 0 ? `+${p.odds}` : `${p.odds}`;
-      return `  ${label} ${p.pick} ${odds} (${p.book}) vs Pinnacle → ${ev} EV | Game: ${p.away_team} @ ${p.home_team} [${p.sport || '?'}]`;
+      if (!p.pick || typeof p.pick !== 'string' || !p.pick.trim() ||
+          !p.away_team || typeof p.away_team !== 'string' || !p.away_team.trim() ||
+          !p.home_team || typeof p.home_team !== 'string' || !p.home_team.trim()) {
+        console.warn('[generate-content] Skipping pick with missing required fields:', {
+          pick: p.pick, away_team: p.away_team, home_team: p.home_team, game_id: p.game_id,
+        });
+        return null;
+      }
+      const ev       = p.ev_percent != null ? `+${parseFloat(p.ev_percent).toFixed(1)}%` : 'EV unknown';
+      const odds     = p.odds > 0 ? `+${p.odds}` : `${p.odds}`;
+      const pinnacle = p.pinnacle_odds != null
+        ? (p.pinnacle_odds > 0 ? `+${p.pinnacle_odds}` : `${p.pinnacle_odds}`)
+        : '?';
+      return `  ${label} ${p.pick} ${odds} @ ${p.book} | Pinnacle: ${pinnacle} | Gap: ${ev} EV | Game: ${p.away_team} @ ${p.home_team} [${p.sport || '?'}]`;
     };
 
     const sharpText = sharpPicks.length
-      ? `SHARP PICKS (EV ≥1%, odds -200 to +300):\n${sharpPicks.map(p => fmtPick(p, '•')).join('\n')}\n\n`
+      ? `SHARP PICKS (EV ≥1%, odds -200 to +300):\n${sharpPicks.map(p => fmtPick(p, '•')).filter(Boolean).join('\n')}\n\n`
       : '';
 
     const longshotText = longshotPicks.length
-      ? `LONG SHOT PLAYS (EV ≥1%, odds +300 to +1500 — high variance, expected hit rate ~15-25%):\n${longshotPicks.map(p => fmtPick(p, '⚡')).join('\n')}\n\n`
+      ? `LONG SHOT PLAYS (EV ≥1%, odds +300 to +1500 — high variance, expected hit rate ~15-25%):\n${longshotPicks.map(p => fmtPick(p, '⚡')).filter(Boolean).join('\n')}\n\n`
       : '';
 
     const noEvText = noEvPicks.length
@@ -104,13 +116,17 @@ module.exports = async (req, res) => {
     // ── 6. Yesterday's results context ────────────────────────────────────────
     let resultsContextForPrompt = '';
     if (yesterdayResults.length) {
+      const wins   = yesterdayResults.filter(r => r.outcome === 'win').length;
+      const losses = yesterdayResults.filter(r => r.outcome === 'loss').length;
+      const pushes = yesterdayResults.filter(r => r.outcome === 'push').length;
+      const record = `${wins}-${losses}${pushes > 0 ? `-${pushes}` : ''}`;
       const lines = yesterdayResults.map(r => {
         const p = r.picks || {};
-        const odds = p.odds > 0 ? `+${p.odds}` : `${p.odds}`;
+        const odds = p.odds != null ? (p.odds > 0 ? `+${p.odds}` : `${p.odds}`) : '?';
         const outcome = r.outcome === 'win' ? 'WIN' : r.outcome === 'loss' ? 'LOSS' : 'PUSH';
-        return `  ${p.pick} ${odds} — ${outcome}`;
+        return `  ${p.pick || '?'} ${odds} — ${outcome}`;
       });
-      resultsContextForPrompt = `YESTERDAY'S RESOLVED RESULTS (reference these honestly in Reddit and follow-up content):\n${lines.join('\n')}\n\n`;
+      resultsContextForPrompt = `YESTERDAY'S RESOLVED RESULTS (${record} record):\n${lines.join('\n')}\n\nFRAMING INSTRUCTION FOR LOSSES: Never use phrases like "didn't go our way", "tough day", or "unlucky". If any losses occurred, frame it as: "${record} yesterday — this is what +EV betting looks like short term. Variance is real. The edge plays out over hundreds of bets, not daily."\n\n`;
     }
 
     // ── 7. Follow-up context from previous generated content ──────────────────
@@ -148,40 +164,38 @@ module.exports = async (req, res) => {
       ? `\n\nNO QUALIFYING PICKS TODAY: There are no picks with EV ≥1% today. Generate content about the Capy methodology instead — how Pinnacle de-vig works, why most lines are efficient, and what "expected value" actually means in practice. Do not invent or mention specific picks. Be honest that the tool found no clear edges today — this builds credibility.`
       : '';
 
-    const prompt = `You are the analytical content voice for Capy (getcapy.co).
+    const prompt = `You are the content voice for Capy (getcapy.co) — a tool that finds +EV bets by comparing sportsbook odds to Pinnacle's sharp line. Write as the builder, not as a brand. Sound like a sharp bettor sharing what they found.
 
-WHAT CAPY IS: A market inefficiency tool that compares sportsbook odds to Pinnacle's sharp line to find mispriced odds. NOT a picks page. NOT a tout service.
-CORE MESSAGE: "Books move at different speeds. We find where they're wrong."
+CORE MESSAGE: Books move at different speeds. The gap between a US book and Pinnacle is where the edge lives.
 
-ABSOLUTE BRAND RULES — never violate these:
-- NEVER USE: "hot picks", "lock", "go-to expert", "can they pull it off", "bet like a pro", "potential payout feels", "guaranteed", "locks", "fire play", "best bet"
-- ALWAYS USE: data-first language — show the math, cite the EV, name the books
-- Voice: analytical, direct, humble, credible — like a sharp bettor sharing research, not a tout selling picks
-- Never claim guaranteed wins — always frame as edges and probabilities
-- If uncertain, say so. Honesty builds more credibility than hype.
+ABSOLUTE RULES — never violate:
+- NEVER USE: "hot picks", "lock", "guaranteed", "fire play", "best bet", "bet like a pro", "this tool helps", "this tool compares", "tool I use", "this tool", "market inefficiency"
+- ALWAYS USE: real numbers, real book names, real Pinnacle prices — no placeholders like "Team A"
+- If data is incomplete for a pick (missing team name, missing Pinnacle odds), skip that pick entirely
+- Voice: direct, humble, credible — like a person sharing research, not a product selling itself
 
 TODAY'S DATA (${todayDate}):
 ${sharpText}${longshotText}${noEvText}${resultsContextForPrompt}${followUpContext}${hintLine}${methodologyFallbackInstruction}
 
-Generate a JSON object (raw JSON only — no markdown, no backticks, no explanation) with this exact structure. Follow the format templates exactly:
+Generate a JSON object (raw JSON only — no markdown, no backticks, no explanation before or after) with this exact structure. Follow every format rule exactly:
 
 {
   "twitter": [
-    "Tweet 1 — Sharp pick format: '[Team] [Odds] ([Book])\\n+[EV]% vs Pinnacle sharp line\\n[one honest, specific sentence about why the edge exists]\\ngetcapy.co' — max 220 chars total",
-    "Tweet 2 — Explain the WHY: reference the specific gap between the book and Pinnacle's fair price, what sport, what the number means. Still data-first, no hype.",
-    "Tweet 3 — If a longshot pick exists, use: '[Team] [Odds] ([Book])\\nLong shot — lower probability but price looks off vs market\\ngetcapy.co'. If no longshot, write a third data-focused tweet about the methodology or another sharp pick."
+    "Tweet 1 — MAIN PICK. Must open with one of these signature phrases: 'Books don't agree 👇' OR 'This is the gap 👇' OR 'Sharp bettors start with price, not picks'. Then use stacked line breaks — NEVER compress into one line. Format exactly:\\n\\nBooks don't agree 👇\\n[Team] +[odds] on [Book]\\nPinnacle is closer to [pinnacle odds]\\nThat gap = [EV]% edge\\nNot a lock — just a better number\\ngetcapy.co",
+    "Tweet 2 — REPLY / DEEPER EXPLANATION. Explain the gap in plain language. Format exactly:\\n\\nBooks don't agree on this one\\n[Book]: +[odds]\\nPinnacle: ~[pinnacle odds]\\nThat difference is where the edge comes from\\nMost people never look for this",
+    "Tweet 3 — LONG SHOT (if one qualifies with EV ≥1%). Must include the Pinnacle comparison explicitly. Format exactly:\\n\\n[Team] +[odds] ([Book])\\nPinnacle has this closer to [pinnacle odds]\\nSmall edge — but still a long shot\\nNot all +EV bets feel comfortable\\ngetcapy.co\\n\\nIf no longshot qualifies, write a third data-focused tweet about comparing books to Pinnacle — still use stacked lines, still include real numbers from today's data."
   ],
   "reddit": {
-    "title": "A specific, factual title referencing what the tool found today — not clickbait, not an ad. Example: 'Tool I built found a +2.4% EV edge on [Team] vs Pinnacle today'",
-    "body": "Under 150 words. Lead with what the tool does, not what the pick is. Include one specific example with actual EV shown. If yesterday had results, mention them honestly at the top. End with a genuine question to invite discussion. Never sound like an ad. Format: first line = what the tool does. Second section = today's clearest edge with real numbers. Third line = honest caveat about line efficiency. Final line = genuine question."
+    "title": "Found a +[X]% edge comparing [Book] to Pinnacle today ([Team]) — title must follow this format exactly, written as the builder not a brand",
+    "body": "Under 150 words. Write as the person who built this, not as a brand. Open with the specific edge: '[Book] has [Team] at +[odds] while Pinnacle is closer to +[pinnacle odds] — that gap is roughly [EV]% EV.' Then one sentence on what that means long term. If yesterday had results, state them plainly at the top using the approved framing (X-Y record, variance is real). End with a genuine question: 'Curious how often people actually compare to sharp books vs just betting what they see.' Never use 'Tool I use', 'this tool', or any product language."
   },
   "tiktok": {
-    "hook": "A question or counterintuitive statement about betting math — NOT hype. Choose one: 'Most +2000 bets are terrible. But sometimes the price is just wrong.' OR 'Sportsbooks aren't always right. Here is how you can tell.' OR 'This is what sharp bettors actually look for.'",
-    "script": "Max 8 short conversational lines. Explain WHY the specific line looks off using today's actual data. End with what the tool does — not a call to action or download prompt. Each line on its own line in the string, separated by \\n.",
-    "caption": "TikTok caption — analytical tone, no hype. Include: #sportsbetting #expectedvalue #sharpbetting #valuebets #pinnacle #getcapy"
+    "hook": "Must make the viewer feel 'I've been doing this wrong'. Choose one: 'Sharp bettors don't start with picks — they start with price.' OR 'Most people bet the team. Sharp bettors bet the number.' OR 'Sportsbooks don't always agree. Here is what that looks like.'",
+    "script": "Max 8 short lines. Show the actual numbers from today's top pick. Walk through the gap between the book price and Pinnacle. End with: 'That gap is the edge.' Never say 'this tool', 'this app', or 'this helps you'. Each line separated by \\n.",
+    "caption": "Perspective-first — about the insight, not the product. Include: #sportsbetting #expectedvalue #sharpbetting #valuebets #pinnacle #getcapy"
   },
   "instagram": {
-    "caption": "3-4 sentences. Lead with the insight, not the pick. Show the math: book odds vs fair odds vs EV. Analytical tone — no exclamation marks on data statements.",
+    "caption": "3-4 sentences. Lead with the insight. Show the math: book odds vs Pinnacle vs EV gap. Must include this exact sentence somewhere: 'That doesn\\'t guarantee a win — it just means you\\'re on the right side of the number long term.' Analytical tone — no exclamation marks on data statements.",
     "hashtags": "#sportsbetting #expectedvalue #sharpbetting #valuebets #pinnacle #getcapy"
   }
 }`;
@@ -198,7 +212,64 @@ Generate a JSON object (raw JSON only — no markdown, no backticks, no explanat
         messages: [
           {
             role: 'system',
-            content: 'You are a sports analytics content writer for Capy (getcapy.co). Return only valid JSON, no markdown, no backticks, no explanation. Return only a single valid JSON object. No newlines inside string values except where explicitly shown as \\n. Escape all apostrophes as \\u0027. Never use the words: hot picks, lock, guaranteed, bet like a pro.'
+            content: `You are writing content for a sports betting analytics brand called Capy (getcapy.co). The product finds positive expected value (+EV) bets by comparing sportsbook odds to Pinnacle — the sharpest market in the world.
+
+Your job is to turn structured betting data into human, sharp, trustworthy content across Twitter, Reddit, TikTok, and Instagram.
+
+VOICE:
+- Sound like a sharp bettor sharing what they found — not a tool explaining itself
+- Be concise, clear, and direct
+- Focus on WHY the bet is mispriced — the gap between the book price and Pinnacle
+- Acknowledge uncertainty ("not a lock", "long term edge", "variance is real")
+- Write like a real person, not a fintech product
+
+DO:
+- Always include the sportsbook price AND the Pinnacle price
+- Emphasize the gap between them — that gap is the whole product
+- Use plain language: "books don't agree", "price is off", "you're getting a better number"
+- Lead with the best EV pick (most believable odds) as the main post
+- Make secondary picks (long shots) feel secondary — replies or footnotes, not headlines
+
+DO NOT use any of these phrases ever:
+- "expected value indicates"
+- "the tool found" / "the tool identifies"
+- "market inefficiency" / "book inefficiency"
+- "undervaluation" / "overvaluation"
+- "data-driven approach"
+- "more informed betting decisions"
+- "indicates a potential"
+- "hot picks", "lock", "guaranteed", "fire play", "best bet"
+- Any placeholder like "Team A" or missing team names — if data is incomplete, skip the pick entirely
+
+WHEN PICKS LOST YESTERDAY:
+Do not say "didn't go our way". Instead say something like:
+"X-Y yesterday — this is what +EV betting looks like short term. Variance is real. The edge plays out over hundreds of bets, not daily."
+
+TWITTER FORMAT (main pick):
+[Team] +[odds] on [Book]
+Pinnacle is closer to [pinnacle odds]
+That gap = [EV]% edge
+Not a lock — just a better price than the sharp market
+getcapy.co
+
+TWITTER FORMAT (reply / deeper explanation):
+Books don't agree on this one
+[Book]: +[odds]
+Pinnacle: ~[pinnacle odds]
+That difference is where the edge comes from
+Most people never look for this
+
+OUTPUT STRUCTURE:
+1. One main Twitter post (best EV pick, clearest edge)
+2. One reply tweet (explains the gap deeper)
+3. One secondary tweet if a long shot qualifies (frame as secondary, not headline)
+4. One Reddit post (title + body — explain what the tool found and why it matters, written as a person not a product)
+5. One TikTok script (hook that makes people feel "I've been doing this wrong", then show the numbers, explain the gap, end with the long term edge concept)
+6. One Instagram caption (make it about the bettor, not the tool — "when you see this gap, here's what it means for you")
+
+Keep everything tight. No fluff. No over-explanation. Sound like someone who knows what they're talking about.
+
+CRITICAL — RESPONSE FORMAT: Return only a single valid JSON object. No markdown, no backticks, no explanation before or after. No newlines inside string values except where explicitly shown as \\n. This is machine-parsed — any extra text breaks the output.`
           },
           {
             role: 'user',

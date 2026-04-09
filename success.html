@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You're Sharp Now — Capy</title>
+  <meta name="description" content="Welcome to Capy Sharp. Check your email for access details." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber: #BA7517;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --green: #1D9E75;
+      --green-light: #EAF3DE;
+      --green-dark: #27500A;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --text-hint: #9b9b9b;
+      --border: rgba(0,0,0,0.1);
+      --border-mid: rgba(0,0,0,0.15);
+      --surface: #fff;
+      --surface-2: #f7f6f3;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    [data-theme="dark"] {
+      --amber: #e8991e;
+      --amber-light: #2d1f08;
+      --amber-dark: #f5c87a;
+      --green: #22c48a;
+      --green-light: #0a2118;
+      --green-dark: #7dd9b4;
+      --text: #eeedf0;
+      --text-muted: #9898a4;
+      --text-hint: #505058;
+      --border: rgba(255,255,255,0.07);
+      --border-mid: rgba(255,255,255,0.13);
+      --surface: #1a1d27;
+      --surface-2: #13151f;
+    }
+    [data-theme="dark"] body { background-color: #0f1117; }
+    [data-theme="dark"] nav  { background: #161920; border-color: rgba(255,255,255,0.07); }
+    [data-theme="dark"] .success-card { background: var(--surface); }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background-color: #fafaf8;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 0.5px solid var(--border);
+      background: #fafaf8;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 1rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--amber-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+
+    .nav-link:hover { background: var(--surface-2); color: var(--text); }
+
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary { background: var(--amber); color: #fff; }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-green:hover { opacity: 0.88; }
+
+    .theme-toggle-btn {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border-mid);
+      border-radius: 20px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s;
+      flex-shrink: 0;
+      padding: 0;
+      line-height: 1;
+    }
+
+    /* SUCCESS PAGE */
+    .success-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .success-card {
+      background: var(--surface);
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+
+    .success-capy {
+      font-size: 64px;
+      display: block;
+      margin-bottom: 1rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .success-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: var(--green-dark);
+      background: var(--green-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 1.25rem;
+    }
+
+    .success-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(26px, 5vw, 36px);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .success-body {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.75rem;
+    }
+
+    .success-body strong { color: var(--text); font-weight: 600; }
+
+    .success-steps {
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.75rem;
+      text-align: left;
+    }
+
+    .success-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+
+    .success-step:last-child { border-bottom: none; padding-bottom: 0; }
+    .success-step:first-child { padding-top: 0; }
+
+    .step-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--amber-light);
+      color: var(--amber-dark);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .success-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .success-actions a {
+      padding: 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 0.5px solid var(--border);
+      padding: 1.25rem 0;
+    }
+
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .footer-copy { font-size: 11px; color: var(--text-hint); }
+  </style>
+  <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="logo-mark">🐾</div>
+        Capy
+      </a>
+      <div class="nav-links">
+        <a href="/odds.html" class="nav-link">Live Odds</a>
+        <a href="/parlay.html" class="nav-link">Parlay</a>
+        <a href="/record.html" class="nav-link">Record</a>
+        <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">☀️</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="success-wrap">
+    <div class="success-card">
+      <span class="success-capy">🦫</span>
+      <div class="success-badge">✓ Subscription active</div>
+      <div class="success-title">You're Sharp now.</div>
+      <p class="success-body">
+        Welcome to the herd. Your subscription is confirmed — <strong>check your email</strong> for your access details and first picks drop.
+      </p>
+      <div class="success-steps">
+        <div class="success-step">
+          <span class="step-num">1</span>
+          <span>Check your inbox for a confirmation email from Capy — it has your login link and account details.</span>
+        </div>
+        <div class="success-step">
+          <span class="step-num">2</span>
+          <span>Head to <strong>Live Odds</strong> — you now have full access to all sports, all books, and every EV edge.</span>
+        </div>
+        <div class="success-step">
+          <span class="step-num">3</span>
+          <span>Capy's Picks land in your inbox daily. The edge is in the data — bet what the numbers say.</span>
+        </div>
+      </div>
+      <div class="success-actions">
+        <a href="/odds.html" class="btn btn-green">Go to Live Odds →</a>
+        <a href="/" class="btn" style="background:var(--surface-2);color:var(--text-muted);">Back to home</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="/" class="footer-logo"><span>🐾</span> Capy</a>
+      <div style="display:flex;gap:16px;">
+        <a href="/terms.html" style="font-size:12px;color:var(--text-hint);text-decoration:none;">Terms</a>
+        <a href="/privacy.html" style="font-size:12px;color:var(--text-hint);text-decoration:none;">Privacy</a>
+      </div>
+      <div class="footer-copy">© 2026 Capy. Must be 21+ to bet. Please gamble responsibly.</div>
+    </div>
+  </footer>
+
+  <script>
+    const themeIcon = document.getElementById('theme-icon');
+    function applyThemeIcon() {
+      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeIcon) themeIcon.textContent = dark ? '🌙' : '☀️';
+    }
+    function toggleTheme() {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('capy_theme', next);
+      applyThemeIcon();
+    }
+    applyThemeIcon();
+  </script>
+
+</body>
+</html>

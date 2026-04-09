@@ -168,7 +168,25 @@
     .odds-cell.worst { background: var(--red-light); color: var(--red-cell-text); font-size: 15px; font-weight: 500; }
     .odds-cell.row-alt:not(.best):not(.worst):not(.tied-best):not(.odds-cell-empty) { background: #FAFAFA; }
     .odds-row-label.row-alt { background: rgba(0,0,0,0.015); border-radius: 4px; }
-    .odds-cell.locked { filter: blur(4px); cursor: pointer; user-select: none; }
+    .odds-cell.locked { position: relative; overflow: hidden; cursor: pointer; }
+    .odds-cell.locked > .locked-content { filter: blur(4px); user-select: none; pointer-events: none; display: block; }
+
+    /* LOCK OVERLAY — shared by desktop cells, mobile rows, and pick cards */
+    .lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; z-index: 2; }
+    .lock-icon { color: var(--text-hint); flex-shrink: 0; }
+    .lock-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; font-variant: small-caps; color: #16A34A; letter-spacing: 0.05em; line-height: 1; }
+    .lock-hint { font-family: 'Outfit', sans-serif; font-size: 9px; color: var(--text-hint); opacity: 0; transition: opacity 0.15s; white-space: nowrap; position: absolute; bottom: 3px; left: 0; right: 0; text-align: center; }
+    .odds-cell.locked:hover .lock-hint { opacity: 1; }
+    /* Pick card lock wrapper */
+    .pick-locked-wrap { position: relative; overflow: hidden; }
+    .pick-locked-wrap .locked-content { filter: blur(4px); user-select: none; pointer-events: none; opacity: 0.6; }
+    .pick-locked-wrap .lock-overlay { background: rgba(255,255,255,0.04); border-radius: 8px; }
+    .pick-locked-wrap .lock-icon { color: #9CA3AF; }
+    .pick-locked-wrap:hover .lock-hint { opacity: 1; }
+    /* Mobile lock indicator */
+    .mobile-lock-icon { display: inline-flex; align-items: center; gap: 4px; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; color: #16A34A; cursor: pointer; vertical-align: middle; }
+    /* PREVIEW MODE BANNER */
+    #preview-banner { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #FEF08A; color: #713F12; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; text-align: center; padding: 8px 16px; border-bottom: 1px solid #FDE047; letter-spacing: 0.01em; }
     .odds-cell-empty { background: var(--surface-2); color: var(--text-hint); font-size: 13px; cursor: default; text-align: center; padding: 9px 4px; font-style: italic; }
     .odds-divider { grid-column: 1 / -1; height: 1px; background: var(--border); margin: 2px 0; }
     .odds-market-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 5px; padding: 10px 4px 3px; }
@@ -637,10 +655,51 @@
     [data-theme="dark"] .ev-share-btn { background: #111318; border-color: #1F2330; }
     [data-theme="dark"] .ev-share-btn.copied { background: #052E16; border-color: #22C55E; color: #4ADE80; }
     [data-theme="dark"] .no-edges-state { box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+    /* ══ HERO EDGE CARD ══════════════════════════════════════════════════ */
+    .hero-edge-section { margin-bottom: 1.5rem; }
+    .hero-edge-card { background: var(--surface); border-radius: var(--radius); border: 2px solid var(--green); box-shadow: 0 4px 24px rgba(22,163,74,0.10), 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; animation: fadeInUp 0.3s ease both; }
+    .hero-edge-label { background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; padding: 6px 16px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .hero-edge-header { padding: 14px 16px 4px; }
+    .hero-edge-matchup { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-top: 6px; }
+    .hero-edge-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .hero-edge-body { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; margin: 14px 16px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .hero-book-col { padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; background: var(--surface-2); }
+    .hero-sharp-col { padding: 18px 20px; text-align: right; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; background: var(--surface-2); }
+    .hero-compare-label { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); }
+    .hero-compare-book { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 1px; }
+    .hero-compare-odds { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 600; line-height: 1; color: var(--green); margin-top: 6px; }
+    .hero-compare-odds.neutral { color: var(--text); }
+    .hero-compare-side { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); margin-top: 5px; }
+    .hero-ev-center { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px 20px; min-width: 110px; background: var(--green-light); border-left: 1px solid rgba(22,163,74,0.18); border-right: 1px solid rgba(22,163,74,0.18); }
+    .hero-ev-pct { font-family: 'DM Mono', monospace; font-size: 30px; font-weight: 700; color: var(--green); line-height: 1; }
+    .hero-ev-lbl { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin-top: 6px; white-space: nowrap; }
+    .hero-edge-note { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); padding: 0 16px 8px; line-height: 1.5; }
+    .hero-edge-actions { display: flex; align-items: center; gap: 10px; padding: 0 16px 16px; flex-wrap: wrap; }
+    @media (max-width: 600px) {
+      .hero-edge-body { grid-template-columns: 1fr; }
+      .hero-ev-center { border-left: none; border-right: none; border-top: 1px solid rgba(22,163,74,0.18); border-bottom: 1px solid rgba(22,163,74,0.18); }
+      .hero-sharp-col { text-align: left; align-items: flex-start; }
+      .hero-compare-odds { font-size: 28px; }
+      .hero-ev-pct { font-size: 24px; }
+    }
+    [data-theme="dark"] .hero-edge-card { border-color: #22C55E; box-shadow: 0 4px 24px rgba(34,197,94,0.08); }
+    [data-theme="dark"] .hero-book-col, [data-theme="dark"] .hero-sharp-col { background: #0D0F15; }
+    [data-theme="dark"] .hero-ev-center { background: #052E16; border-color: rgba(34,197,94,0.2); }
+    [data-theme="dark"] .hero-ev-pct { color: #4ADE80; }
+    [data-theme="dark"] .hero-ev-lbl { color: #4ADE80; }
+    [data-theme="dark"] .hero-compare-odds { color: #4ADE80; }
+    [data-theme="dark"] .hero-compare-odds.neutral { color: var(--text); }
+
+    /* ── EV floor label + "why this exists" blurb ─────────────────────── */
+    .ev-floor-label { font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text-hint); padding: 4px 1.5rem 2px; max-width: 1400px; margin: 0 auto; }
+    .ev-why-blurb { font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text-hint); line-height: 1.6; margin-bottom: 1.5rem; padding: 0 2px; }
+    @media (max-width: 600px) { .ev-floor-label { padding: 4px 1rem 2px; } }
   </style>
   <script>(function(){var t=localStorage.getItem('capy_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
+<div id="preview-banner">Preview Mode — not visible to users</div>
 
   <nav>
     <div class="nav-inner">
@@ -667,8 +726,7 @@
       <div class="ev-filter-group">
         <span class="ev-filter-label">Min EV</span>
         <select class="ev-filter-select" id="min-ev-select" onchange="setMinEvFilter(+this.value)">
-          <option value="0">Any</option>
-          <option value="1">1%+</option>
+          <option value="0">1%+ (default)</option>
           <option value="2">2%+</option>
           <option value="3">3%+</option>
         </select>
@@ -682,6 +740,7 @@
         <button class="ev-pill" onclick="setEvSportFilter('icehockey_nhl', this)">NHL</button>
       </div>
     </div>
+    <div class="ev-floor-label">Showing edges ≥ 1% vs Pinnacle sharp line</div>
   </div>
 
   <div class="main">
@@ -840,6 +899,9 @@
       </div>
     </div>
 
+    <!-- TOP EDGE HERO — populated by renderTopEdgeHero() -->
+    <div id="top-edge-hero-section" style="display:none;"></div>
+
     <!-- HIGH UPSIDE PARLAYS — below EV section -->
     <div class="section-divider">
       <div class="section-divider-line"></div>
@@ -867,6 +929,7 @@
     </div>
 
     <!-- ALL GAMES — full odds table -->
+    <p class="ev-why-blurb">Books move at different speeds. We compare them to Pinnacle — the sharp market — to find mispriced odds before they close.</p>
     <div class="section-divider">
       <div class="section-divider-line"></div>
       <span class="section-divider-label">All Games</span>
@@ -995,6 +1058,11 @@
     let pinnacleCache = {}; // keyed by sport, then "home|away"
     let propsCache = {};    // keyed by eventId, value: { data, ts }
     let userEmail = localStorage.getItem('capy_email') || null;
+    const previewMode = new URLSearchParams(window.location.search).get('preview') === 'true';
+    if (previewMode) {
+      document.getElementById('preview-banner').style.display = 'block';
+      document.body.style.paddingTop = '36px';
+    }
     let gateShown = false;
     let viewMode = (() => {
       if (window.innerWidth < 768) return 'list';
@@ -1420,12 +1488,13 @@
     }
 
     function getEvFilteredGames() {
+      const floor = Math.max(1, minEvFilter); // hard floor at 1% — below this is noise, not signal
       return allGames.filter(g => {
         if (evSportFilter !== 'all' && g.sport_key !== evSportFilter) return false;
         const ev = calcGameEV(g);
         if (!ev) return false;
         const best = Math.max(ev.home.ev, ev.away.ev);
-        return best >= minEvFilter;
+        return best >= floor;
       });
     }
 
@@ -1514,6 +1583,7 @@
               <div class="ev-compare-book">${refLabel}</div>
               <div class="ev-compare-odds ev-neu-odds">${fmtAm(fairAm)}</div>
               <div class="ev-compare-side">Fair price</div>
+              <div style="font-family:'Outfit',sans-serif;font-size:9px;color:var(--text-hint);margin-top:6px;line-height:1.3;">Based on live<br>Pinnacle odds</div>
             </div>
           </div>
           <div class="ev-card-actions">
@@ -1552,13 +1622,93 @@
         container.innerHTML = `
           <div class="no-edges-state">
             <span class="no-edges-icon">📊</span>
-            <div class="no-edges-title">No edges right now</div>
+            <div class="no-edges-title">No edges above 1% right now</div>
             <div class="no-edges-sub">Most books are efficiently priced at the moment. Check back soon — lines move fast.</div>
           </div>`;
         return;
       }
 
       container.innerHTML = `<div class="ev-cards-grid">${positiveOnly.map(g => buildEvCard(g)).join('')}</div>`;
+      renderTopEdgeHero();
+    }
+
+    // ── Top Edge Hero card ────────────────────────────────────────────────
+    function renderTopEdgeHero() {
+      const section = document.getElementById('top-edge-hero-section');
+      if (!section) return;
+
+      // Best candidate: highest EV game ≥1% (safety cap already applied by calcGameEV)
+      const candidates = allGames
+        .map(g => ({ game: g, ev: calcGameEV(g) }))
+        .filter(({ ev }) => ev && Math.max(ev.home.ev, ev.away.ev) >= 1)
+        .sort((a, b) => Math.max(b.ev.home.ev, b.ev.away.ev) - Math.max(a.ev.home.ev, a.ev.away.ev));
+
+      if (!candidates.length) {
+        section.style.display = 'none';
+        section.innerHTML = '';
+        return;
+      }
+
+      const { game, ev } = candidates[0];
+      const isHomeBetter = ev.home.ev >= ev.away.ev;
+      const bestSide = isHomeBetter ? ev.home : ev.away;
+      const bestTeam = isHomeBetter ? game.home_team : game.away_team;
+      const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
+      const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
+      const fairAm = fairProbToAm(bestSide.fairProb);
+      const teamShort = bestTeam.split(' ').pop();
+      const time = fmtGameDate(game.commence_time);
+      const sport = game.sport_key;
+      const sportEmoji = SPORT_EMOJIS[sport] || '🎯';
+      const label = SPORT_LABELS[sport] || sport;
+      const tagKey = sport.includes('nba') ? 'nba' : sport.includes('nfl') ? 'nfl' : sport.includes('mlb') ? 'mlb' : sport.includes('nhl') ? 'nhl' : 'other';
+      const betUrl = getBookUrl(bestSide.bestBook);
+      const betBtn = betUrl
+        ? `<a href="${betUrl}" target="_blank" rel="noopener" class="ev-bet-btn">Bet at ${bestSide.bestBook} →</a>`
+        : '';
+      const fresh = getFreshnessInfo(sport);
+      const freshnessHtml = fresh.text
+        ? `<span class="freshness-label${fresh.stale ? ' stale' : ''}">Updated ${fresh.text}</span>`
+        : '';
+
+      section.style.display = 'block';
+      section.innerHTML = `
+        <div class="hero-edge-section">
+          <div class="hero-edge-card">
+            <div class="hero-edge-label">Top Edge Right Now</div>
+            <div class="hero-edge-header">
+              <div class="hero-edge-meta">
+                <span class="sport-tag tag-${tagKey}">${sportEmoji} ${label}</span>
+                <span class="game-time">${time}</span>
+                ${freshnessHtml}
+              </div>
+              <div class="hero-edge-matchup">${game.away_team} <span style="color:var(--text-hint);font-weight:400;font-size:14px;">@</span> ${game.home_team}</div>
+            </div>
+            <div class="hero-edge-body">
+              <div class="hero-book-col">
+                <div class="hero-compare-label">Best Book</div>
+                <div class="hero-compare-book">${bestSide.bestBook}</div>
+                <div class="hero-compare-odds">${fmtAm(bestSide.bestOdds)}</div>
+                <div class="hero-compare-side">${teamShort} ML</div>
+              </div>
+              <div class="hero-ev-center">
+                <div class="hero-ev-pct">${evStr}</div>
+                <div class="hero-ev-lbl">EV Edge</div>
+              </div>
+              <div class="hero-sharp-col">
+                <div class="hero-compare-label">Pinnacle Fair Odds</div>
+                <div class="hero-compare-book">Pinnacle</div>
+                <div class="hero-compare-odds neutral">${fmtAm(fairAm)}</div>
+                <div class="hero-compare-side">Fair price (no vig)</div>
+              </div>
+            </div>
+            <div class="hero-edge-note">Based on live Pinnacle sharp line &nbsp;·&nbsp; Pinnacle is the sharpest market in the world — used by professionals to benchmark fair value.</div>
+            <div class="hero-edge-actions">
+              ${betBtn}
+              <button class="ev-share-btn" id="hero-share-btn-${game.id}" onclick="shareEdge('${game.id}', this)">Share</button>
+            </div>
+          </div>
+        </div>`;
     }
 
     // ── Share button: copy edge text to clipboard ─────────────────────────
@@ -1572,7 +1722,7 @@
       const bestTeam  = isHomeBetter ? game.home_team : game.away_team;
       const fmtAm = n => n > 0 ? `+${n}` : `${n}`;
       const evStr = `${bestSide.ev > 0 ? '+' : ''}${bestSide.ev.toFixed(1)}%`;
-      const text = `${bestTeam} ${fmtAm(bestSide.bestOdds)} (${bestSide.bestBook})\n${evStr} edge vs Pinnacle sharp line\ngetcapy.co`;
+      const text = `${bestTeam} ${fmtAm(bestSide.bestOdds)} (${bestSide.bestBook})\n${evStr} edge vs Pinnacle\ngetcapy.co`;
 
       const markCopied = () => {
         if (!btn) return;
@@ -2023,7 +2173,7 @@
         const reason = edgeInfo.type === 'spread'
           ? `${bestBook.bookName} has this spread ${edge} pts better than the worst available line — that's real money on the table.`
           : `${bestBook.bookName} has the best moneyline on this game — ${edgeInfo.bestLine} vs ${edgeInfo.worstLine} at other books.`;
-        const isLocked = !hasAccess && idx > 0;
+        const isLocked = !previewMode && !hasAccess && idx > 0;
         const gameDateTime = fmtGameDate(game.commence_time);
 
         return `
@@ -2039,17 +2189,23 @@
                 <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${edgeTypeLabel}</span>
               </div>
             </div>
-            <div class="pick-body${isLocked ? ' pick-body-blurred' : ''}">
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
-                <div><div class="pick-rec">${recText}</div></div>
-                <div style="text-align:right;flex-shrink:0;">
-                  ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts edge</div>` : ''}
+            <div class="${isLocked ? 'pick-locked-wrap' : ''}">
+              <div class="pick-body${isLocked ? ' locked-content' : ''}">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:10px;">
+                  <div><div class="pick-rec">${recText}</div></div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    ${edgeInfo.type === 'spread' ? `<div class="pick-edge-num">+${edge}</div><div class="pick-edge-label">pts edge</div>` : ''}
+                  </div>
                 </div>
+                <div class="pick-reason">${reason}</div>
+                ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
               </div>
-              <div class="pick-reason">${reason}</div>
-              ${!isLocked ? `<a href="${bestBook.bookUrl}" target="_blank" rel="noopener" class="pick-bet-btn">Bet at ${bestBook.bookName} →</a>` : ''}
+              ${isLocked ? `<div class="lock-overlay" onclick="showGate()">
+                <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span class="lock-label" style="font-size:12px;">Pro</span>
+                <span class="lock-hint" style="bottom:6px;">Unlock with Capy Pro</span>
+              </div>` : ''}
             </div>
-            ${isLocked ? '<div class="pick-lock-badge">🔒 Pro Pick</div>' : ''}
             ${!isLocked && idx === 0 ? '<div style="font-size:11px;font-weight:600;color:var(--green);margin-top:6px;">⚡ This edge is live now — lines move fast</div>' : ''}
           </div>`;
       }).join('');
@@ -2528,14 +2684,17 @@
             if (!v) return '';
             const isBest = hasVariance && v.num === best;
             const isWorst = hasVariance && v.num === worst;
-            const isLocked = !isFirst && !userEmail && v.idx > 2;
-            const betBtn = isBest && market === 'h2h' && BOOK_URLS[BOOK_KEYS[v.idx]]
+            const isLocked = !previewMode && !isFirst && !userEmail && v.idx > 2;
+            const betBtn = isBest && !isLocked && market === 'h2h' && BOOK_URLS[BOOK_KEYS[v.idx]]
               ? `<a href="${BOOK_URLS[BOOK_KEYS[v.idx]]}" target="_blank" rel="noopener" class="odds-mobile-bet-btn" onclick="event.stopPropagation()">Bet →</a>`
               : '';
+            const valHtml = isLocked
+              ? `<span class="mobile-lock-icon" onclick="showGate()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Pro</span>`
+              : `<span class="odds-mobile-val ${isBest ? 'best' : isWorst ? 'worst' : ''}">${v.val}</span>`;
             return `<div class="odds-mobile-row">
               <div class="odds-mobile-book">${BOOKS[v.idx]}</div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <span class="odds-mobile-val ${isBest ? 'best' : isWorst ? 'worst' : ''}">${isLocked ? '••••' : v.val}</span>
+                ${valHtml}
                 ${betBtn}
               </div>
             </div>`;
@@ -2606,7 +2765,7 @@
         const cells = vals.map((v, i) => {
           if (!v) return `<div class="odds-cell odds-cell-empty" title="This book doesn't offer odds on this game">—</div>`;
           const num = numVals[i];
-          const isLocked = !isFirst && !userEmail && i > 2;
+          const isLocked = !previewMode && !isFirst && !userEmail && i > 2;
           let cellClass = '';
           if (hasVariance) {
             if (num === best) cellClass = bestCount === 1 ? 'best' : 'tied-best';
@@ -2622,8 +2781,17 @@
             const evC = classifyEV(cellEV);
             evCellHtml = `<span class="ev-badge ev-cell ${evC.cls}">${evC.label}</span>`;
           }
-          return `<div class="odds-cell ${cellClass} ${altClass} ${isLocked ? 'locked' : ''}"
-            onclick="${isLocked ? 'showGate()' : ''}">${v}${betNow}${evCellHtml}</div>`;
+          if (isLocked) {
+            return `<div class="odds-cell ${cellClass} ${altClass} locked" onclick="showGate()">
+              <span class="locked-content">${v}${betNow}${evCellHtml}</span>
+              <div class="lock-overlay">
+                <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span class="lock-label">Pro</span>
+                <span class="lock-hint">Unlock with Capy Pro</span>
+              </div>
+            </div>`;
+          }
+          return `<div class="odds-cell ${cellClass} ${altClass}">${v}${betNow}${evCellHtml}</div>`;
         });
 
         const allEqualNote = allEqual
