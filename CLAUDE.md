@@ -119,3 +119,125 @@ When something isn't working:
 - Show empty states without helpful fallback messages
 - Make a button that does nothing or triggers a download unexpectedly
 - Break mobile layout when fixing desktop
+# CLAUDE.md additions — append to existing CLAUDE.md
+
+## Database schema (authoritative — do NOT guess column names)
+
+The `bets` table schema as of 2026-04-16. If Claude Code needs a column that
+isn't listed here, run the schema query in Supabase first, don't invent names.
+
+```
+id                    uuid          PK
+date                  date
+game_time             timestamptz
+sport                 text          (e.g. baseball_mlb, icehockey_nhl)
+pick                  text          (team name or player prop description)
+book                  text          (FanDuel, BetOnline.ag, etc.)
+bet_type              text
+pick_type             text
+odds_placed           integer       (American odds at placement)
+decimal_odds          numeric
+pinnacle_odds         integer       (Pinnacle at placement, for EV calc)
+pinnacle_away_odds    integer       (opposing side at placement)
+true_probability      numeric       (de-vigged Pinnacle prob at placement)
+ev_percent            numeric
+stake_units           numeric
+result                text          (pending | win | loss | push)
+profit_units          numeric
+closing_odds          integer       (Pinnacle at game start — filled by cron)
+closing_odds_away     integer       (opposing side at game start)
+clv                   numeric       (closing line value, decimal not percent)
+archived              boolean
+created_at            timestamptz
+closing_odds_captured boolean       NOT NULL — true once cron has written closing_odds
+observed_at           timestamptz   (when bet was first observed/placed)
+player_name           text          (prop bets only)
+stat_type             text          (prop bets only)
+line                  numeric       (prop line)
+over_under            text          (prop side)
+pick_id               uuid          FK to picks table
+closing_odds_captured_at  timestamptz  (NEW — when cron wrote closing_odds)
+```
+
+### Common column name mistakes to avoid
+
+Past versions of these notes had WRONG column names. Do not use these:
+
+| Wrong (do not use) | Correct           |
+| ------------------ | ----------------- |
+| closing_odds_final | closing_odds      |
+| closing_odds_final_away | closing_odds_away |
+| true_clv           | clv               |
+| observe_at         | observed_at       |
+
+## CLV pipeline — how it works and how to verify it
+
+1. `api/capture-closing-lines.js` runs on a 15-minute cron.
+2. It queries picks whose `game_time` falls in a window around NOW
+   (currently: 2h before → 30min after game start).
+3. For each pick, it fetches the current Pinnacle h2h line via game_id exact-match.
+4. It UPDATEs `bets` rows for that `pick_id`, setting:
+   - `closing_odds` (and `closing_odds_away`)
+   - `closing_odds_captured = true`
+   - `closing_odds_captured_at = NOW()`
+   - `clv` — see canonical formula below
+
+### Formula reference
+
+American odds → implied probability:
+- Positive odds (+150): `100 / (odds + 100)`
+- Negative odds (-150): `-odds / (-odds + 100)`
+
+CLV (decimal, not percent) — canonical no-vig formula:
+```
+rawClose     = implied_prob(closing_odds)          // single-sided raw prob
+rawCloseAway = implied_prob(closing_odds_away)     // opposing side raw prob
+fairProb     = rawClose / (rawClose + rawCloseAway) // de-vigged closing prob
+fairDecimal  = 1 / fairProb
+clv          = (placed_decimal - fairDecimal) / fairDecimal
+// equivalently: clv = placed_decimal * fairProb - 1
+```
+
+This is the formula used by:
+- `api/capture-closing-lines.js` (production cron — the only authorized CLV writer)
+- `scripts/verify-clv.js` (audit script)
+- `bets.clv` column (stored value, source of truth for record.html)
+
+**Deprecated:** the single-sided ratio `(implied_prob_of_closing / implied_prob_of_placed) - 1`
+was used in session 9 but produces different values when closing odds are de-vigged.
+Do not use it. The no-vig formula above is the only canonical definition.
+
+Positive CLV = your placed odds were better than the de-vigged closing line = you beat the market.
+
+### Verification — run before trusting CLV numbers on record.html
+
+Run `node scripts/verify-clv.js` from project root. This audits:
+- How many bets actually have closing odds
+- Whether captured bets have the expected fields populated
+- Whether CLV math reconciles from stored odds
+- Whether closing odds were captured at the right time (not too early)
+
+## Rules for Claude Code working on this project
+
+### Do not
+- Modify the CLV or EV formula without adding a test case that proves the new
+  output on a known bet
+- Guess column names — query Supabase first or check this file
+- Assume a fix worked because the code compiles; verify with data
+- Add new markets beyond h2h without asking Sunny
+- Call The Odds API directly from frontend
+- Mark a CLV/cron change "done" until verify-clv.js shows it working on real bets
+
+### Before ending any session
+Append an entry to SESSION_LOG.md with:
+- Goal
+- Files changed
+- What was VERIFIED (with evidence — SQL output, log output, screenshot)
+- What is still BROKEN or UNVERIFIED
+- Exact next action for the next session
+
+### Intentional oddities (not bugs)
+- NHL props are raw only (no EV) — Pinnacle doesn't cover NHL props
+- 9.9% EV cap is intentional (filters out data errors that produce fake huge edges)
+- Off-season guards skip sports outside their active window
+- Daily pick cap: 6 Sharp + 1 Long Shot, min quality 0.60/0.65
