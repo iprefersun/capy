@@ -395,10 +395,13 @@ async function handleStats(req, res, supabase) {
     .filter(k => bucketMap[k])
     .map(k => ({ evBucket: k, ...calcStats(bucketMap[k]) }));
 
-  // Last 7 days daily summary
+  // Last 7 days daily summary — settled results only (win/loss/push).
+  // Using resolved (not normalizedBets) excludes pending bets, void rows, and
+  // future-dated games that haven't played yet, which were inflating bets counts
+  // and creating phantom buckets for tomorrow's date.
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const dayMap = {};
-  for (const b of normalizedBets) {
+  for (const b of resolved) {
     if (!b.date || new Date(b.date) < sevenDaysAgo) continue;
     const day = b.date.split('T')[0];
     if (!dayMap[day]) dayMap[day] = { date: day, bets: 0, wins: 0, profitUnits: 0 };
