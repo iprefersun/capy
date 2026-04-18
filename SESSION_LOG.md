@@ -5,6 +5,52 @@ Newest entries at top. Archive to SESSION_LOG_ARCHIVE.md when past ~50 entries.
 
 ---
 
+## 2026-04-18 (session 19) — Duplicate picks on record.html: root cause diagnosed + fixed
+
+**Goal:** Diagnose and fix duplicate picks visible on record.html (Texas Rangers ×2, Minnesota Twins ×2, Colorado Rockies ×2).
+
+**Root causes identified (verified against live DB):**
+
+Three separate issues, all in `api/get-stats.js` `handleRecord`:
+
+1. **`p.results?.length` bug (critical):** `results(*)` join returns a single **object**, not an array. `!p.results?.length` is always `true` (`undefined` → `!undefined = true`), so ALL 55 picks in the 14-day window passed as "pending". The frontend dedup papered over most leakers but not void duplicates.
+
+2. **Pending void duplicates (Texas Rangers, Minnesota Twins):** Cross-midnight duplicate picks (both with no results row, one with bets.result=void) both appeared in pendingPicks. The void bets row was not checked when building pendingPicks.
+
+3. **Resolved duplicates (Colorado Rockies):** Both duplicate picks had their own results rows (outcome=loss). Both appeared in `activeResults`. No dedup existed for resolved vs resolved.
+
+**Files changed:**
+- `api/get-stats.js` — `handleRecord`:
+  - Fix 1: Changed `pendingPicks` filter from `!p.results?.length || p.results[0]?.outcome === 'pending'` → `!p.results || p.results?.outcome === 'pending'`. pendingPicks reduced from 55 → 17.
+  - Fix 2: Added `result` to betsSupp select; moved `betsMap` to outer scope (from `const` inside `if` block to `let` before it).
+  - Fix 3: Added `dedupedActive` loop: one row per (pick, game_time.slice(0,16)), preferring the row whose bets.result ≠ 'void'. Moved sharpResults/longshotResults/biggestWinner computation to use `dedupedActive`.
+  - Fix 4: Added `dedupedPendingPicks`: filters pendingPicks to exclude those with bets.result='void', then deduplicates by (pick, sport, game_time.slice(0,16)).
+  - Return now uses `dedupedActive` and `dedupedPendingPicks`.
+
+**Verified (simulation against live Supabase data):**
+- pendingPicks: 55 → 17 (Fix 1) → 13 (Fix 4, void filter + dedup)
+- dedupedActive: 38 → 37 (Fix 3, one Rockies duplicate removed)
+- Texas Rangers: 1 pending (odds +127, Apr 18) + 2 resolved (Apr 11 loss, Apr 8 win) ✓
+- Minnesota Twins: 1 pending (odds -134, Apr 18) + 3 resolved ✓
+- Colorado Rockies: 0 pending + 2 resolved (Apr 18 loss, Apr 17 win — different games) ✓
+- Syntax check: `node --input-type=module < api/get-stats.js` → exit 0 ✓
+
+**admin.html behavior unchanged:**
+- `type=bets` feed (raw bets table, no void filter) → all bets including voided still visible ✓
+- `type=record` feed now returns deduped picks (admin also sees deduped record view)
+
+**Broken / unverified:**
+- Not yet deployed to Vercel — changes are local only. Deploy and browser-verify record.html shows each team once.
+- The partial unique index (`bets_unique_active_pick`) from session 17 was never confirmed created. Without it, future cross-midnight duplicates can still be saved — save-picks.js Step 4b guard is the only runtime protection.
+
+**Next session starts with:**
+1. `git push` / deploy to Vercel
+2. Open record.html and confirm Texas Rangers, Minnesota Twins, Colorado Rockies each appear exactly once
+3. Confirm pending count in admin looks correct (~13 game picks pending)
+4. Confirm partial unique index exists: `SELECT indexname, indexdef FROM pg_indexes WHERE tablename='bets' AND indexname='bets_unique_active_pick';`
+
+---
+
 ## 2026-04-18 (session 18) — MAGIC_TEST cleanup + CLAUDE.md CLV formula correction
 
 **Goal:** Two documentation/cleanup tasks only — no production logic changes.

@@ -6,7 +6,7 @@
 // GET /api/get-stats?type=record  → win/loss record from results+picks tables
 //
 // Merged from: get-bets.js, get-record.js, get-stats.js
-// Required env: SUPABASE_URL, SUPABASE_ANON_KEY
+// Required env: SUPABASE_URL, SUPABASE_SERVICE_KEY
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from '@supabase/supabase-js';
@@ -14,9 +14,11 @@ import { createClient } from '@supabase/supabase-js';
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
+  // Server-side endpoint — use service key to bypass RLS on internal tables.
+  // Never expose SUPABASE_SERVICE_KEY to the browser.
   const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY
+    process.env.SUPABASE_SERVICE_KEY
   );
 
   const type = req.query.type || 'stats';
@@ -28,9 +30,9 @@ export default async function handler(req, res) {
 
 // ── type=bets ─────────────────────────────────────────────────────────────────
 // Filtered raw bet list from the bets table.
-// Query params: sport, result, pick_type, days
+// Query params: sport, result, pick_type, bet_type, days
 async function handleBets(req, res, supabase) {
-  const { sport, result, pick_type, days } = req.query;
+  const { sport, result, pick_type, bet_type, days } = req.query;
 
   let query = supabase
     .from('bets')
@@ -42,19 +44,33 @@ async function handleBets(req, res, supabase) {
   if (sport && sport !== 'all')         query = query.eq('sport', sport);
   if (result && result !== 'all')       query = query.eq('result', result);
   if (pick_type && pick_type !== 'all') query = query.eq('pick_type', pick_type);
+  if (bet_type && bet_type !== 'all')   query = query.eq('bet_type', bet_type);
   if (days && days !== 'all') {
     const cutoff = new Date(Date.now() - parseInt(days, 10) * 24 * 60 * 60 * 1000)
       .toISOString().split('T')[0];
     query = query.gte('date', cutoff);
   }
 
-  const { data, error } = await query;
+  const { data: rawData, error } = await query;
   if (error) {
     console.error('[get-stats/bets] Supabase error:', error.message);
     return res.status(500).json({ error: error.message, bets: [] });
   }
 
-  return res.status(200).json({ bets: data || [] });
+  // Exclude archived picks from all public-facing stats (DB query already filters,
+  // this in-memory pass is defense-in-depth)
+  const data = (rawData || []).filter(b => !b.archived);
+
+  console.log('[get-stats/bets] fetched', rawData?.length || 0, 'rows |', data.length, 'active');
+  if (data.length > 0) {
+    const resultValues = [...new Set(data.map(b => b.result))];
+    console.log('[get-stats/bets] unique result values:', resultValues);
+    console.log('[get-stats/bets] sample (first 3):', JSON.stringify(
+      data.slice(0, 3).map(b => ({ pick: b.pick, result: b.result, date: b.date }))
+    ));
+  }
+
+  return res.status(200).json({ bets: data });
 }
 
 // ── type=record ───────────────────────────────────────────────────────────────
@@ -64,7 +80,7 @@ async function handleRecord(req, res, supabase) {
   const { data: results, error } = await supabase
     .from('results')
     .select('*, picks(*)')
-    .neq('outcome', 'pending')
+    .in('outcome', ['win', 'loss', 'push'])
     .order('recorded_at', { ascending: false });
 
   if (error || !results) {
@@ -73,8 +89,8 @@ async function handleRecord(req, res, supabase) {
     });
   }
 
-  // Filter out archived picks
-  const activeResults = results.filter(r => r.picks?.archived !== true);
+  // Exclude archived picks from all public-facing stats
+  const activeResults = results.filter(r => !r.picks?.archived);
 
   // Pending picks from the last 14 days without a completed result
   const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
@@ -85,8 +101,14 @@ async function handleRecord(req, res, supabase) {
     .eq('archived', false)
     .order('created_at', { ascending: false });
 
+  // Exclude archived picks from all public-facing stats (DB query already filters,
+  // this in-memory pass is defense-in-depth)
+  // Supabase returns results(*) as a single object (not array) when the FK is 1-to-1.
+  // Check !p.results (no row at all) or p.results.outcome === 'pending' (row exists but unsettled).
+  // The old check `!p.results?.length` was always true (objects have no .length), so all 55 picks
+  // in the window leaked through as pending — resolved picks were only filtered by the frontend dedup.
   const pendingPicks = (recentPicks || []).filter(p =>
-    !p.results?.length || p.results[0]?.outcome === 'pending'
+    !p.archived && (!p.results || p.results?.outcome === 'pending')
   );
 
   function calcStats(subset) {
@@ -119,7 +141,11 @@ async function handleRecord(req, res, supabase) {
       ? (evValues.reduce((a, b) => a + b, 0) / evValues.length).toFixed(1)
       : null;
 
-    const clvValues = subset.filter(r => r.picks?.clv != null).map(r => r.picks.clv);
+    // Only use bets_clv — stored by capture-closing-lines.js at game time (no-vig formula).
+    // Never fall back to picks.clv (pick-time CLV, not closing CLV).
+    const clvValues = subset
+      .map(r => r.bets_clv)
+      .filter(v => v != null);
     const avgCLV = clvValues.length > 0
       ? (clvValues.reduce((a, b) => a + b, 0) / clvValues.length).toFixed(1)
       : null;
@@ -134,13 +160,84 @@ async function handleRecord(req, res, supabase) {
     };
   }
 
-  const sharpResults    = activeResults.filter(r => !r.picks?.pick_type || r.picks?.pick_type === 'sharp');
-  const longshotResults = activeResults.filter(r => r.picks?.pick_type === 'longshot');
+  // Supplement picks with bets-table fields not available from results+picks join.
+  // Also fetches result so dedup can prefer the non-void bets row when duplicates exist.
+  const allPickIds = [
+    ...activeResults.map(r => r.picks?.id),
+    ...pendingPicks.map(p => p.id),
+  ].filter(Boolean);
+
+  let betsMap = new Map();
+  if (allPickIds.length > 0) {
+    const { data: betsSupp } = await supabase
+      .from('bets')
+      .select('pick_id, observed_at, closing_odds_captured_at, closing_odds_captured, clv, result')
+      .in('pick_id', allPickIds)
+      .eq('archived', false);
+    if (betsSupp) {
+      for (const b of betsSupp) {
+        if (b.pick_id && !betsMap.has(b.pick_id)) betsMap.set(b.pick_id, b);
+      }
+      for (const r of activeResults) {
+        const b = betsMap.get(r.picks?.id);
+        r.observed_at              = b?.observed_at              ?? null;
+        r.closing_odds_captured_at = b?.closing_odds_captured_at ?? null;
+        r.closing_odds_captured    = b?.closing_odds_captured    ?? false;
+        r.bets_clv                 = b?.clv                      ?? null;
+      }
+      for (const p of pendingPicks) {
+        const b = betsMap.get(p.id);
+        p.observed_at              = b?.observed_at              ?? null;
+        p.closing_odds_captured_at = b?.closing_odds_captured_at ?? null;
+        p.closing_odds_captured    = b?.closing_odds_captured    ?? false;
+      }
+    }
+  }
+
+  // ── Dedup active results ────────────────────────────────────────────────────
+  // When cross-midnight saves create duplicate picks rows (same pick + game_time),
+  // both end up in activeResults because each has its own results row.
+  // Keep one per (pick, game_time), preferring the row whose bets entry is not void.
+  // activeResults is ordered by recorded_at desc so first = most recently recorded.
+  const activeSeenMap = new Map(); // key → index in dedupedActive
+  const dedupedActive = [];
+  for (const r of activeResults) {
+    const key = `${(r.picks?.pick || '').toLowerCase()}|${(r.picks?.game_time || '').slice(0, 16)}`;
+    if (!activeSeenMap.has(key)) {
+      activeSeenMap.set(key, dedupedActive.length);
+      dedupedActive.push(r);
+    } else {
+      const idx          = activeSeenMap.get(key);
+      const existingBets = betsMap.get(dedupedActive[idx]?.picks?.id);
+      const currentBets  = betsMap.get(r.picks?.id);
+      if (existingBets?.result === 'void' && currentBets?.result !== 'void') {
+        dedupedActive[idx] = r;
+      }
+    }
+  }
+
+  // ── Filter + dedup pending picks ────────────────────────────────────────────
+  // Exclude pending picks whose bets row is void — these are the stale duplicates
+  // created by cross-midnight saves that save-picks.js already guards against going
+  // forward, but existing rows need to be suppressed here.
+  // Then dedup by (pick, game_time) in case two non-void picks exist for the same game.
+  const pendingSeenKeys = new Set();
+  const dedupedPendingPicks = pendingPicks
+    .filter(p => { const b = betsMap.get(p.id); return !b || b.result !== 'void'; })
+    .filter(p => {
+      const key = `${(p.pick || '').toLowerCase()}|${(p.sport || '')}|${(p.game_time || '').slice(0, 16)}`;
+      if (pendingSeenKeys.has(key)) return false;
+      pendingSeenKeys.add(key);
+      return true;
+    });
+
+  // Stats computed from deduped results so win-rate and ROI reflect unique picks only
+  const sharpResults    = dedupedActive.filter(r => !r.picks?.pick_type || r.picks?.pick_type === 'sharp');
+  const longshotResults = dedupedActive.filter(r => r.picks?.pick_type === 'longshot');
 
   const sharpStats    = calcStats(sharpResults);
   const longshotStats = calcStats(longshotResults);
 
-  // Biggest longshot winner by American odds
   const biggestWinner = longshotResults
     .filter(r => r.outcome === 'win' && r.picks?.odds != null)
     .sort((a, b) => (b.picks.odds || 0) - (a.picks.odds || 0))[0] || null;
@@ -154,11 +251,11 @@ async function handleRecord(req, res, supabase) {
   }
 
   return res.status(200).json({
-    picks:        activeResults.slice(0, 50),
-    stats:        calcStats(activeResults),
+    picks:        dedupedActive.slice(0, 50),
+    stats:        calcStats(dedupedActive),
     sharpStats,
     longshotStats,
-    pendingPicks: pendingPicks.slice(0, 20),
+    pendingPicks: dedupedPendingPicks.slice(0, 20),
   });
 }
 
@@ -166,27 +263,60 @@ async function handleRecord(req, res, supabase) {
 // Aggregated analytics from the bets table.
 // Returns: { overall, byPickType, bySport, byEvBucket, last7Days, clvStats, pendingCount }
 async function handleStats(req, res, supabase) {
-  const { data: allBets, error } = await supabase
+  const { data: rawBets, error } = await supabase
     .from('bets')
     .select('*')
     .eq('archived', false)
     .order('date', { ascending: false });
 
-  if (error || !allBets) {
+  if (error || !rawBets) {
     console.error('[get-stats] Failed to fetch bets:', error?.message);
     return res.status(200).json({
-      overall:     emptyStats(),
-      byPickType:  { sharp: emptyStats(), longshot: emptyStats() },
-      bySport:     [],
-      byEvBucket:  [],
-      last7Days:   [],
-      clvStats:    { avgClv: null, positiveRate: null, sampleSize: 0 },
-      pendingCount: 0,
+      overall:          emptyStats(),
+      byPickType:       { sharp: emptyStats(), longshot: emptyStats() },
+      bySport:          [],
+      byEvBucket:       [],
+      last7Days:        [],
+      clvStats:         { avgClv: null, positiveRate: null, sampleSize: 0 },
+      closingLineStats: { avgClv: null, beatRate: null, sampleSize: 0 },
+      pendingCount:     0,
     });
   }
 
-  const resolved = allBets.filter(b => b.result !== 'pending');
-  const pending  = allBets.filter(b => b.result === 'pending');
+  // Exclude archived picks from all public-facing stats (DB query already filters,
+  // this in-memory pass is defense-in-depth against any RLS or query-builder gap)
+  const allBets = rawBets.filter(b => !b.archived);
+
+  console.log('[get-stats] allBets raw count:', rawBets.length, '| active:', allBets.length);
+
+  // Exclude prop bets — they stay pending indefinitely and would pollute the
+  // game-picks aggregated stats (win rate, by-sport breakdown, pending count).
+  // Props are surfaced separately via type=bets&bet_type=prop.
+  const gameBets = allBets.filter(b => !b.bet_type || b.bet_type !== 'prop');
+  const propBetsCount = allBets.length - gameBets.length;
+  if (propBetsCount > 0) {
+    console.log(`[get-stats] Excluded ${propBetsCount} prop bets from game stats aggregation`);
+  }
+
+  if (gameBets.length > 0) {
+    const resultValues = [...new Set(gameBets.map(b => b.result))];
+    console.log('[get-stats] game bets count:', gameBets.length, '| unique result values:', resultValues);
+    console.log('[get-stats] sample (first 3):', JSON.stringify(
+      gameBets.slice(0, 3).map(b => ({ pick: b.pick, result: b.result, date: b.date, profit_units: b.profit_units }))
+    ));
+  }
+
+  // Normalize result values to lowercase to handle 'Win'/'Loss', 1/0, or any
+  // other casing/format differences between what was stored and what we filter on.
+  const normalizedBets = gameBets.map(b => ({
+    ...b,
+    result: b.result != null ? String(b.result).toLowerCase() : 'pending',
+  }));
+
+  const resolved = normalizedBets.filter(b => ['win', 'loss', 'push'].includes(b.result));
+  const pending  = normalizedBets.filter(b => b.result === 'pending');
+
+  console.log('[get-stats] resolved count:', resolved.length, '| pending count:', pending.length);
 
   function emptyStats() {
     return { total: 0, wins: 0, losses: 0, pushes: 0, winRate: null, profitUnits: 0, roiPercent: null, avgEv: null };
@@ -211,6 +341,10 @@ async function handleStats(req, res, supabase) {
     return {
       total, wins, losses, pushes, winRate,
       profitUnits: Math.round(totalProfit * 100) / 100,
+      // stakeUnits = sum of stake_units per bet (longshots = 0.5, sharp = 1.0).
+      // Required by the payout calculator so it can compute actual dollars wagered
+      // correctly — longshot bets are half-unit so total * stake would double-count.
+      stakeUnits:  Math.round(totalStake  * 100) / 100,
       roiPercent,
       avgEv: avgEv != null ? Math.round(avgEv * 10000) / 100 : null, // 0.021 → 2.1
     };
@@ -222,16 +356,24 @@ async function handleStats(req, res, supabase) {
     longshot: calcStats(resolved.filter(b => b.pick_type === 'longshot')),
   };
 
-  // By sport
-  const sportMap = {};
-  for (const b of resolved) {
-    const sport = b.sport || 'unknown';
-    if (!sportMap[sport]) sportMap[sport] = [];
-    sportMap[sport].push(b);
+  // By sport — helper groups any subset of bets by sport key
+  function bySportFor(bets) {
+    const map = {};
+    for (const b of bets) {
+      const sport = b.sport || 'unknown';
+      if (!map[sport]) map[sport] = [];
+      map[sport].push(b);
+    }
+    return Object.entries(map)
+      .map(([sport, subset]) => ({ sport, ...calcStats(subset) }))
+      .sort((a, b) => b.total - a.total);
   }
-  const bySport = Object.entries(sportMap)
-    .map(([sport, bets]) => ({ sport, ...calcStats(bets) }))
-    .sort((a, b) => b.total - a.total);
+
+  const bySport         = bySportFor(resolved);
+  const sharpResolved   = resolved.filter(b => !b.pick_type || b.pick_type === 'sharp');
+  const longshotResolved = resolved.filter(b => b.pick_type === 'longshot');
+  const bySportSharp    = bySportFor(sharpResolved);
+  const bySportLongshot = bySportFor(longshotResolved);
 
   // By EV bucket (ev_percent stored as decimal: 0.021 = 2.1%)
   function evBucket(ev) {
@@ -256,7 +398,7 @@ async function handleStats(req, res, supabase) {
   // Last 7 days daily summary
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const dayMap = {};
-  for (const b of allBets) {
+  for (const b of normalizedBets) {
     if (!b.date || new Date(b.date) < sevenDaysAgo) continue;
     const day = b.date.split('T')[0];
     if (!dayMap[day]) dayMap[day] = { date: day, bets: 0, wins: 0, profitUnits: 0 };
@@ -268,25 +410,58 @@ async function handleStats(req, res, supabase) {
     .sort((a, b) => a.date.localeCompare(b.date))
     .map(d => ({ ...d, profitUnits: Math.round(d.profitUnits * 100) / 100 }));
 
-  // CLV stats
-  const withClv      = resolved.filter(b => b.clv != null);
-  const avgClv       = withClv.length > 0
-    ? withClv.reduce((sum, b) => sum + b.clv, 0) / withClv.length
+  // EV at Pick Time stats — sourced from ev_percent (the EV calculated at save time)
+  const withEv       = normalizedBets.filter(b => b.ev_percent != null);
+  const avgEvAtPick  = withEv.length > 0
+    ? withEv.reduce((sum, b) => sum + b.ev_percent, 0) / withEv.length
     : null;
-  const positiveRate = withClv.length > 0
-    ? (withClv.filter(b => b.clv > 0).length / withClv.length * 100).toFixed(1)
+  const positiveRate = withEv.length > 0
+    ? (withEv.filter(b => b.ev_percent > 0).length / withEv.length * 100).toFixed(1)
     : null;
+
+  // Closing-line CLV stats — only bets where closing odds were actually captured.
+  // Uses normalizedBets so pending results with captured closing odds are included
+  // in the raw averages, but settledClvCount only counts win/loss/push so the UI
+  // can guard against displaying aggregate CLV before n >= 30 settled bets.
+  const withClosingClv     = normalizedBets.filter(b => b.closing_odds_captured === true && b.clv != null);
+  const settledWithClv     = withClosingClv.filter(b => b.result === 'win' || b.result === 'loss' || b.result === 'push');
+  const avgClosingClv      = withClosingClv.length > 0
+    ? withClosingClv.reduce((sum, b) => sum + b.clv, 0) / withClosingClv.length
+    : null;
+  const closingBeatRate = withClosingClv.length > 0
+    ? (withClosingClv.filter(b => b.clv > 0).length / withClosingClv.length * 100).toFixed(1)
+    : null;
+
+  // Per-pick-type closing CLV
+  function avgClvFor(bets) {
+    const subset = bets.filter(b => b.closing_odds_captured === true && b.clv != null);
+    if (!subset.length) return null;
+    const avg = subset.reduce((sum, b) => sum + b.clv, 0) / subset.length;
+    return Math.round(avg * 10000) / 10000;
+  }
+  const avgClosingClvSharp    = avgClvFor(normalizedBets.filter(b => !b.pick_type || b.pick_type === 'sharp'));
+  const avgClosingClvLongshot = avgClvFor(normalizedBets.filter(b => b.pick_type === 'longshot'));
 
   return res.status(200).json({
     overall:     calcStats(resolved),
     byPickType,
     bySport,
+    bySportSharp,
+    bySportLongshot,
     byEvBucket,
     last7Days,
-    clvStats:    {
-      avgClv:       avgClv != null ? Math.round(avgClv * 10000) / 10000 : null,
+    clvStats: {
+      avgClv:       avgEvAtPick != null ? Math.round(avgEvAtPick * 10000) / 10000 : null,
       positiveRate,
-      sampleSize:   withClv.length,
+      sampleSize:   withEv.length,
+    },
+    closingLineStats: {
+      avgClv:          avgClosingClv != null ? Math.round(avgClosingClv * 10000) / 10000 : null,
+      beatRate:        closingBeatRate,
+      sampleSize:      withClosingClv.length,
+      settledClvCount: settledWithClv.length,
+      avgClvSharp:     avgClosingClvSharp,
+      avgClvLongshot:  avgClosingClvLongshot,
     },
     pendingCount: pending.length,
   });
