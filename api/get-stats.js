@@ -29,10 +29,13 @@ export default async function handler(req, res) {
 }
 
 // ── type=bets ─────────────────────────────────────────────────────────────────
-// Filtered raw bet list from the bets table.
+// Filtered raw bet list from the bets (or prop_picks) table.
 // Query params: sport, result, pick_type, bet_type, days
 async function handleBets(req, res, supabase) {
   const { sport, result, pick_type, bet_type, days } = req.query;
+
+  // Props live in prop_picks, not bets
+  if (bet_type === 'prop') return handlePropBets(req, res, supabase);
 
   let query = supabase
     .from('bets')
@@ -70,6 +73,45 @@ async function handleBets(req, res, supabase) {
     ));
   }
 
+  return res.status(200).json({ bets: data });
+}
+
+// ── prop bets branch (called when bet_type=prop) ──────────────────────────────
+// Queries prop_picks and normalizes column names to match the bets shape.
+async function handlePropBets(req, res, supabase) {
+  const { sport, result, days } = req.query;
+
+  let query = supabase
+    .from('prop_picks')
+    .select('*')
+    .eq('archived', false)
+    .order('game_time', { ascending: false })
+    .limit(500);
+
+  if (sport && sport !== 'all')   query = query.eq('sport', sport);
+  if (result && result !== 'all') query = query.eq('result', result);
+  if (days && days !== 'all') {
+    const cutoff = new Date(Date.now() - parseInt(days, 10) * 24 * 60 * 60 * 1000).toISOString();
+    query = query.gte('picked_at', cutoff);
+  }
+
+  const { data: rawData, error } = await query;
+  if (error) {
+    console.error('[get-stats/propBets] Supabase error:', error.message);
+    return res.status(500).json({ error: error.message, bets: [] });
+  }
+
+  // Add synthetic bets-compatible fields so consumers don't need to branch
+  const data = (rawData || []).filter(r => !r.archived).map(r => ({
+    ...r,
+    bet_type:           'prop',
+    pick_type:          'sharp',
+    true_probability:   r.fair_probability,
+    pinnacle_away_odds: r.pinnacle_odds_opposing,
+    date:               r.game_time ? r.game_time.split('T')[0] : null,
+  }));
+
+  console.log('[get-stats/propBets] fetched', rawData?.length || 0, 'rows |', data.length, 'active');
   return res.status(200).json({ bets: data });
 }
 
