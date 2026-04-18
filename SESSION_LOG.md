@@ -5,6 +5,31 @@ Newest entries at top. Archive to SESSION_LOG_ARCHIVE.md when past ~50 entries.
 
 ---
 
+## 2026-04-18 (session 21) — Prop-pick storage migrated from bets to prop_picks
+
+**Goal:** Move internal prop-pick storage from the `bets` table to the new dedicated `prop_picks` table.
+
+**Schema:** `prop_picks` table created by user in Supabase. Unique index on `(player_name, market_type, line, over_under, game_time, book) WHERE result NOT IN ('void')`.
+
+**Files changed:**
+- `api/save-prop-picks.js` — rewrote Step 1 dedup (bets→prop_picks, tuple-key dedup instead of pick label), Step 5 insert (bets→prop_picks with all new schema fields). Added `market_type`, `event_id`, `matchup`, `homeTeam`/`awayTeam` to event objects. PROP_MAX_DAILY: 3→5. `official_pick=false`, `sharp_book='pinnacle'` set on every row.
+- `api/get-stats.js` — `handleBets`: added early-exit to `handlePropBets()` when `bet_type=prop`. New `handlePropBets()` queries `prop_picks`, normalizes column aliases (`fair_probability→true_probability`, `pinnacle_odds_opposing→pinnacle_away_odds`, synthetic `bet_type='prop'`, `date` derived from `game_time`).
+
+**Verified:**
+- `GET /api/save-prop-picks` → `{"message":"No qualifying prop picks found","saved":0}` — ran to completion, no DB error, no crash (no EV+ candidates today — expected off-peak result)
+- `GET /api/get-stats?type=bets&bet_type=prop` → `{"bets":[]}` — prop_picks table accessible, no error
+- Deploy: `dpl_76kDAbVq9UwHiR7NhmiAEw1YS226` — READY ✓
+
+**Unverified:**
+- Actual insert into prop_picks with real data (no EV+ picks today — will verify naturally when next qualifying game slate runs)
+- `closing_captured` pipeline (capture-closing-lines.js) still targets `bets` table — prop CLV capture not wired up yet
+
+**Next session starts with:**
+- Verify first real prop_picks insert via Supabase dashboard or cron logs when next NBA/MLB slate runs
+- Wire up closing line capture for prop_picks (capture-closing-lines.js reads from `bets` — needs prop_picks branch)
+
+---
+
 ## 2026-04-18 (session 20) — Last 7 Days chart: future/pending bets excluded
 
 **Goal:** Diagnose and fix "Last 7 Days" chart on record.html showing future/tomorrow games.
