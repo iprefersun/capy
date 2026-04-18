@@ -5,6 +5,48 @@ Newest entries at top. Archive to SESSION_LOG_ARCHIVE.md when past ~50 entries.
 
 ---
 
+## 2026-04-18 (session 20) — Last 7 Days chart: future/pending bets excluded
+
+**Goal:** Diagnose and fix "Last 7 Days" chart on record.html showing future/tomorrow games.
+
+**Root cause (verified):**
+`handleStats` in `api/get-stats.js` built `last7Days` by iterating `normalizedBets` (all non-archived, non-prop game bets) with only a 7-day age cutoff. No filter on `result`. This meant:
+- Pending bets with `date` ≥ 7 days ago passed through — including future-dated games
+- `bets.date` is set from `game_time.split('T')[0]` (UTC), so a game at `01:39 UTC Apr 19` = `6:39 PM PDT Apr 18` got bucketed under Apr 19
+- Void bets contributed `bets++` with `profit_units=null→0`
+
+**Concrete example (live before fix):**
+```
+2026-04-19 | bets: 3 | wins: 0 | profit: 0  ← FUTURE DATE
+  Angels (game_time 2026-04-19T01:39, result: pending)
+  Diamondbacks (game_time 2026-04-19T00:11, result: pending)
+  Kings (game_time 2026-04-19T19:10, result: pending)
+
+2026-04-18 | bets: 9 | wins: 0 | profit: -1  ← only 1 of 9 was settled
+  (8 pending bets inflated the count; only Rockies loss was real)
+```
+
+**Fix:**
+- `api/get-stats.js` `handleStats`: changed `last7Days` loop source from `normalizedBets` → `resolved`
+- `resolved` = `normalizedBets.filter(b => ['win','loss','push'].includes(b.result))` — already defined above the loop; excludes pending, void, and future-dated games
+
+**Verified (live API after deploy):**
+```
+2026-04-17 | bets: 3 | wins: 1 | profit: -0.52  (was 4 — Orlando Magic pending excluded)
+2026-04-18 | bets: 1 | wins: 0 | profit: -1      (was 9 — 8 pending excluded)
+2026-04-19 bucket gone entirely ✓
+```
+Deploy: `dpl_CCxLF9uMwaLvJF5YLN9kjgBU8MFs` — READY ✓
+
+**Broken / unverified:**
+- Timezone: `bets.date` is UTC game date, so a game at 01:39 UTC = prior evening US time shows under the UTC date. Not fixed here — would require storing or computing a local-time date at save time. Accepted as known limitation for now.
+
+**Next session starts with:**
+- Monitor for any new pending bets leaking back into the chart
+- Consider whether `bets.date` should be stored as local (US/Las_Vegas) date for correct day bucketing
+
+---
+
 ## 2026-04-18 (session 19) — Duplicate picks on record.html: root cause diagnosed + fixed
 
 **Goal:** Diagnose and fix duplicate picks visible on record.html (Texas Rangers ×2, Minnesota Twins ×2, Colorado Rockies ×2).
