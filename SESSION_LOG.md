@@ -5,6 +5,37 @@ Newest entries at top. Archive to SESSION_LOG_ARCHIVE.md when past ~50 entries.
 
 ---
 
+## 2026-04-18 (session 22) — prop-admin.html: internal prop_picks debug viewer
+
+**Goal:** Build lightweight internal admin page to inspect prop_picks rows without exposing data publicly.
+
+**Files changed:**
+- `prop-admin.html` (new) — standalone password-protected page at `/prop-admin`
+
+**No API changes.** Uses existing `GET /api/get-stats?type=bets&bet_type=prop` with `days`, `sport`, `result` query params.
+
+**Features implemented:**
+- Auth gate: same `admin-override.js` ping pattern as admin.html
+- Summary bar: Total / Pending / Settled / Official / CLV Captured / Latest picked_at
+- Filters: days (7/30/all — server-side), sport, result, ⭐ official-only toggle, player/matchup search (all client-side except days)
+- Table: 17 columns (picked_at, game_time, sport, matchup, player, stat, line, side, book, odds, EV%, pin odds, result, official, CLV, event_id, source_page)
+- Visual flags: pending/win/loss/push/void badges, ⭐ Official vs Internal, CLV ✓ / Pending, No ID (missing event_id), No Play (is_playable=false)
+- Inline row expand (click any row) → shows: market_type, fair_probability, pinnacle_odds_opposing, clv_at_save, clv, closing_odds, closing_captured_at, picked_at, observed_at, event_id, source_page, is_playable, official_pick, stake_units, profit_units, notes
+
+**Verified:**
+- `GET /api/get-stats?type=bets&bet_type=prop&days=7` returns correct shape
+- API returns 1 row with test data, cleanup returns 0 rows ✓
+- all key fields present: player_name, stat_type, official_pick, event_id, source_page, result, closing_captured ✓
+- Deploy: `dpl_8uTJB1cNy4feoyrDpK91aLjCE8vN` — READY ✓
+
+**URL:** `https://www.getcapy.co/prop-admin` (requires admin password)
+
+**Next session starts with:**
+- Verify page loads in browser and row expand works against real prop_picks data when next cron run produces inserts
+- Wire up closing line capture for prop_picks (capture-closing-lines.js still only reads `bets`)
+
+---
+
 ## 2026-04-18 (session 21) — Prop-pick storage migrated from bets to prop_picks
 
 **Goal:** Move internal prop-pick storage from the `bets` table to the new dedicated `prop_picks` table.
