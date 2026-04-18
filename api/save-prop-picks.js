@@ -51,7 +51,7 @@ const STAT_TYPE = {
   batter_home_runs:   'home_runs',
 };
 
-const PROP_EV_MIN    = 2.0;   // minimum EV% to qualify vs Pinnacle
+const PROP_EV_MIN    = 0.5;   // TEMP: lowered from 2.0 for insert verification — revert after testing
 const PROP_MAX_DAILY = 5;     // max prop picks saved per day total
 const PROP_STAKE     = 0.5;   // half-unit stake per prop pick
 
