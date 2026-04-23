@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Props Record | Capy</title>
+  <meta name="description" content="Capy prop pick history — every player prop logged with EV, odds, and result." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,900;1,900&family=Inter:wght@400;500;600&family=Outfit:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --amber: #BA7517; --amber-light: #FAEEDA; --amber-dark: #633806;
+      --green: #16A34A; --green-light: #EAF3DE; --green-dark: #27500A;
+      --red: #D85A30; --red-light: #FAECE7;
+      --text: #1a1a1a; --text-muted: #6b6b6b; --text-hint: #9b9b9b;
+      --border: rgba(0,0,0,0.08); --border-mid: rgba(0,0,0,0.15);
+      --surface: #fff; --surface-2: #f7f6f3;
+      --radius: 12px; --radius-sm: 8px;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: #f5f4f1; line-height: 1.5; }
+
+    /* ── AUTH GATE ── */
+    .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f4f1; }
+    .auth-box { background: var(--surface); border: 0.5px solid var(--border-mid); border-radius: var(--radius); padding: 2.5rem; width: 340px; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    .auth-icon { font-size: 36px; margin-bottom: 12px; }
+    .auth-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+    .auth-sub { font-size: 13px; color: var(--text-hint); margin-bottom: 20px; }
+    .auth-input { width: 100%; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 14px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text); margin-bottom: 12px; outline: none; }
+    .auth-input:focus { border-color: var(--amber); }
+    .auth-btn { width: 100%; padding: 10px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; background: var(--amber); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; }
+    .auth-btn:hover { opacity: 0.88; }
+    .auth-error { font-size: 13px; color: var(--red); margin-top: 10px; display: none; }
+
+    /* ── NAV ── */
+    nav { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1400px; margin: 0 auto; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
+    .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+    .nav-link { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; transition: background 0.15s; white-space: nowrap; }
+    .nav-link:hover { background: var(--surface-2); color: var(--text); }
+    .nav-link.active { color: var(--green); font-weight: 600; }
+    .nav-badge { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
+    .btn-small { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 8px; border: none; background: var(--green); color: #fff; cursor: pointer; text-decoration: none; transition: opacity 0.15s; }
+    .btn-small:hover { opacity: 0.88; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; margin-right: 4px; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
+    .theme-toggle-btn:hover { opacity: 0.8; }
+    .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px 6px; font-size: 22px; line-height: 1; color: var(--text); flex-shrink: 0; }
+    @media (max-width: 640px) { .nav-link { display: none !important; } .nav-badge { display: none; } .hamburger-btn { display: flex; align-items: center; justify-content: center; } }
+    .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--surface); flex-direction: column; padding: 0; overflow-y: auto; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .mobile-menu-logo { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .mobile-menu-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); padding: 4px 6px; line-height: 1; }
+    .mobile-menu-links { display: flex; flex-direction: column; padding: 1rem 0; }
+    .mobile-menu-link { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 500; color: var(--text); text-decoration: none; padding: 14px 1.5rem; border-bottom: 1px solid var(--border); display: block; transition: background 0.12s; }
+    .mobile-menu-link:hover { background: var(--surface-2); }
+    .mobile-menu-gopro { display: block; width: calc(100% - 3rem); margin: 1.25rem 1.5rem; text-align: center; background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; padding: 13px 20px; border-radius: 8px; text-decoration: none; border: none; cursor: pointer; }
+    [data-theme="dark"] nav { background: #0F1117; border-color: #1F2330; }
+    [data-theme="dark"] .mobile-menu { background: #0F1117; }
+    [data-theme="dark"] .mobile-menu-header { border-color: #1F2330; }
+    [data-theme="dark"] .mobile-menu-link { border-color: #1F2330; }
+
+    /* MAIN */
+    .main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* HERO */
+    .hero { margin-bottom: 2rem; }
+    .hero-title { font-family: 'Fraunces', serif; font-size: clamp(24px, 4vw, 38px); font-weight: 900; line-height: 1.1; margin-bottom: 8px; }
+    .hero-sub { font-size: 15px; color: var(--text-muted); max-width: 560px; }
+
+    /* SUMMARY STATS */
+    .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 2rem; }
+    @media (max-width: 900px) { .summary-row { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .summary-row { grid-template-columns: repeat(2, 1fr); } }
+    .hstat { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+    .hstat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px; color: var(--text-hint); margin-bottom: 6px; }
+    .hstat-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--text); }
+    .hstat-value.green { color: var(--green); }
+    .hstat-value.red   { color: var(--red); }
+    .hstat-value.amber { color: var(--amber); }
+    .hstat-sub { font-size: 11px; color: var(--text-hint); margin-top: 3px; }
+
+    /* FILTER BAR */
+    .filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filter-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .filter-btn { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: transparent; color: var(--text-hint); cursor: pointer; transition: background 0.12s, color 0.12s; line-height: 1.6; }
+    .filter-btn:hover { background: var(--surface-2); color: var(--text-muted); }
+    .filter-btn.active { background: var(--green-light); color: var(--green-dark); border-color: transparent; }
+
+    /* TABLE */
+    .table-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 2rem; }
+    .table-card-header { font-size: 13px; font-weight: 700; padding: 14px 16px 10px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .table-card-header span { font-size: 11px; font-weight: 400; color: var(--text-hint); margin-left: 4px; }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .props-table { width: 100%; min-width: 1080px; border-collapse: collapse; }
+    .props-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-hint); padding: 8px 12px; text-align: left; background: var(--surface-2); border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+    .props-table th.right { text-align: right; }
+    .props-table td { font-size: 12px; padding: 10px 12px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+    .props-table tr:last-child td { border-bottom: none; }
+    .props-table tr:hover td { background: var(--surface-2); }
+    .props-table td.mono { font-family: 'DM Mono', monospace; }
+    .props-table td.right { text-align: right; font-family: 'DM Mono', monospace; }
+
+    .player-name { font-weight: 600; font-size: 12px; }
+    .prop-detail { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .matchup-text { font-size: 11px; color: var(--text-muted); }
+    .sport-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--surface-2); color: var(--text-hint); }
+    .book-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--surface-2); color: var(--text-hint); text-transform: capitalize; }
+
+    .result-badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+    .result-win     { background: var(--green-light); color: var(--green-dark); }
+    .result-loss    { background: var(--red-light);   color: var(--red); }
+    .result-push    { background: var(--surface-2);   color: var(--text-hint); }
+    .result-pending { background: var(--amber-light); color: var(--amber-dark); }
+
+    .green-text { color: var(--green); font-weight: 600; }
+    .red-text   { color: var(--red);   font-weight: 600; }
+    .dim-text   { color: var(--text-hint); }
+
+    .empty-row { text-align: center; padding: 2.5rem 1.5rem; color: var(--text-hint); font-size: 13px; }
+
+    /* EMPTY STATE */
+    .empty-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 3rem 2rem; text-align: center; margin-bottom: 2rem; }
+    .empty-icon { font-size: 36px; margin-bottom: 12px; }
+    .empty-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+    .empty-sub { font-size: 14px; color: var(--text-muted); max-width: 400px; margin: 0 auto; line-height: 1.65; }
+
+    /* TWO-COLUMN INSIGHT ROW */
+    .insight-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
+    @media (max-width: 700px) { .insight-row { grid-template-columns: 1fr; } }
+
+    /* WIN RATE BAR */
+    .wr-bar-track { width: 100%; height: 6px; background: var(--surface-2); border-radius: 3px; margin: 6px 0 14px; overflow: hidden; border: 0.5px solid var(--border); }
+    .wr-bar-fill  { height: 100%; border-radius: 3px; background: var(--green); transition: width 0.45s ease; }
+
+    /* PAYOUT CALCULATOR */
+    .calc-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 1.5rem; }
+    .calc-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+    .calc-title { font-size: 13px; font-weight: 700; }
+    .calc-sub { font-size: 11px; color: var(--text-hint); }
+    .calc-stake-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+    .calc-stake-label { font-size: 12px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    .calc-stake-input-wrap { display: flex; align-items: center; gap: 8px; }
+    .calc-stake-prefix { font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text-muted); }
+    .calc-stake-input { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); background: var(--surface-2); border: 1px solid var(--border-mid); border-radius: 8px; padding: 8px 12px; width: 90px; outline: none; transition: border-color 0.15s; }
+    .calc-stake-input:focus { border-color: var(--green); }
+    .calc-stake-slider { flex: 1; min-width: 120px; accent-color: var(--green); cursor: pointer; height: 4px; }
+    .calc-col { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; max-width: 300px; }
+    .calc-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .calc-col-title { font-size: 12px; font-weight: 700; }
+    .calc-col-picks { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-hint); }
+    .calc-row { display: flex; align-items: baseline; justify-content: space-between; padding: 5px 0; border-bottom: 0.5px solid var(--border); }
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); }
+    .calc-row-value { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text); }
+    .calc-row-value.green { color: var(--green); }
+    .calc-row-value.red   { color: var(--red); }
+
+    /* PAGINATION */
+    .pagination-bar { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 16px; border-top: 0.5px solid var(--border); }
+    .page-btn { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: transparent; color: var(--text-muted); cursor: pointer; transition: background 0.12s; }
+    .page-btn:hover:not(:disabled) { background: var(--surface-2); }
+    .page-btn:disabled { opacity: 0.35; cursor: default; }
+    .page-info { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-hint); min-width: 100px; text-align: center; }
+
+    /* DARK MODE */
+    [data-theme="dark"] {
+      --amber: #e8991e; --amber-light: #2d1f08; --amber-dark: #f5c87a;
+      --green: #22C55E; --green-light: #0a2118; --green-dark: #7dd9b4;
+      --red: #F07050; --red-light: #2a1009;
+      --text: #eeedf0; --text-muted: #9898a4; --text-hint: #505058;
+      --border: rgba(255,255,255,0.07); --border-mid: rgba(255,255,255,0.13);
+      --surface: #1a1d27; --surface-2: #13151f;
+    }
+    [data-theme="dark"] body { background: #0f1117; }
+  </style>
+  <link rel="stylesheet" href="/capy-polish.css">
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+  <!-- ── AUTH GATE ── -->
+  <div class="auth-gate" id="auth-gate">
+    <div class="auth-box">
+      <div class="auth-icon">🦫</div>
+      <div class="auth-title">Props Record</div>
+      <div class="auth-sub">Enter your admin password to view</div>
+      <input type="password" class="auth-input" id="pw-input" placeholder="Password"
+        onkeydown="if(event.key==='Enter')checkPassword()" />
+      <button class="auth-btn" onclick="checkPassword()">Continue →</button>
+      <div class="auth-error" id="auth-error">Incorrect password. Try again.</div>
+    </div>
+  </div>
+
+  <!-- ── PAGE UI (hidden until authenticated) ── -->
+  <div id="page-ui" style="display:none;">
+
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="logo-mark">🐾</div>
+        Capy
+      </a>
+      <div class="nav-right">
+        <a href="/odds" class="nav-link"><span class="live-dot"></span>Live Odds</a>
+        <a href="/props" class="nav-link">Props</a>
+        <a href="/parlay" class="nav-link">Parlay</a>
+        <a href="/record" class="nav-link">Record</a>
+        <a href="/props-record" class="nav-link active">Props Record</a>
+        <a href="/stats" class="nav-link">Stats</a>
+        <button class="hamburger-btn" id="hamburger-btn" onclick="openMobileMenu()" aria-label="Open menu">☰</button>
+        <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">🌙</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation">
+    <div class="mobile-menu-header">
+      <a href="/" class="mobile-menu-logo"><div class="logo-mark" style="width:28px;height:28px;font-size:14px;">🐾</div>Capy</a>
+      <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">✕</button>
+    </div>
+    <nav class="mobile-menu-links">
+      <a href="/odds" class="mobile-menu-link" onclick="closeMobileMenu()">Live Odds</a>
+      <a href="/props" class="mobile-menu-link" onclick="closeMobileMenu()">Props</a>
+      <a href="/parlay" class="mobile-menu-link" onclick="closeMobileMenu()">Parlay Builder</a>
+      <a href="/record" class="mobile-menu-link" onclick="closeMobileMenu()">Track Record</a>
+      <a href="/props-record" class="mobile-menu-link" onclick="closeMobileMenu()">Props Record</a>
+      <a href="/stats" class="mobile-menu-link" onclick="closeMobileMenu()">Stats</a>
+    </nav>
+    <button class="mobile-menu-gopro" onclick="closeMobileMenu()">Close</button>
+  </div>
+
+  <div class="main">
+
+    <div class="hero">
+      <div class="hero-title">🎯 Props Record</div>
+      <div class="hero-sub">Every qualifying prop logged with EV, closing odds, and CLV at pick time. Results graded automatically as games complete.</div>
+    </div>
+
+    <!-- SUMMARY STATS -->
+    <div class="summary-row" id="summary-row" style="display:none;">
+      <div class="hstat">
+        <div class="hstat-label">Total Props</div>
+        <div class="hstat-value" id="stat-total">—</div>
+        <div class="hstat-sub">last 30 days</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Record</div>
+        <div class="hstat-value" id="stat-record">—</div>
+        <div class="hstat-sub">W–L–P settled</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Win Rate</div>
+        <div class="hstat-value" id="stat-winrate">—</div>
+        <div class="hstat-sub">settled only</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Units P/L</div>
+        <div class="hstat-value" id="stat-units">—</div>
+        <div class="hstat-sub">settled only</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Avg EV</div>
+        <div class="hstat-value" id="stat-ev">—</div>
+        <div class="hstat-sub">at pick time</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Avg CLV</div>
+        <div class="hstat-value" id="stat-clv">—</div>
+        <div class="hstat-sub" id="stat-clv-sub">closing line captured</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Closing Captured</div>
+        <div class="hstat-value" id="stat-captured">—</div>
+        <div class="hstat-sub">Pinnacle closing odds</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">ROI</div>
+        <div class="hstat-value" id="stat-roi">—</div>
+        <div class="hstat-sub">settled picks only</div>
+      </div>
+    </div>
+
+    <!-- CALCULATOR + YESTERDAY ROW -->
+    <div class="insight-row" id="calc-card-props" style="display:none;">
+
+      <!-- Left: Payout Calculator -->
+      <div class="calc-card" style="margin-bottom:0;">
+        <div class="calc-header">
+          <div class="calc-title">Payout Calculator</div>
+          <div class="calc-sub">flat stake · settled picks only</div>
+        </div>
+        <div class="calc-stake-row">
+          <div class="calc-stake-label">Stake per pick</div>
+          <div class="calc-stake-input-wrap">
+            <span class="calc-stake-prefix">$</span>
+            <input class="calc-stake-input" type="number" id="calc-stake" value="10" min="1" max="1000" step="1" />
+          </div>
+          <input class="calc-stake-slider" type="range" id="calc-slider" value="10" min="1" max="1000" step="1" />
+        </div>
+        <div class="calc-col" style="max-width:none;">
+          <div class="calc-col-header">
+            <div class="calc-col-title">Props Performance</div>
+            <div class="calc-col-picks" id="calc-picks"></div>
+          </div>
+          <div class="calc-row"><span class="calc-row-label">Wagered</span><span class="calc-row-value" id="calc-wagered">—</span></div>
+          <div class="calc-row"><span class="calc-row-label">Return</span><span class="calc-row-value" id="calc-return">—</span></div>
+          <div class="calc-row"><span class="calc-row-label">Net P/L</span><span class="calc-row-value" id="calc-pl">—</span></div>
+          <div class="calc-row"><span class="calc-row-label">ROI</span><span class="calc-row-value" id="calc-roi">—</span></div>
+        </div>
+      </div>
+
+      <!-- Right: Yesterday's Results -->
+      <div class="calc-card" style="margin-bottom:0;">
+        <div class="calc-header">
+          <div class="calc-title">Yesterday's Results</div>
+          <div class="calc-sub" id="yday-date-label">—</div>
+        </div>
+        <div id="yday-body">
+          <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--text);margin-bottom:3px;" id="yday-record-line">—</div>
+          <div style="font-size:11px;color:var(--text-hint);" id="yday-wr-label"></div>
+          <div class="wr-bar-track"><div class="wr-bar-fill" id="yday-wr-bar" style="width:0%"></div></div>
+          <div class="calc-col" style="max-width:none;">
+            <div class="calc-row"><span class="calc-row-label">Units P/L</span><span class="calc-row-value" id="yday-units">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">Avg CLV</span><span class="calc-row-value" id="yday-clv">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">Avg EV</span><span class="calc-row-value" id="yday-ev">—</span></div>
+          </div>
+        </div>
+        <div id="yday-empty" style="display:none;font-size:12px;color:var(--text-hint);padding-top:4px;">No settled props found for yesterday.</div>
+      </div>
+
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <span class="filter-label">Show:</span>
+      <button class="filter-btn active" data-result="completed">Completed</button>
+      <button class="filter-btn" data-result="all">All</button>
+      <button class="filter-btn" data-result="pending">Pending</button>
+      <button class="filter-btn" data-result="win">Win</button>
+      <button class="filter-btn" data-result="loss">Loss</button>
+      <button class="filter-btn" data-result="push">Push</button>
+    </div>
+
+    <!-- PICKS TABLE -->
+    <div class="table-card" id="table-card">
+      <div class="table-card-header">
+        Props History <span id="table-count"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="props-table">
+          <thead>
+            <tr>
+              <th>Game Time</th>
+              <th>Player</th>
+              <th>Prop</th>
+              <th>Matchup</th>
+              <th>Book</th>
+              <th class="right">Odds</th>
+              <th class="right">EV%</th>
+              <th class="right">Closing</th>
+              <th class="right">CLV</th>
+              <th>Result</th>
+              <th class="right">Units</th>
+            </tr>
+          </thead>
+          <tbody id="props-tbody">
+            <tr><td colspan="11" class="empty-row">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-bar" id="pagination-bar"></div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-card" id="empty-state" style="display:none;">
+      <div class="empty-icon">🦫</div>
+      <div class="empty-title">No prop picks yet</div>
+      <div class="empty-sub">Prop picks are logged automatically by the cron. Check back after tonight's games.</div>
+    </div>
+
+  </div><!-- /main -->
+  </div><!-- /page-ui -->
+
+  <script>
+    // ── Theme ─────────────────────────────────────────────────────────────────
+    (function() {
+      const saved = localStorage.getItem('capy_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = saved === 'dark' ? '☀️' : '🌙';
+    })();
+    function toggleTheme() {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('capy_theme', next);
+      document.getElementById('theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
+    }
+
+    // ── Auth ──────────────────────────────────────────────────────────────────
+    function checkPassword() {
+      const pw = document.getElementById('pw-input').value;
+      fetch('/api/admin-override', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw, action: 'ping' })
+      }).then(r => {
+        if (r.status === 403) {
+          document.getElementById('auth-error').style.display = 'block';
+        } else {
+          sessionStorage.setItem('capy_admin_pw', pw);
+          showPage();
+        }
+      }).catch(() => {
+        sessionStorage.setItem('capy_admin_pw', pw);
+        showPage();
+      });
+    }
+
+    function showPage() {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('page-ui').style.display   = 'block';
+      loadProps();
+    }
+
+    (function() {
+      if (sessionStorage.getItem('capy_admin_pw')) showPage();
+    })();
+
+    // ── EV integrity thresholds ───────────────────────────────────────────────
+    const MAX_PUBLIC_PROP_EV = 0.10;
+    const PROP_EV_WARN       = 0.07;
+    // Minimum captured picks required before showing avg CLV aggregate.
+    // Prevents a single outlier dominating the displayed average.
+    // (ML record uses n≥30; props use n≥10 because props accumulate faster.)
+    const MIN_CLV_DISPLAY_N  = 10;
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let _allPicks     = [];
+    let _activeFilter = 'completed';
+    let _currentPage  = 1;
+    const ROWS_PER_PAGE = 15;
+
+    // ── Formatters ────────────────────────────────────────────────────────────
+    function parseTs(iso) {
+      if (!iso) return null;
+      const s = iso.replace(' ', 'T').replace(/([+-]\d{2})$/, '$1:00');
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function fmtDateTime(iso) {
+      if (!iso) return '—';
+      const d = parseTs(iso);
+      if (!d) return '—';
+      const date = d.toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric' });
+      const time = d.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit', hour12: true })
+        .toLowerCase().replace('\u202f', '').replace(' ', '');
+      return `${date}<div class="prop-detail">${time} PT</div>`;
+    }
+
+    function fmtOdds(v) {
+      if (v == null) return '<span class="dim-text">—</span>';
+      return v > 0 ? `+${v}` : String(v);
+    }
+
+    function fmtEv(ev) {
+      if (ev == null) return '<span class="dim-text">—</span>';
+      const evDecimal = Math.abs(ev) < 1 ? ev : ev / 100;
+      if (evDecimal > MAX_PUBLIC_PROP_EV) {
+        return '<span class="dim-text" title="EV under review">—</span>';
+      }
+      const pct = evDecimal * 100;
+      const cls = pct >= 0 ? 'green-text' : 'red-text';
+      const warn = evDecimal > PROP_EV_WARN
+        ? '<span style="font-size:9px;color:var(--amber);margin-left:2px;" title="Elevated EV — verify odds">⚠</span>'
+        : '';
+      return `<span class="${cls}">${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%</span>${warn}`;
+    }
+
+    function fmtClv(clv) {
+      if (clv == null || Math.abs(clv) > 0.5) return '<span class="dim-text">—</span>';
+      const pct = clv * 100;
+      const cls = pct >= 0 ? 'green-text' : 'red-text';
+      return `<span class="${cls}">${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%</span>`;
+    }
+
+    function fmtUnitsResult(u) {
+      if (u == null) return '<span class="dim-text">—</span>';
+      const cls = u > 0 ? 'green-text' : u < 0 ? 'red-text' : '';
+      return `<span class="${cls}">${u >= 0 ? '+' : ''}${u.toFixed(2)}u</span>`;
+    }
+
+    function fmtResult(r) {
+      if (!r || r === 'pending') return '<span class="result-badge result-pending">Pending</span>';
+      const n = r.toLowerCase();
+      if (n === 'win')  return '<span class="result-badge result-win">Win ✓</span>';
+      if (n === 'loss') return '<span class="result-badge result-loss">Loss ✗</span>';
+      if (n === 'push') return '<span class="result-badge result-push">Push</span>';
+      return `<span class="result-badge result-pending">${r}</span>`;
+    }
+
+    function fmtSport(key) {
+      const MAP = {
+        basketball_nba: 'NBA', americanfootball_nfl: 'NFL',
+        baseball_mlb: 'MLB', icehockey_nhl: 'NHL',
+        basketball_ncaab: 'NCAAB',
+      };
+      return MAP[key] || (key ? key.replace(/_/g, ' ').toUpperCase() : '—');
+    }
+
+    function parsePropPick(row) {
+      const player = row.player_name || '';
+      if (row.stat_type && row.over_under && row.line != null) {
+        const stat = row.stat_type.charAt(0).toUpperCase() + row.stat_type.slice(1);
+        const side = row.over_under.charAt(0).toUpperCase() + row.over_under.slice(1);
+        return { player: player || '—', prop: `${stat} ${side} ${row.line}` };
+      }
+      if (row.pick && row.pick.includes(' - ')) {
+        const idx = row.pick.indexOf(' - ');
+        return { player: row.pick.slice(0, idx), prop: row.pick.slice(idx + 3) };
+      }
+      return { player: player || row.pick || '—', prop: '—' };
+    }
+
+    function escHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ── Filter + Pagination ───────────────────────────────────────────────────
+    function applyFilter() {
+      const f = _activeFilter;
+      return _allPicks.filter(p => {
+        if (f === 'all')       return true;
+        if (f === 'completed') return ['win','loss','push'].includes(p.result);
+        if (f === 'pending')   return !p.result || p.result === 'pending';
+        return p.result === f;
+      });
+    }
+
+    function renderPagination(total, pages) {
+      const bar = document.getElementById('pagination-bar');
+      if (!bar) return;
+      if (pages <= 1) { bar.innerHTML = ''; return; }
+      bar.innerHTML = `
+        <button class="page-btn" ${_currentPage <= 1 ? 'disabled' : ''} onclick="goPage(${_currentPage - 1})">← Prev</button>
+        <span class="page-info">Page ${_currentPage} of ${pages}</span>
+        <button class="page-btn" ${_currentPage >= pages ? 'disabled' : ''} onclick="goPage(${_currentPage + 1})">Next →</button>
+      `;
+    }
+
+    function goPage(p) {
+      _currentPage = p;
+      render();
+      document.getElementById('table-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function render() {
+      const filtered = applyFilter();
+      const total    = filtered.length;
+      const pages    = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
+      _currentPage   = Math.min(_currentPage, pages);
+      const start    = (_currentPage - 1) * ROWS_PER_PAGE;
+      const pageRows = filtered.slice(start, start + ROWS_PER_PAGE);
+
+      const tbody   = document.getElementById('props-tbody');
+      const countEl = document.getElementById('table-count');
+
+      countEl.textContent = total > 0 ? `${total} pick${total !== 1 ? 's' : ''}` : '';
+
+      if (total === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="empty-row">No picks match this filter.</td></tr>`;
+        renderPagination(0, 1);
+        return;
+      }
+
+      const closingFmt = (p) => {
+        const raw = p.closing_odds ?? null;
+        if (raw == null) return '<span class="dim-text">—</span>';
+        return `<span class="mono">${raw > 0 ? '+' : ''}${raw}</span>`;
+      };
+
+      tbody.innerHTML = pageRows.map(p => {
+        const { player, prop } = parsePropPick(p);
+        return `<tr>
+          <td class="mono" style="white-space:nowrap;">${fmtDateTime(p.game_time)}</td>
+          <td><div class="player-name">${escHtml(player)}</div>
+              <div class="prop-detail">${escHtml(fmtSport(p.sport))}</div></td>
+          <td>${escHtml(prop)}</td>
+          <td><div class="matchup-text">${escHtml(p.matchup || '—')}</div></td>
+          <td><span class="book-tag">${escHtml(p.book || '—')}</span></td>
+          <td class="right">${fmtOdds(p.odds_placed)}</td>
+          <td class="right">${fmtEv(p.ev_percent)}</td>
+          <td class="right">${closingFmt(p)}</td>
+          <td class="right">${fmtClv(p.clv)}</td>
+          <td>${fmtResult(p.result)}</td>
+          <td class="right">${fmtUnitsResult(p.profit_units)}</td>
+        </tr>`;
+      }).join('');
+
+      renderPagination(total, pages);
+    }
+
+    // ── Yesterday's Results ───────────────────────────────────────────────────
+    function renderYesterday() {
+      // Yesterday's date as YYYY-MM-DD in PT
+      const ydayDate = (() => {
+        const d = new Date(); d.setDate(d.getDate() - 1);
+        return d.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+      })();
+      const ydayLabel = (() => {
+        const d = new Date(); d.setDate(d.getDate() - 1);
+        return d.toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric' });
+      })();
+      document.getElementById('yday-date-label').textContent = ydayLabel;
+
+      const ydayPicks = _allPicks.filter(p => {
+        if (!p.game_time) return false;
+        const d = parseTs(p.game_time);
+        if (!d) return false;
+        const gameDate = d.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+        return gameDate === ydayDate && ['win','loss','push'].includes(p.result);
+      });
+
+      if (ydayPicks.length === 0) {
+        document.getElementById('yday-body').style.display  = 'none';
+        document.getElementById('yday-empty').style.display = '';
+        return;
+      }
+
+      const wins    = ydayPicks.filter(p => p.result === 'win').length;
+      const losses  = ydayPicks.filter(p => p.result === 'loss').length;
+      const pushes  = ydayPicks.filter(p => p.result === 'push').length;
+      const decisive = wins + losses;
+      const wr       = decisive > 0 ? (wins / decisive) * 100 : null;
+      const totalU   = ydayPicks.reduce((sum, p) => sum + (p.profit_units ?? 0), 0);
+
+      const withClv = ydayPicks.filter(p => p.clv != null && Math.abs(p.clv) <= 0.5);
+      const avgClv  = withClv.length > 0
+        ? withClv.reduce((s, p) => s + p.clv, 0) / withClv.length
+        : null;
+
+      const withEv = ydayPicks.filter(p => {
+        if (p.ev_percent == null) return false;
+        const evD = Math.abs(p.ev_percent) < 1 ? p.ev_percent : p.ev_percent / 100;
+        return evD <= MAX_PUBLIC_PROP_EV;
+      });
+      const avgEv = withEv.length > 0
+        ? withEv.reduce((s, p) => {
+            const evD = Math.abs(p.ev_percent) < 1 ? p.ev_percent : p.ev_percent / 100;
+            return s + evD;
+          }, 0) / withEv.length
+        : null;
+
+      const color = v => v > 0 ? 'green' : v < 0 ? 'red' : '';
+
+      document.getElementById('yday-record-line').textContent =
+        pushes > 0 ? `${wins}–${losses}–${pushes}` : `${wins}–${losses}`;
+      // Append "small sample" warning when fewer than 5 picks — win rate from 2-4 picks is pure variance
+      const smallSample = ydayPicks.length < 5;
+      document.getElementById('yday-wr-label').textContent =
+        wr != null
+          ? `${wr.toFixed(1)}% win rate · ${ydayPicks.length} pick${ydayPicks.length !== 1 ? 's' : ''}${smallSample ? ' · small sample' : ''}`
+          : 'no decisive results';
+      document.getElementById('yday-wr-bar').style.width =
+        wr != null ? `${Math.min(100, wr).toFixed(1)}%` : '0%';
+
+      const unitsEl = document.getElementById('yday-units');
+      unitsEl.textContent = `${totalU >= 0 ? '+' : ''}${totalU.toFixed(2)}u`;
+      unitsEl.className   = `calc-row-value ${color(totalU)}`;
+
+      const clvEl = document.getElementById('yday-clv');
+      if (avgClv != null) {
+        clvEl.textContent = `${avgClv >= 0 ? '+' : ''}${(avgClv * 100).toFixed(1)}%`;
+        clvEl.className   = `calc-row-value ${color(avgClv)}`;
+      } else {
+        clvEl.textContent = '—';
+        clvEl.className   = 'calc-row-value';
+      }
+
+      const evEl = document.getElementById('yday-ev');
+      if (avgEv != null) {
+        evEl.textContent = `${avgEv >= 0 ? '+' : ''}${(avgEv * 100).toFixed(1)}%`;
+        evEl.className   = `calc-row-value ${color(avgEv)}`;
+      } else {
+        evEl.textContent = '—';
+        evEl.className   = 'calc-row-value';
+      }
+    }
+
+    // ── Payout Calculator ─────────────────────────────────────────────────────
+    function updateCalculator() {
+      const stake   = Math.max(1, Math.min(1000, parseFloat(document.getElementById('calc-stake').value) || 10));
+      const settled = _allPicks.filter(p => ['win','loss','push'].includes(p.result));
+      if (settled.length === 0) return;
+
+      const totalUnits  = settled.reduce((sum, p) => sum + (p.profit_units ?? 0), 0);
+      const risked      = settled.filter(p => p.result === 'win' || p.result === 'loss');
+      const wagered     = risked.length * stake;
+      const netPL      = totalUnits * stake;
+      const ret        = wagered + netPL;
+      const roi        = wagered > 0 ? (netPL / wagered) * 100 : null;
+
+      const colorClass = v => v > 0 ? 'green' : v < 0 ? 'red' : '';
+      const fmt$       = v => v >= 0 ? `$${v.toFixed(2)}` : `-$${Math.abs(v).toFixed(2)}`;
+      const fmtNet$    = v => v >= 0 ? `+$${v.toFixed(2)}` : `-$${Math.abs(v).toFixed(2)}`;
+
+      document.getElementById('calc-picks').textContent    = `${settled.length} settled picks`;
+      document.getElementById('calc-wagered').textContent  = fmt$(wagered);
+      document.getElementById('calc-return').textContent   = fmt$(Math.max(0, ret));
+
+      const plEl = document.getElementById('calc-pl');
+      plEl.textContent = fmtNet$(netPL);
+      plEl.className   = `calc-row-value ${colorClass(netPL)}`;
+
+      const roiEl = document.getElementById('calc-roi');
+      roiEl.textContent = roi != null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%` : '—';
+      roiEl.className   = `calc-row-value ${roi != null ? colorClass(roi) : ''}`;
+    }
+
+    // ── Load ─────────────────────────────────────────────────────────────────
+    async function loadProps() {
+      try {
+        const res  = await fetch('/api/get-prop-picks?days=30');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        console.log('[Capy] props-record loaded:', data.summary);
+
+        if (!data.picks || data.picks.length === 0) {
+          document.getElementById('table-card').style.display   = 'none';
+          document.getElementById('empty-state').style.display  = 'block';
+          return;
+        }
+
+        _allPicks = data.picks;
+
+        // ── Summary cards ────────────────────────────────────────────────────
+        const s = data.summary;
+        document.getElementById('summary-row').style.display = '';
+        document.getElementById('stat-total').textContent = s.total;
+
+        const record = s.settled > 0
+          ? `${s.wins}–${s.losses}${s.pushes > 0 ? `–${s.pushes}` : ''}`
+          : '—';
+        document.getElementById('stat-record').textContent = record;
+
+        const wrEl    = document.getElementById('stat-winrate');
+        const decisive = s.wins + s.losses;
+        if (decisive > 0) {
+          const wr = ((s.wins / decisive) * 100).toFixed(1);
+          wrEl.textContent = `${wr}%`;
+          // Suppress green/red until 10 decisive results — avoids variance looking like edge
+          wrEl.className   = 'hstat-value ' + (decisive >= 10
+            ? (parseFloat(wr) >= 52 ? 'green' : parseFloat(wr) < 45 ? 'red' : '')
+            : '');
+        } else {
+          wrEl.textContent = '—';
+          wrEl.className   = 'hstat-value';
+        }
+
+        const unitsEl = document.getElementById('stat-units');
+        if (s.settled > 0 && s.profitUnits != null) {
+          unitsEl.textContent = `${s.profitUnits >= 0 ? '+' : ''}${s.profitUnits.toFixed(2)}u`;
+          unitsEl.className   = 'hstat-value ' + (s.profitUnits > 0 ? 'green' : s.profitUnits < 0 ? 'red' : '');
+        } else {
+          unitsEl.textContent = '—';
+          unitsEl.className   = 'hstat-value';
+        }
+
+        const evEl = document.getElementById('stat-ev');
+        if (s.avgEv != null) {
+          const pct = Math.abs(s.avgEv) < 1 ? s.avgEv * 100 : s.avgEv;
+          evEl.textContent = `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`;
+          evEl.className   = 'hstat-value ' + (pct >= 0 ? 'green' : 'red');
+        } else {
+          evEl.textContent = '—';
+          evEl.className   = 'hstat-value';
+        }
+
+        const clvEl = document.getElementById('stat-clv');
+        if (s.avgClv != null && s.closingCaptured >= MIN_CLV_DISPLAY_N) {
+          const pct = (s.avgClv * 100).toFixed(1);
+          clvEl.textContent = `${s.avgClv >= 0 ? '+' : ''}${pct}%`;
+          clvEl.className   = 'hstat-value ' + (s.avgClv >= 0 ? 'green' : 'red');
+          document.getElementById('stat-clv-sub').textContent = `${s.closingCaptured} pick${s.closingCaptured !== 1 ? 's' : ''} captured`;
+        } else if (s.closingCaptured > 0 && s.closingCaptured < MIN_CLV_DISPLAY_N) {
+          clvEl.textContent = '—';
+          clvEl.className   = 'hstat-value';
+          document.getElementById('stat-clv-sub').textContent = `${s.closingCaptured} captured (need ${MIN_CLV_DISPLAY_N})`;
+        } else {
+          clvEl.textContent = '—';
+          clvEl.className   = 'hstat-value';
+        }
+
+        document.getElementById('stat-captured').textContent = s.closingCaptured ?? '—';
+
+        // ROI card: net profit units / settled picks × 100
+        // Guard: require at least 10 settled picks before coloring ROI — short samples are pure variance.
+        const roiEl = document.getElementById('stat-roi');
+        const roiDecisive = s.wins + s.losses;
+        if (roiDecisive > 0 && s.profitUnits != null) {
+          const roi = (s.profitUnits / roiDecisive) * 100;
+          roiEl.textContent = `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%`;
+          roiEl.className   = 'hstat-value ' + (roiDecisive >= 10
+            ? (roi > 0 ? 'green' : roi < 0 ? 'red' : '')
+            : '');
+          if (roiDecisive < 10) roiEl.title = `${roiDecisive} picks — need 10 for reliable ROI`;
+        } else {
+          roiEl.textContent = '—';
+          roiEl.className   = 'hstat-value';
+        }
+
+        // ── Calculator + Yesterday ───────────────────────────────────────────
+        const hasSettled = _allPicks.some(p => ['win','loss','push'].includes(p.result));
+        if (hasSettled) {
+          document.getElementById('calc-card-props').style.display = '';
+          updateCalculator();
+          renderYesterday();
+        }
+
+        render();
+      } catch (err) {
+        console.error('[Capy] Failed to load prop picks:', err);
+        document.getElementById('props-tbody').innerHTML =
+          `<tr><td colspan="11" class="empty-row">Failed to load picks. Try refreshing.</td></tr>`;
+      }
+    }
+
+    // ── Filter buttons ────────────────────────────────────────────────────────
+    document.querySelector('.filter-bar').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _activeFilter = btn.dataset.result;
+      _currentPage  = 1;
+      render();
+    });
+
+    // ── Calculator inputs ─────────────────────────────────────────────────────
+    document.getElementById('calc-stake').addEventListener('input', function () {
+      const v = Math.max(1, Math.min(1000, parseInt(this.value, 10) || 10));
+      document.getElementById('calc-slider').value = v;
+      updateCalculator();
+    });
+    document.getElementById('calc-slider').addEventListener('input', function () {
+      document.getElementById('calc-stake').value = this.value;
+      updateCalculator();
+    });
+
+    // ── Mobile menu ───────────────────────────────────────────────────────────
+    function openMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) { menu.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) { menu.classList.remove('open'); document.body.style.overflow = ''; }
+    }
+    document.getElementById('mobile-menu')?.addEventListener('click', function(e) {
+      if (e.target === this) closeMobileMenu();
+    });
+  </script>
+</body>
+</html>

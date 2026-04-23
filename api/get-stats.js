@@ -213,7 +213,7 @@ async function handleRecord(req, res, supabase) {
   if (allPickIds.length > 0) {
     const { data: betsSupp } = await supabase
       .from('bets')
-      .select('pick_id, observed_at, closing_odds_captured_at, closing_odds_captured, clv, result')
+      .select('pick_id, observed_at, closing_odds_captured_at, closing_odds_captured, closing_odds, clv, result, book')
       .in('pick_id', allPickIds)
       .eq('archived', false);
     if (betsSupp) {
@@ -225,13 +225,16 @@ async function handleRecord(req, res, supabase) {
         r.observed_at              = b?.observed_at              ?? null;
         r.closing_odds_captured_at = b?.closing_odds_captured_at ?? null;
         r.closing_odds_captured    = b?.closing_odds_captured    ?? false;
+        r.bets_closing_odds        = b?.closing_odds             ?? null;
         r.bets_clv                 = b?.clv                      ?? null;
+        r.bets_book                = b?.book                     ?? null;
       }
       for (const p of pendingPicks) {
         const b = betsMap.get(p.id);
         p.observed_at              = b?.observed_at              ?? null;
         p.closing_odds_captured_at = b?.closing_odds_captured_at ?? null;
         p.closing_odds_captured    = b?.closing_odds_captured    ?? false;
+        p.bets_book                = b?.book                     ?? null;
       }
     }
   }
@@ -446,9 +449,11 @@ async function handleStats(req, res, supabase) {
   for (const b of resolved) {
     if (!b.date || new Date(b.date) < sevenDaysAgo) continue;
     const day = b.date.split('T')[0];
-    if (!dayMap[day]) dayMap[day] = { date: day, bets: 0, wins: 0, profitUnits: 0 };
+    if (!dayMap[day]) dayMap[day] = { date: day, bets: 0, wins: 0, losses: 0, pushes: 0, profitUnits: 0 };
     dayMap[day].bets++;
-    if (b.result === 'win') dayMap[day].wins++;
+    if (b.result === 'win')  dayMap[day].wins++;
+    if (b.result === 'loss') dayMap[day].losses++;
+    if (b.result === 'push') dayMap[day].pushes++;
     dayMap[day].profitUnits += b.profit_units || 0;
   }
   const last7Days = Object.values(dayMap)
@@ -477,15 +482,15 @@ async function handleStats(req, res, supabase) {
     ? (withClosingClv.filter(b => b.clv > 0).length / withClosingClv.length * 100).toFixed(1)
     : null;
 
-  // Per-pick-type closing CLV
-  function avgClvFor(bets) {
+  // Per-pick-type closing CLV — returns {avg, n} so UI can apply a sample guard
+  function clvStatsFor(bets) {
     const subset = bets.filter(b => b.closing_odds_captured === true && b.clv != null);
-    if (!subset.length) return null;
+    if (!subset.length) return { avg: null, n: 0 };
     const avg = subset.reduce((sum, b) => sum + b.clv, 0) / subset.length;
-    return Math.round(avg * 10000) / 10000;
+    return { avg: Math.round(avg * 10000) / 10000, n: subset.length };
   }
-  const avgClosingClvSharp    = avgClvFor(normalizedBets.filter(b => !b.pick_type || b.pick_type === 'sharp'));
-  const avgClosingClvLongshot = avgClvFor(normalizedBets.filter(b => b.pick_type === 'longshot'));
+  const clvSharp    = clvStatsFor(normalizedBets.filter(b => !b.pick_type || b.pick_type === 'sharp'));
+  const clvLongshot = clvStatsFor(normalizedBets.filter(b => b.pick_type === 'longshot'));
 
   return res.status(200).json({
     overall:     calcStats(resolved),
@@ -505,8 +510,10 @@ async function handleStats(req, res, supabase) {
       beatRate:        closingBeatRate,
       sampleSize:      withClosingClv.length,
       settledClvCount: settledWithClv.length,
-      avgClvSharp:     avgClosingClvSharp,
-      avgClvLongshot:  avgClosingClvLongshot,
+      avgClvSharp:     clvSharp.avg,
+      avgClvLongshot:  clvLongshot.avg,
+      sampleSharp:     clvSharp.n,
+      sampleLongshot:  clvLongshot.n,
     },
     pendingCount: pending.length,
   });

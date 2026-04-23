@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="google-site-verification" content="_lhdRmjSNR2wOScSoRePf2RPtsypTKnpLT7xUpDvbWo" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capy's Track Record | Transparent Pick History</title>
   <meta name="description" content="Full transparency. Every pick Capy flags is logged automatically. Every result verified. Nothing deleted." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,900;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,900;1,900&family=Inter:wght@400;500;600&family=Outfit:wght@500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --amber: #BA7517; --amber-light: #FAEEDA; --amber-dark: #633806;
-      --green: #1D9E75; --green-light: #EAF3DE; --green-dark: #27500A;
+      --green: #16A34A; --green-light: #EAF3DE; --green-dark: #27500A;
       --red: #D85A30; --red-light: #FAECE7;
       --text: #1a1a1a; --text-muted: #6b6b6b; --text-hint: #9b9b9b;
       --border: rgba(0,0,0,0.08); --border-mid: rgba(0,0,0,0.15);
@@ -21,18 +22,50 @@
     }
     body { font-family: 'Inter', sans-serif; color: var(--text); background: #f5f4f1; line-height: 1.5; }
 
-    /* NAV */
-    nav { background: var(--surface); border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
-    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+    /* ── AUTH GATE ── */
+    .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f4f1; }
+    .auth-box { background: var(--surface); border: 0.5px solid var(--border-mid); border-radius: var(--radius); padding: 2.5rem; width: 340px; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    .auth-icon { font-size: 36px; margin-bottom: 12px; }
+    .auth-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+    .auth-sub { font-size: 13px; color: var(--text-hint); margin-bottom: 20px; }
+    .auth-input { width: 100%; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 14px; border: 1.5px solid var(--border-mid); border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text); margin-bottom: 12px; outline: none; }
+    .auth-input:focus { border-color: var(--amber); }
+    .auth-btn { width: 100%; padding: 10px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; background: var(--amber); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; }
+    .auth-btn:hover { opacity: 0.88; }
+    .auth-error { font-size: 13px; color: var(--red); margin-top: 10px; display: none; }
+
+    /* ── NAV ── */
+    nav { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; max-width: 1400px; margin: 0 auto; }
     .nav-logo { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; }
     .logo-mark { width: 30px; height: 30px; background: var(--amber-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .nav-right { display: flex; align-items: center; gap: 8px; }
-    .nav-link { font-size: 13px; color: var(--text-muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; transition: background 0.12s; }
+    .nav-right { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+    .nav-link { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; transition: background 0.15s; white-space: nowrap; }
     .nav-link:hover { background: var(--surface-2); color: var(--text); }
     .nav-link.active { color: var(--green); font-weight: 600; }
-    .nav-badge { font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
-    .btn-small { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 6px; border: none; background: var(--amber); color: #fff; cursor: pointer; text-decoration: none; }
-    .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; padding: 0; line-height: 1; }
+    .nav-badge { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; background: var(--amber-light); color: var(--amber-dark); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
+    .btn-small { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0; line-height: 1; padding: 7px 16px; border-radius: 8px; border: none; background: var(--green); color: #fff; cursor: pointer; text-decoration: none; transition: opacity 0.15s; }
+    .btn-small:hover { opacity: 0.88; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; margin-right: 4px; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .theme-toggle-btn { background: var(--surface-2); border: 0.5px solid var(--border-mid); border-radius: 20px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.15s; flex-shrink: 0; padding: 0; line-height: 1; }
+    .theme-toggle-btn:hover { opacity: 0.8; }
+    .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px 6px; font-size: 22px; line-height: 1; color: var(--text); flex-shrink: 0; }
+    @media (max-width: 640px) { .nav-link { display: none !important; } .nav-badge { display: none; } .hamburger-btn { display: flex; align-items: center; justify-content: center; } }
+    .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--surface); flex-direction: column; padding: 0; overflow-y: auto; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .mobile-menu-logo { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .mobile-menu-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); padding: 4px 6px; line-height: 1; }
+    .mobile-menu-links { display: flex; flex-direction: column; padding: 1rem 0; }
+    .mobile-menu-link { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 500; color: var(--text); text-decoration: none; padding: 14px 1.5rem; border-bottom: 1px solid var(--border); display: block; transition: background 0.12s; }
+    .mobile-menu-link:hover { background: var(--surface-2); }
+    .mobile-menu-gopro { display: block; width: calc(100% - 3rem); margin: 1.25rem 1.5rem; text-align: center; background: var(--green); color: #fff; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; padding: 13px 20px; border-radius: 8px; text-decoration: none; border: none; cursor: pointer; transition: opacity 0.15s; }
+    .mobile-menu-gopro:hover { opacity: 0.88; }
+    [data-theme="dark"] nav { background: #0F1117; border-color: #1F2330; }
+    [data-theme="dark"] .mobile-menu { background: #0F1117; }
+    [data-theme="dark"] .mobile-menu-header { border-color: #1F2330; }
+    [data-theme="dark"] .mobile-menu-link { border-color: #1F2330; }
 
     /* MAIN */
     .main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
@@ -42,10 +75,19 @@
     .hero-title { font-family: 'Fraunces', serif; font-size: clamp(26px, 4vw, 40px); font-weight: 900; line-height: 1.1; margin-bottom: 8px; }
     .hero-sub { font-size: 15px; color: var(--text-muted); max-width: 560px; }
 
-    /* OVERALL HEADER ROW */
-    .header-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 2rem; }
-    @media (max-width: 900px) { .header-stats { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 560px) { .header-stats { grid-template-columns: repeat(2, 1fr); } }
+    /* CREDIBILITY METRICS CARD */
+    .cred-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 1.5rem; }
+    .cred-groups { display: flex; gap: 0; align-items: stretch; }
+    .cred-group { flex: 1; min-width: 0; padding: 0 24px; }
+    .cred-group:first-child { padding-left: 0; }
+    .cred-group:last-child  { padding-right: 0; }
+    .cred-divider { width: 0.5px; background: var(--border); flex-shrink: 0; margin: 4px 0; }
+    .cred-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); margin-bottom: 14px; display: flex; align-items: center; gap: 4px; }
+    @media (max-width: 640px) { .cred-groups { flex-direction: column; gap: 20px; } .cred-divider { display: none; } .cred-group { padding: 0; } }
+
+    /* OVERALL SUMMARY ROW (secondary, below pick-type cards) */
+    .overall-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 2rem; }
+    @media (max-width: 700px) { .overall-summary { grid-template-columns: repeat(2, 1fr); } }
     .hstat { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
     .hstat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px; color: var(--text-hint); margin-bottom: 6px; }
     .hstat-value { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 500; color: var(--text); }
@@ -64,8 +106,9 @@
     .pt-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .pt-card-title { font-size: 14px; font-weight: 700; }
     .pt-card-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .pt-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    @media (max-width: 500px) { .pt-stats { grid-template-columns: repeat(2, 1fr); } }
+    .pt-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    @media (max-width: 600px) { .pt-stats { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 400px) { .pt-stats { grid-template-columns: repeat(2, 1fr); } }
     .pt-stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-hint); margin-bottom: 4px; }
     .pt-stat-value { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; }
     .pt-stat-value.green { color: var(--green); }
@@ -93,12 +136,17 @@
     .dim-text   { color: var(--text-hint); }
     .sport-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--surface-2); color: var(--text-hint); }
 
-    /* 7-DAY CHART */
-    .chart-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 2rem; overflow: hidden; }
+    /* SPORT FILTER TOGGLES */
+    .sport-breakdown-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .sport-filter-group { display: flex; gap: 4px; }
+    .sport-filter-btn { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: transparent; color: var(--text-hint); cursor: pointer; transition: background 0.12s, color 0.12s; line-height: 1.6; }
+    .sport-filter-btn:hover { background: var(--surface-2); color: var(--text-muted); }
+    .sport-filter-btn.active { background: var(--green-light); color: var(--green-dark); border-color: transparent; }
+
+    /* 7-DAY SUMMARY */
+    .chart-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 2rem; }
     .chart-title { font-size: 13px; font-weight: 700; margin-bottom: 16px; }
     .chart-title span { font-size: 11px; font-weight: 400; color: var(--text-hint); margin-left: 6px; }
-    .chart-wrap { overflow-x: auto; }
-    svg.bar-chart { display: block; overflow: visible; }
 
     /* CLV SECTION */
     .clv-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 2rem; }
@@ -109,6 +157,10 @@
     .clv-stat-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; }
     .clv-explainer { font-size: 12px; color: var(--text-muted); line-height: 1.65; max-width: 560px; }
     .clv-explainer strong { color: var(--text); }
+    /* Tooltip icon used on CLV label */
+    .info-tip { display: inline-flex; align-items: center; justify-content: center; width: 13px; height: 13px; border-radius: 50%; background: var(--surface-2); border: 0.5px solid var(--border-mid); font-size: 9px; font-weight: 700; color: var(--text-hint); cursor: default; vertical-align: middle; position: relative; margin-left: 3px; }
+    .info-tip::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(15,17,23,0.93); color: #eeedf0; font-size: 11px; font-weight: 400; font-family: 'Inter', sans-serif; line-height: 1.55; padding: 8px 11px; border-radius: 7px; white-space: normal; width: 230px; text-align: left; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 20; letter-spacing: 0; text-transform: none; }
+    .info-tip:hover::after { opacity: 1; }
 
     /* EMPTY STATE */
     .empty-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 3rem 2rem; text-align: center; margin-bottom: 2rem; }
@@ -124,39 +176,133 @@
     .credibility-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
     .credibility-text { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
 
+    /* PAYOUT CALCULATOR */
+    .calc-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 2rem; }
+    .calc-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+    .calc-title { font-size: 13px; font-weight: 700; }
+    .calc-sub { font-size: 11px; color: var(--text-hint); }
+    .calc-stake-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+    .calc-stake-label { font-size: 12px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    .calc-stake-input-wrap { display: flex; align-items: center; gap: 8px; }
+    .calc-stake-prefix { font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text-muted); }
+    .calc-stake-input {
+      font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500;
+      color: var(--text); background: var(--surface-2);
+      border: 1px solid var(--border-mid); border-radius: 8px;
+      padding: 8px 12px; width: 90px; outline: none;
+      transition: border-color 0.15s;
+    }
+    .calc-stake-input:focus { border-color: var(--green); }
+    .calc-stake-slider { flex: 1; min-width: 120px; accent-color: var(--green); cursor: pointer; height: 4px; }
+    .calc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (max-width: 560px) { .calc-grid { grid-template-columns: 1fr; } }
+    .calc-col { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; }
+    .calc-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .calc-col-title { font-size: 12px; font-weight: 700; }
+    .calc-col-picks { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-hint); }
+    .calc-row { display: flex; align-items: baseline; justify-content: space-between; padding: 5px 0; border-bottom: 0.5px solid var(--border); }
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-hint); }
+    .calc-row-value { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text); }
+    .calc-row-value.green { color: var(--green); }
+    .calc-row-value.red   { color: var(--red); }
+
+    /* PICKS HISTORY TABLE */
+    .picks-history-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 2rem; }
+    .picks-history-title { font-size: 13px; font-weight: 700; padding: 14px 16px 10px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .picks-history-title span { font-size: 11px; font-weight: 400; color: var(--text-hint); margin-left: 4px; }
+    .picks-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .picks-table { width: 100%; min-width: 1000px; border-collapse: collapse; }
+    .picks-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-hint); padding: 8px 12px; text-align: left; background: var(--surface-2); border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+    .picks-table td { font-size: 12px; padding: 9px 12px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+    .picks-table tr:last-child td { border-bottom: none; }
+    .picks-table tr:hover td { background: var(--surface-2); }
+    .picks-table td.mono { font-family: 'DM Mono', monospace; }
+    .picks-table td.right { text-align: right; font-family: 'DM Mono', monospace; }
+    .result-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+    .result-win  { background: var(--green-light); color: var(--green-dark); }
+    .result-loss { background: var(--red-light);   color: var(--red); }
+    .result-push { background: var(--surface-2);   color: var(--text-hint); }
+    .result-pending { background: var(--amber-light); color: var(--amber-dark); }
+    .pick-team { font-weight: 600; font-size: 12px; }
+    .game-teams { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .matchup-text { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .book-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--surface-2); color: var(--text-hint); text-transform: capitalize; white-space: nowrap; }
+    .picks-empty { text-align: center; padding: 2.5rem 1.5rem; color: var(--text-hint); font-size: 13px; }
+
+    /* Picks history filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .filter-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-right: 2px; }
+    .filter-btn { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: transparent; color: var(--text-hint); cursor: pointer; transition: background 0.12s, color 0.12s; line-height: 1.6; }
+    .filter-btn:hover { background: var(--surface-2); color: var(--text-muted); }
+    .filter-btn.active { background: var(--green-light); color: var(--green-dark); border-color: transparent; }
+
     /* DARK MODE */
     [data-theme="dark"] {
       --amber: #e8991e; --amber-light: #2d1f08; --amber-dark: #f5c87a;
-      --green: #22c48a; --green-light: #0a2118; --green-dark: #7dd9b4;
+      --green: #22C55E; --green-light: #0a2118; --green-dark: #7dd9b4;
       --red: #F07050; --red-light: #2a1009;
       --text: #eeedf0; --text-muted: #9898a4; --text-hint: #505058;
       --border: rgba(255,255,255,0.07); --border-mid: rgba(255,255,255,0.13);
       --surface: #1a1d27; --surface-2: #13151f;
     }
     [data-theme="dark"] body { background: #0f1117; }
-    [data-theme="dark"] nav  { background: #161920; }
-    [data-theme="dark"] svg.bar-chart .bar-zero-line { stroke: rgba(255,255,255,0.1); }
-    [data-theme="dark"] svg.bar-chart text { fill: #9898a4; }
   </style>
+  <link rel="stylesheet" href="/capy-polish.css">
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
+
+  <!-- ── AUTH GATE ── -->
+  <div class="auth-gate" id="auth-gate">
+    <div class="auth-box">
+      <div class="auth-icon">🦫</div>
+      <div class="auth-title">Capy Track Record</div>
+      <div class="auth-sub">Enter your admin password to view</div>
+      <input type="password" class="auth-input" id="pw-input" placeholder="Password"
+        onkeydown="if(event.key==='Enter')checkPassword()" />
+      <button class="auth-btn" onclick="checkPassword()">Continue →</button>
+      <div class="auth-error" id="auth-error">Incorrect password. Try again.</div>
+    </div>
+  </div>
+
+  <!-- ── RECORD UI (hidden until authenticated) ── -->
+  <div id="record-ui" style="display:none;">
+
   <nav>
     <div class="nav-inner">
       <a href="/" class="nav-logo">
-        <div class="logo-mark">🦫</div>
+        <div class="logo-mark">🐾</div>
         Capy
       </a>
       <div class="nav-right">
-        <a href="/odds" class="nav-link">Live odds</a>
-        <a href="/parlay.html" class="nav-link">Parlay</a>
-        <a href="/record.html" class="nav-link active">Record</a>
-        <a href="/stats.html" class="nav-link">Stats</a>
+        <a href="/odds" class="nav-link"><span class="live-dot"></span>Live Odds</a>
+        <a href="/props" class="nav-link">Props</a>
+        <a href="/parlay" class="nav-link">Parlay</a>
+        <a href="/record" class="nav-link active">Record</a>
+        <a href="/stats" class="nav-link">Stats</a>
         <a href="/#pricing" class="nav-badge">⚡ Founding rate — $10/mo</a>
-        <a href="/#signup" class="btn-small">Go Sharp</a>
+        <button class="btn-small" onclick="startCheckout('monthly', this)">Go Sharp</button>
+        <button class="hamburger-btn" id="hamburger-btn" onclick="openMobileMenu()" aria-label="Open menu">☰</button>
         <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"><span id="theme-icon">🌙</span></button>
       </div>
     </div>
   </nav>
+
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation">
+    <div class="mobile-menu-header">
+      <a href="/" class="mobile-menu-logo"><div class="logo-mark" style="width:28px;height:28px;font-size:14px;">🐾</div>Capy</a>
+      <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">✕</button>
+    </div>
+    <nav class="mobile-menu-links">
+      <a href="/odds" class="mobile-menu-link" onclick="closeMobileMenu()">Live Odds</a>
+      <a href="/props" class="mobile-menu-link" onclick="closeMobileMenu()">Props</a>
+      <a href="/parlay" class="mobile-menu-link" onclick="closeMobileMenu()">Parlay Builder</a>
+      <a href="/record" class="mobile-menu-link" onclick="closeMobileMenu()">Track Record</a>
+      <a href="/stats" class="mobile-menu-link" onclick="closeMobileMenu()">Stats</a>
+    </nav>
+    <button class="mobile-menu-gopro" onclick="closeMobileMenu(); startCheckout('monthly', this)">Go Sharp →</button>
+  </div>
 
   <div class="main">
 
@@ -165,17 +311,53 @@
       <div class="hero-sub">Full transparency. Every pick logged automatically. Every result verified against official scores. Nothing deleted.</div>
     </div>
 
-    <!-- Overall header stats populated by JS -->
-    <div class="header-stats" id="header-stats">
-      <div class="hstat"><div class="hstat-label">Record</div><div class="hstat-value" id="hs-record">—</div><div class="hstat-sub" id="hs-record-sub"></div></div>
-      <div class="hstat"><div class="hstat-label">Win Rate</div><div class="hstat-value" id="hs-winrate">—</div></div>
-      <div class="hstat"><div class="hstat-label">Units P/L</div><div class="hstat-value" id="hs-units">—</div><div class="hstat-sub">since Apr 7, 2026</div></div>
-      <div class="hstat"><div class="hstat-label">ROI</div><div class="hstat-value" id="hs-roi">—</div></div>
-      <div class="hstat"><div class="hstat-label">Avg EV at Pick</div><div class="hstat-value amber" id="hs-ev">—</div><div class="hstat-sub">vs Pinnacle</div></div>
-    </div>
-
     <!-- Content area — hidden until data loads, replaced by empty state if no resolved bets -->
     <div id="content-area" style="display:none;">
+
+      <!-- CREDIBILITY METRICS: CLV + EV AT PICK TIME -->
+      <div class="cred-card">
+        <div class="cred-groups">
+          <div class="cred-group" id="clv-cred-group">
+            <div class="cred-group-label">Closing Line Value <span class="info-tip" data-tip="True CLV: captured at T-20 min before game time. Compares your placed odds (Pinnacle no-vig at placement) vs Pinnacle closing line (no-vig). Positive = market confirmed your edge. Source: Pinnacle EU.">?</span></div>
+            <div id="clv-aggregate-stats" class="clv-stats-row">
+              <div class="clv-stat">
+                <div class="clv-stat-label">Avg CLV</div>
+                <div class="clv-stat-value" id="closing-clv-avg">—</div>
+              </div>
+              <div class="clv-stat">
+                <div class="clv-stat-label">Beat Closing Line</div>
+                <div class="clv-stat-value" id="closing-clv-beat">—</div>
+              </div>
+              <div class="clv-stat">
+                <div class="clv-stat-label">Sample Size</div>
+                <div class="clv-stat-value dim-text" id="closing-clv-n">—</div>
+              </div>
+            </div>
+            <div id="clv-collecting-msg" style="display:none; font-size:13px; color:var(--text-muted); padding: 4px 0;">
+              Collecting data — <span id="clv-collecting-n">0</span> settled bets tracked so far (need 30 to display aggregate)
+            </div>
+            <div style="font-size:11px; color:var(--text-hint); margin-top:6px;">CLV tracking active from April 16, 2026</div>
+          </div>
+          <div class="cred-divider"></div>
+          <div class="cred-group">
+            <div class="cred-group-label">EV at Pick Time <span class="info-tip" data-tip="EV uses two-sided Pinnacle de-vig: both sides normalized to remove vig, fair probability extracted, then compared to your book's odds. Source: Pinnacle EU at pick time.">?</span></div>
+            <div class="clv-stats-row">
+              <div class="clv-stat">
+                <div class="clv-stat-label">Avg EV</div>
+                <div class="clv-stat-value" id="clv-avg">—</div>
+              </div>
+              <div class="clv-stat">
+                <div class="clv-stat-label">Positive EV Rate</div>
+                <div class="clv-stat-value" id="clv-pos-rate">—</div>
+              </div>
+              <div class="clv-stat">
+                <div class="clv-stat-label">Sample Size</div>
+                <div class="clv-stat-value dim-text" id="clv-sample">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- PICK TYPE CARDS -->
       <div class="section-label">By Pick Type</div>
@@ -193,6 +375,7 @@
             <div><div class="pt-stat-label">Win Rate</div><div class="pt-stat-value green" id="sh-wr">—</div></div>
             <div><div class="pt-stat-label">Units P/L</div><div class="pt-stat-value" id="sh-units">—</div></div>
             <div><div class="pt-stat-label">ROI</div><div class="pt-stat-value" id="sh-roi">—</div></div>
+            <div><div class="pt-stat-label">Avg CLV</div><div class="pt-stat-value" id="sh-clv">—</div></div>
           </div>
         </div>
         <div class="pt-card" id="longshot-card">
@@ -208,14 +391,79 @@
             <div><div class="pt-stat-label">Hit Rate</div><div class="pt-stat-value amber" id="ls-wr">—</div></div>
             <div><div class="pt-stat-label">Units P/L</div><div class="pt-stat-value" id="ls-units">—</div></div>
             <div><div class="pt-stat-label">ROI</div><div class="pt-stat-value" id="ls-roi">—</div></div>
+            <div><div class="pt-stat-label">Avg CLV</div><div class="pt-stat-value" id="ls-clv">—</div></div>
           </div>
         </div>
+      </div>
+
+      <!-- PAYOUT CALCULATOR -->
+      <div class="calc-card" id="calc-card">
+        <div class="calc-header">
+          <div class="calc-title">Payout Calculator</div>
+          <div class="calc-sub">Based on actual results at flat stake per pick</div>
+        </div>
+        <div class="calc-stake-row">
+          <div class="calc-stake-label">Stake per pick</div>
+          <div class="calc-stake-input-wrap">
+            <span class="calc-stake-prefix">$</span>
+            <input class="calc-stake-input" type="number" id="calc-stake" value="10" min="1" max="1000" step="1" />
+          </div>
+          <input class="calc-stake-slider" type="range" id="calc-slider" value="10" min="1" max="1000" step="1" />
+        </div>
+        <div class="calc-grid">
+          <div class="calc-col">
+            <div class="calc-col-header">
+              <div class="calc-col-title">All Picks</div>
+              <div class="calc-col-picks" id="calc-all-picks"></div>
+            </div>
+            <div class="calc-row"><span class="calc-row-label">Wagered</span><span class="calc-row-value" id="calc-all-wagered">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">Return</span><span class="calc-row-value" id="calc-all-return">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">Net P/L</span><span class="calc-row-value" id="calc-all-pl">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">ROI</span><span class="calc-row-value" id="calc-all-roi">—</span></div>
+          </div>
+          <div class="calc-col">
+            <div class="calc-col-header">
+              <div class="calc-col-title">🎯 Sharp Picks</div>
+              <div class="calc-col-picks" id="calc-sh-picks"></div>
+            </div>
+            <div class="calc-row"><span class="calc-row-label">Wagered</span><span class="calc-row-value" id="calc-sh-wagered">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">Return</span><span class="calc-row-value" id="calc-sh-return">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">Net P/L</span><span class="calc-row-value" id="calc-sh-pl">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">ROI</span><span class="calc-row-value" id="calc-sh-roi">—</span></div>
+          </div>
+          <div class="calc-col">
+            <div class="calc-col-header">
+              <div class="calc-col-title">🎲 Long Shot Plays</div>
+              <div class="calc-col-picks" id="calc-ls-picks"></div>
+            </div>
+            <div class="calc-row"><span class="calc-row-label">Wagered</span><span class="calc-row-value" id="calc-ls-wagered">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">Return</span><span class="calc-row-value" id="calc-ls-return">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">Net P/L</span><span class="calc-row-value" id="calc-ls-pl">—</span></div>
+            <div class="calc-row"><span class="calc-row-label">ROI</span><span class="calc-row-value" id="calc-ls-roi">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OVERALL SUMMARY -->
+      <div class="section-label">Overall</div>
+      <div class="overall-summary">
+        <div class="hstat"><div class="hstat-label">Record</div><div class="hstat-value" id="hs-record">—</div><div class="hstat-sub" id="hs-record-sub"></div></div>
+        <div class="hstat"><div class="hstat-label">Win Rate</div><div class="hstat-value" id="hs-winrate">—</div></div>
+        <div class="hstat"><div class="hstat-label">Units P/L</div><div class="hstat-value" id="hs-units">—</div><div class="hstat-sub">since Apr 7, 2026</div></div>
+        <div class="hstat"><div class="hstat-label">ROI</div><div class="hstat-value" id="hs-roi">—</div></div>
       </div>
 
       <!-- SPORT + EV BUCKET TABLES -->
       <div class="breakdown-row">
         <div class="breakdown-card">
-          <div class="breakdown-title">By Sport <span id="sport-table-sub"></span></div>
+          <div class="breakdown-title sport-breakdown-title">
+            <span>By Sport <span id="sport-table-sub"></span></span>
+            <div class="sport-filter-group" id="sport-filter-group">
+              <button class="sport-filter-btn active" data-filter="all">All</button>
+              <button class="sport-filter-btn" data-filter="sharp">Sharp</button>
+              <button class="sport-filter-btn" data-filter="longshot">Long Shot</button>
+            </div>
+          </div>
           <table class="breakdown-table" id="sport-table">
             <thead><tr>
               <th>Sport</th>
@@ -223,6 +471,7 @@
               <th>Win%</th>
               <th>Units</th>
               <th>ROI%</th>
+              <th style="text-align:right;">N</th>
             </tr></thead>
             <tbody id="sport-tbody"></tbody>
           </table>
@@ -236,44 +485,79 @@
               <th>Win%</th>
               <th>Units</th>
               <th>ROI%</th>
+              <th style="text-align:right;">N</th>
             </tr></thead>
             <tbody id="ev-tbody"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- 7-DAY BAR CHART -->
+      <!-- 7-DAY SUMMARY -->
       <div class="chart-card">
-        <div class="chart-title">Last 7 Days — Units P/L <span>daily profit/loss</span></div>
-        <div class="chart-wrap">
-          <svg class="bar-chart" id="bar-chart" width="680" height="160" viewBox="0 0 680 160" preserveAspectRatio="xMinYMid meet"></svg>
-        </div>
-      </div>
-
-      <!-- CLV SECTION -->
-      <div class="clv-card">
-        <div class="clv-header">
-          <div class="clv-stats-row">
-            <div class="clv-stat">
-              <div class="clv-stat-label">Avg CLV</div>
-              <div class="clv-stat-value" id="clv-avg">—</div>
-            </div>
-            <div class="clv-stat">
-              <div class="clv-stat-label">Beat Closing Line</div>
-              <div class="clv-stat-value" id="clv-pos-rate">—</div>
-            </div>
-            <div class="clv-stat">
-              <div class="clv-stat-label">Sample Size</div>
-              <div class="clv-stat-value dim-text" id="clv-sample">—</div>
-            </div>
+        <div class="chart-title">Last 7 Days <span>settled bets only · 1u risked per bet</span></div>
+        <div class="clv-stats-row" id="last7-stats">
+          <div class="clv-stat">
+            <div class="clv-stat-label">Bets</div>
+            <div class="clv-stat-value" id="l7-bets">—</div>
           </div>
-          <div class="clv-explainer">
-            <strong>Closing Line Value (CLV)</strong> measures whether you beat the market. If Pinnacle moves the line further from you after you bet, your CLV is positive — you had the sharper number. Over a large sample, consistently positive CLV is the strongest evidence of a real edge.
+          <div class="clv-stat">
+            <div class="clv-stat-label">Record</div>
+            <div class="clv-stat-value" id="l7-record">—</div>
+          </div>
+          <div class="clv-stat">
+            <div class="clv-stat-label">Win Rate</div>
+            <div class="clv-stat-value" id="l7-winrate">—</div>
+          </div>
+          <div class="clv-stat">
+            <div class="clv-stat-label">Net Units</div>
+            <div class="clv-stat-value" id="l7-units">—</div>
           </div>
         </div>
+        <div id="last7-empty" style="display:none; font-size:13px; color:var(--text-hint); padding:4px 0;">No settled bets in the last 7 days.</div>
       </div>
 
     </div><!-- /content-area -->
+
+    <!-- PICKS HISTORY (loaded independently — shows even if bets table is empty) -->
+    <div id="picks-history-section" style="display:none;">
+      <div class="section-label">Picks History</div>
+      <div class="filter-bar">
+        <span class="filter-label">Show:</span>
+        <button class="filter-btn active" data-result="completed">Completed</button>
+        <button class="filter-btn" data-result="all">All</button>
+        <button class="filter-btn" data-result="pending">Pending</button>
+        <button class="filter-btn" data-result="win">Win</button>
+        <button class="filter-btn" data-result="loss">Loss</button>
+        <button class="filter-btn" data-result="push">Push</button>
+      </div>
+      <div class="picks-history-card">
+        <div class="picks-history-title">
+          All Picks <span id="picks-history-count"></span>
+        </div>
+        <div class="picks-table-wrap">
+          <table class="picks-table">
+            <thead>
+              <tr>
+                <th>Date / Time</th>
+                <th>Pick</th>
+                <th>Matchup</th>
+                <th>Book</th>
+                <th class="right">Odds</th>
+                <th class="right">EV%</th>
+                <th class="right">Closing</th>
+                <th class="right">CLV</th>
+                <th>Result</th>
+                <th class="right">Units</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="picks-history-tbody">
+              <tr><td colspan="11" class="picks-empty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <!-- EMPTY STATE (shown until bets exist) -->
     <div class="empty-card" id="empty-state" style="display:none;">
@@ -290,20 +574,138 @@
 
     <!-- HOW WE TRACK -->
     <div class="credibility">
-      <div class="credibility-title">How we track</div>
+      <div class="credibility-title">How we calculate everything</div>
       <div class="credibility-text">
-        Every pick Capy flags is automatically saved to our database with the exact odds and EV at time of pick. Results are verified against official scores via The Odds API and BallDontLie. We never delete losing picks. Sharp Picks and Long Shot Plays are tracked separately — they have different expected win rates and should be evaluated differently. This record started April 7, 2026 and every pick is shown — wins and losses alike.
+        <strong>EV (Expected Value)</strong> — Calculated at pick time using Pinnacle as the sharp reference. We convert both sides of the Pinnacle line to implied probabilities, remove the vig proportionally (two-sided normalization), and derive a fair probability. EV = (fair probability × your book's decimal odds − 1) × 100. A +2% EV pick means, on average, $1 wagered returns $1.02 before variance.<br><br>
+        <strong>CLV at Pick Time</strong> — The difference between the odds you captured at your target book and the Pinnacle line at the same moment, expressed as a percentage. Positive means you got better odds than Pinnacle was offering when the pick was logged.<br><br>
+        <strong>Closing Line Value (True CLV)</strong> — Captured at T-20 minutes before game time. We compare the no-vig probability implied by your placed odds (using Pinnacle both sides at placement) against the no-vig probability of the Pinnacle line at close. Positive true CLV means the closing market confirms the edge was real — the line moved in your favor. This is widely considered the best predictor of long-term profitability.<br><br>
+        <strong>Sharp reference:</strong> Pinnacle EU — the lowest-margin, most efficient sportsbook available, used as the market baseline by professional bettors globally.<br><br>
+        Every pick is logged automatically at time of cron execution. Results are verified against The Odds API official scores. Nothing is deleted. This record started April 7, 2026.
       </div>
     </div>
 
   </div><!-- /main -->
 
+  </div><!-- /record-ui -->
+
   <script>
+    // ── Sample-size guards — thresholds below which metrics are suppressed ──────
+    // Prevents small-sample variance from looking like proven edge.
+    const MIN_SAMPLE_ROI          = 20;  // resolved picks before coloring ROI on pick-type cards
+    const MIN_SAMPLE_WINRATE_CLR  = 10;  // resolved picks before applying green/red to win rate
+    const MIN_SAMPLE_CLV_PERTYPE  =  5;  // CLV captures before showing per-type avg CLV
+    const MIN_SAMPLE_SPORT_ROW    =  5;  // picks in a sport/EV-bucket row before showing ROI color
+
+    // ── Auth gate ─────────────────────────────────────────────────────────────
+    function checkPassword() {
+      const pw = document.getElementById('pw-input').value;
+      fetch('/api/admin-override', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw, action: 'ping' })
+      }).then(r => {
+        if (r.status === 403) {
+          document.getElementById('auth-error').style.display = 'block';
+        } else {
+          sessionStorage.setItem('capy_admin_pw', pw);
+          showRecord();
+        }
+      }).catch(() => {
+        // Non-403 errors (e.g. 400 from unknown action) still mean auth passed
+        sessionStorage.setItem('capy_admin_pw', pw);
+        showRecord();
+      });
+    }
+
+    function showRecord() {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('record-ui').style.display = 'block';
+      loadStats();
+      loadPicksHistory();
+    }
+
+    (function() {
+      const stored = sessionStorage.getItem('capy_admin_pw');
+      if (stored) {
+        showRecord();
+      }
+    })();
+
+    // ── Payout calculator state — set once stats load ─────────────────────────
+    let _calcData = null;
+
+    // ── Sport table filter state ───────────────────────────────────────────────
+    let _sportData = { all: [], sharp: [], longshot: [] };
+
+    function renderSportTable(rows) {
+      const sportTbody = document.getElementById('sport-tbody');
+      const sub = document.getElementById('sport-table-sub');
+      if (rows && rows.length > 0) {
+        sub.textContent = `${rows.length} sport${rows.length !== 1 ? 's' : ''}`;
+        sportTbody.innerHTML = rows.map(s => {
+          const small = s.total < MIN_SAMPLE_SPORT_ROW;
+          // Suppress green/red win rate and ROI on rows with too few picks
+          const wrCell  = small
+            ? `<span class="dim-text">${fmtPct(s.winRate)}</span>`
+            : fmtWr(s.winRate);
+          const roiCell = small
+            ? `<span class="dim-text" title="${s.total} picks — need ${MIN_SAMPLE_SPORT_ROW}">—</span>`
+            : fmtRoi(s.roiPercent);
+          return `<tr>
+            <td><span class="sport-tag">${fmtSport(s.sport)}</span></td>
+            <td class="dim-text">${fmtRecord(s)}</td>
+            <td>${wrCell}</td>
+            <td>${fmtUnits(s.profitUnits)}</td>
+            <td>${roiCell}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${s.total}</td>
+          </tr>`;
+        }).join('');
+      } else {
+        sub.textContent = '';
+        sportTbody.innerHTML = '<tr><td colspan="6" class="dim-text" style="text-align:center;padding:16px;">No data yet</td></tr>';
+      }
+    }
+
+    document.getElementById('sport-filter-group').addEventListener('click', e => {
+      const btn = e.target.closest('.sport-filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.sport-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderSportTable(_sportData[btn.dataset.filter]);
+    });
+
     const SPORT_LABELS = {
-      basketball_nba: 'NBA', americanfootball_nfl: 'NFL',
-      baseball_mlb: 'MLB', icehockey_nhl: 'NHL',
-      basketball_ncaab: 'NCAAB', americanfootball_ncaaf: 'NCAAF',
-      icehockey_nhl: 'NHL', soccer_epl: 'EPL',
+      // US major leagues
+      basketball_nba:          'NBA',
+      americanfootball_nfl:    'NFL',
+      baseball_mlb:            'MLB',
+      icehockey_nhl:           'NHL',
+      basketball_ncaab:        'NCAAB',
+      americanfootball_ncaaf:  'NCAAF',
+      // International basketball
+      basketball_euroleague:   'EuroLeague',
+      basketball_nbl:          'NBL',
+      // Australian rules
+      aussierules_afl:         'AFL',
+      // Soccer
+      soccer_epl:              'EPL',
+      soccer_usa_mls:          'MLS',
+      soccer_uefa_champs_league:  'Champions League',
+      soccer_uefa_europa_league:  'Europa League',
+      soccer_spain_la_liga:    'La Liga',
+      soccer_germany_bundesliga:  'Bundesliga',
+      soccer_italy_serie_a:    'Serie A',
+      soccer_france_ligue_one: 'Ligue 1',
+      soccer_brazil_campeonato: 'Brasileirão',
+      soccer_mexico_ligamx:    'Liga MX',
+      // Combat sports
+      mma_mixed_martial_arts:  'MMA',
+      boxing_boxing:           'Boxing',
+      // Other
+      cricket_odi:             'Cricket ODI',
+      cricket_test_match:      'Cricket Test',
+      rugbyleague_nrl:         'NRL',
+      rugbyunion:              'Rugby Union',
     };
 
     function fmtSport(key) { return SPORT_LABELS[key] || key?.replace(/_/g, ' ').toUpperCase() || '—'; }
@@ -336,6 +738,9 @@
       try {
         const res = await fetch('/api/get-stats');
         data = await res.json();
+        console.log('[Capy] get-stats raw response:', JSON.stringify(data, null, 2));
+        console.log('[Capy] overall:', data.overall);
+        console.log('[Capy] pendingCount:', data.pendingCount);
       } catch (err) {
         document.getElementById('empty-state').style.display = 'block';
         document.getElementById('empty-state').querySelector('.empty-sub').textContent =
@@ -343,7 +748,7 @@
         return;
       }
 
-      const { overall, byPickType, bySport, byEvBucket, last7Days, clvStats, pendingCount } = data;
+      const { overall, byPickType, bySport, bySportSharp, bySportLongshot, byEvBucket, last7Days, clvStats, closingLineStats, pendingCount } = data;
 
       // Pending notice
       if (pendingCount > 0) {
@@ -377,69 +782,132 @@
       roiEl.textContent = overall.roiPercent != null ? `${r >= 0 ? '+' : ''}${overall.roiPercent}%` : '—';
       roiEl.className = 'hstat-value ' + (r > 0 ? 'green' : r < 0 ? 'red' : '');
 
-      document.getElementById('hs-ev').textContent = overall.avgEv != null ? `+${overall.avgEv.toFixed(1)}%` : '—';
-
       // ── Sharp card ────────────────────────────────────────────────────────
       const sh = byPickType.sharp;
       document.getElementById('sh-record').textContent = sh.total > 0 ? fmtRecord(sh) : '—';
+
       const shWrEl = document.getElementById('sh-wr');
       shWrEl.textContent = sh.winRate ? `${sh.winRate}%` : '—';
-      shWrEl.className = 'pt-stat-value ' + (parseFloat(sh.winRate) >= 52 ? 'green' : parseFloat(sh.winRate) < 45 ? 'red' : 'green');
+      // Suppress green/red color until enough settled picks to distinguish signal from noise
+      shWrEl.className = 'pt-stat-value ' + (sh.total >= MIN_SAMPLE_WINRATE_CLR
+        ? (parseFloat(sh.winRate) >= 52 ? 'green' : parseFloat(sh.winRate) < 45 ? 'red' : '')
+        : '');
+
       const shUEl = document.getElementById('sh-units');
       shUEl.textContent = sh.profitUnits != null ? `${sh.profitUnits >= 0 ? '+' : ''}${sh.profitUnits.toFixed(2)}u` : '—';
       shUEl.className = 'pt-stat-value ' + (sh.profitUnits > 0 ? 'green' : sh.profitUnits < 0 ? 'red' : '');
+
       const shREl = document.getElementById('sh-roi');
-      shREl.textContent = sh.roiPercent != null ? `${parseFloat(sh.roiPercent) >= 0 ? '+' : ''}${sh.roiPercent}%` : '—';
-      shREl.className = 'pt-stat-value ' + (parseFloat(sh.roiPercent) > 0 ? 'green' : parseFloat(sh.roiPercent) < 0 ? 'red' : '');
+      if (sh.roiPercent != null && sh.total >= MIN_SAMPLE_ROI) {
+        shREl.textContent = `${parseFloat(sh.roiPercent) >= 0 ? '+' : ''}${sh.roiPercent}%`;
+        shREl.className   = 'pt-stat-value ' + (parseFloat(sh.roiPercent) > 0 ? 'green' : parseFloat(sh.roiPercent) < 0 ? 'red' : '');
+        shREl.removeAttribute('title');
+      } else {
+        shREl.textContent = '—';
+        shREl.className   = 'pt-stat-value dim-text';
+        if (sh.total > 0) shREl.title = `${sh.total} picks — need ${MIN_SAMPLE_ROI} to display`;
+      }
 
       // ── Longshot card ─────────────────────────────────────────────────────
       const ls = byPickType.longshot;
       document.getElementById('ls-record').textContent = ls.total > 0 ? fmtRecord(ls) : '—';
+
       const lsWrEl = document.getElementById('ls-wr');
       lsWrEl.textContent = ls.winRate ? `${ls.winRate}%` : '—';
       lsWrEl.className = 'pt-stat-value amber';
+
       const lsUEl = document.getElementById('ls-units');
       lsUEl.textContent = ls.profitUnits != null ? `${ls.profitUnits >= 0 ? '+' : ''}${ls.profitUnits.toFixed(2)}u` : '—';
       lsUEl.className = 'pt-stat-value ' + (ls.profitUnits > 0 ? 'green' : ls.profitUnits < 0 ? 'red' : '');
+
       const lsREl = document.getElementById('ls-roi');
-      lsREl.textContent = ls.roiPercent != null ? `${parseFloat(ls.roiPercent) >= 0 ? '+' : ''}${ls.roiPercent}%` : '—';
-      lsREl.className = 'pt-stat-value ' + (parseFloat(ls.roiPercent) > 0 ? 'green' : parseFloat(ls.roiPercent) < 0 ? 'red' : '');
+      if (ls.roiPercent != null && ls.total >= MIN_SAMPLE_ROI) {
+        lsREl.textContent = `${parseFloat(ls.roiPercent) >= 0 ? '+' : ''}${ls.roiPercent}%`;
+        lsREl.className   = 'pt-stat-value ' + (parseFloat(ls.roiPercent) > 0 ? 'green' : parseFloat(ls.roiPercent) < 0 ? 'red' : '');
+        lsREl.removeAttribute('title');
+      } else {
+        lsREl.textContent = '—';
+        lsREl.className   = 'pt-stat-value dim-text';
+        if (ls.total > 0) lsREl.title = `${ls.total} picks — need ${MIN_SAMPLE_ROI} to display`;
+      }
+
+      // ── Per-type avg CLV (closing line, captured picks only) ──────────────
+      // Guard: only show avg CLV when at least MIN_SAMPLE_CLV_PERTYPE captures exist.
+      // A single outlier on 2-3 captures would dominate the displayed average.
+      function renderPtClv(elId, clvVal, sampleN) {
+        const el = document.getElementById(elId);
+        if (clvVal != null && sampleN >= MIN_SAMPLE_CLV_PERTYPE) {
+          const pct = (clvVal * 100).toFixed(1);
+          el.textContent = `${clvVal >= 0 ? '+' : ''}${pct}%`;
+          el.className   = 'pt-stat-value ' + (clvVal > 0 ? 'green' : clvVal < 0 ? 'red' : '');
+          el.removeAttribute('title');
+        } else {
+          el.textContent = '—';
+          el.className   = 'pt-stat-value dim-text';
+          if (sampleN > 0) el.title = `${sampleN} capture${sampleN !== 1 ? 's' : ''} — need ${MIN_SAMPLE_CLV_PERTYPE} to display`;
+        }
+      }
+      const cls = closingLineStats || {};
+      renderPtClv('sh-clv', cls.avgClvSharp    ?? null, cls.sampleSharp    ?? 0);
+      renderPtClv('ls-clv', cls.avgClvLongshot ?? null, cls.sampleLongshot ?? 0);
 
       // ── Sport table ───────────────────────────────────────────────────────
-      const sportTbody = document.getElementById('sport-tbody');
-      if (bySport && bySport.length > 0) {
-        document.getElementById('sport-table-sub').textContent = `${bySport.length} sport${bySport.length !== 1 ? 's' : ''}`;
-        sportTbody.innerHTML = bySport.map(s => `
-          <tr>
-            <td><span class="sport-tag">${fmtSport(s.sport)}</span></td>
-            <td class="dim-text">${fmtRecord(s)}</td>
-            <td>${fmtWr(s.winRate)}</td>
-            <td>${fmtUnits(s.profitUnits)}</td>
-            <td>${fmtRoi(s.roiPercent)}</td>
-          </tr>`).join('');
-      } else {
-        sportTbody.innerHTML = '<tr><td colspan="5" class="dim-text" style="text-align:center;padding:16px;">No data yet</td></tr>';
-      }
+      _sportData = {
+        all:      bySport         || [],
+        sharp:    bySportSharp    || [],
+        longshot: bySportLongshot || [],
+      };
+      renderSportTable(_sportData.all);
 
       // ── EV bucket table ───────────────────────────────────────────────────
       const evTbody = document.getElementById('ev-tbody');
       if (byEvBucket && byEvBucket.length > 0) {
-        evTbody.innerHTML = byEvBucket.map(b => `
-          <tr>
+        evTbody.innerHTML = byEvBucket.map(b => {
+          const small = b.total < MIN_SAMPLE_SPORT_ROW;
+          const wrCell  = small
+            ? `<span class="dim-text">${fmtPct(b.winRate)}</span>`
+            : fmtWr(b.winRate);
+          const roiCell = small
+            ? `<span class="dim-text" title="${b.total} picks — need ${MIN_SAMPLE_SPORT_ROW}">—</span>`
+            : fmtRoi(b.roiPercent);
+          return `<tr>
             <td><strong>${b.evBucket}</strong></td>
             <td class="dim-text">${fmtRecord(b)}</td>
-            <td>${fmtWr(b.winRate)}</td>
+            <td>${wrCell}</td>
             <td>${fmtUnits(b.profitUnits)}</td>
-            <td>${fmtRoi(b.roiPercent)}</td>
-          </tr>`).join('');
+            <td>${roiCell}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-hint);">${b.total}</td>
+          </tr>`;
+        }).join('');
       } else {
-        evTbody.innerHTML = '<tr><td colspan="5" class="dim-text" style="text-align:center;padding:16px;">No data yet</td></tr>';
+        evTbody.innerHTML = '<tr><td colspan="6" class="dim-text" style="text-align:center;padding:16px;">No data yet</td></tr>';
       }
 
       // ── 7-day bar chart ───────────────────────────────────────────────────
-      renderBarChart(last7Days || []);
+      renderLast7Stats(last7Days || []);
 
-      // ── CLV section ───────────────────────────────────────────────────────
+      // ── Closing Line Value section ────────────────────────────────────────
+      // Only show aggregate stats once we have >= 30 settled bets with CLV.
+      // settledClvCount counts win/loss/push bets only — 'pending' is not settled.
+      const settledClvCount = cls.settledClvCount ?? 0;
+      if (settledClvCount >= 30) {
+        document.getElementById('clv-aggregate-stats').style.display = '';
+        document.getElementById('clv-collecting-msg').style.display  = 'none';
+        const closingAvgEl = document.getElementById('closing-clv-avg');
+        if (cls.avgClv != null) {
+          const pct = (cls.avgClv * 100).toFixed(1);
+          closingAvgEl.textContent = `${cls.avgClv >= 0 ? '+' : ''}${pct}%`;
+          closingAvgEl.className = 'clv-stat-value ' + (cls.avgClv >= 0 ? 'green-text' : 'red-text');
+        }
+        document.getElementById('closing-clv-beat').textContent = cls.beatRate != null ? `${cls.beatRate}%` : '—';
+        document.getElementById('closing-clv-n').textContent    = cls.sampleSize > 0 ? `${cls.sampleSize} bet${cls.sampleSize !== 1 ? 's' : ''}` : '—';
+      } else {
+        document.getElementById('clv-aggregate-stats').style.display = 'none';
+        document.getElementById('clv-collecting-msg').style.display  = '';
+        document.getElementById('clv-collecting-n').textContent      = settledClvCount;
+      }
+
+      // ── EV at Pick Time section ───────────────────────────────────────────
       const clvAvgEl = document.getElementById('clv-avg');
       if (clvStats.avgClv != null) {
         // avgClv is a decimal ratio: 0.025 = +2.5%
@@ -451,73 +919,96 @@
       }
       document.getElementById('clv-pos-rate').textContent = clvStats.positiveRate != null ? `${clvStats.positiveRate}%` : '—';
       document.getElementById('clv-sample').textContent = clvStats.sampleSize > 0 ? `${clvStats.sampleSize} bets` : '—';
+
+      // ── Payout calculator ─────────────────────────────────────────────────
+      _calcData = { overall, sharp: byPickType.sharp, longshot: byPickType.longshot };
+      updateCalculator();
     }
 
+    // ── Payout calculator ─────────────────────────────────────────────────────
+    function fmtDollar(v) {
+      if (v == null) return '—';
+      const abs = Math.abs(v);
+      const formatted = abs >= 1000
+        ? '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+        : '$' + abs.toFixed(2);
+      return (v < 0 ? '-' : '') + formatted;
+    }
+
+    function updateCalculator() {
+      if (!_calcData) return;
+
+      const stake = Math.max(1, Math.min(1000, parseFloat(document.getElementById('calc-stake').value) || 10));
+
+      function renderCol(data, prefix) {
+        const total     = data.total || 0;
+        const profit    = data.profitUnits != null ? data.profitUnits : 0;
+        const roi       = data.roiPercent != null ? parseFloat(data.roiPercent) : null;
+        // Flat stake: every pick counts as exactly 1 × stake regardless of stake_units.
+        const wagered   = total * stake;
+        const netPL     = profit * stake;
+        const totalRet  = wagered + netPL;
+        const plClass   = netPL > 0 ? 'green' : netPL < 0 ? 'red' : '';
+        const roiClass  = roi != null ? (roi > 0 ? 'green' : roi < 0 ? 'red' : '') : '';
+
+        document.getElementById(`${prefix}-picks`).textContent  = `${total} pick${total !== 1 ? 's' : ''}`;
+        document.getElementById(`${prefix}-wagered`).textContent = fmtDollar(wagered);
+        document.getElementById(`${prefix}-return`).textContent  = fmtDollar(totalRet);
+
+        const plEl  = document.getElementById(`${prefix}-pl`);
+        plEl.textContent  = (netPL >= 0 ? '+' : '') + fmtDollar(netPL);
+        plEl.className    = 'calc-row-value ' + plClass;
+
+        const roiEl = document.getElementById(`${prefix}-roi`);
+        roiEl.textContent = roi != null ? `${roi >= 0 ? '+' : ''}${roi}%` : '—';
+        roiEl.className   = 'calc-row-value ' + roiClass;
+      }
+
+      renderCol(_calcData.overall,  'calc-all');
+      renderCol(_calcData.sharp,    'calc-sh');
+      renderCol(_calcData.longshot, 'calc-ls');
+    }
+
+    // Sync number input ↔ slider, update on any change
+    document.getElementById('calc-stake').addEventListener('input', function () {
+      const v = Math.max(1, Math.min(1000, parseInt(this.value, 10) || 10));
+      document.getElementById('calc-slider').value = v;
+      updateCalculator();
+    });
+    document.getElementById('calc-slider').addEventListener('input', function () {
+      document.getElementById('calc-stake').value = this.value;
+      updateCalculator();
+    });
+
     // ── SVG bar chart ─────────────────────────────────────────────────────────
-    function renderBarChart(days) {
-      const svg   = document.getElementById('bar-chart');
-      const W     = 680;
-      const H     = 160;
-      const PAD   = { top: 12, right: 16, bottom: 36, left: 44 };
-      const chartW = W - PAD.left - PAD.right;
-      const chartH = H - PAD.top - PAD.bottom;
+    function renderLast7Stats(days) {
+      const totals = days.reduce((acc, d) => {
+        acc.bets   += d.bets   || 0;
+        acc.wins   += d.wins   || 0;
+        acc.losses += d.losses || 0;
+        acc.pushes += d.pushes || 0;
+        acc.units  += d.profitUnits || 0;
+        return acc;
+      }, { bets: 0, wins: 0, losses: 0, pushes: 0, units: 0 });
 
-      if (!days.length) {
-        svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="12" fill="var(--text-hint)" font-family="Inter,sans-serif">No data yet</text>`;
-        return;
-      }
+      const isEmpty = totals.bets === 0;
+      document.getElementById('last7-stats').style.display = isEmpty ? 'none' : '';
+      document.getElementById('last7-empty').style.display  = isEmpty ? ''     : 'none';
+      if (isEmpty) return;
 
-      // Fill missing days in the last 7
-      const today = new Date();
-      const filledDays = [];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
-        const key = d.toISOString().split('T')[0];
-        const existing = days.find(x => x.date === key);
-        filledDays.push(existing || { date: key, bets: 0, wins: 0, profitUnits: 0 });
-      }
+      const decisiveGames = totals.wins + totals.losses;
+      const winRate = decisiveGames > 0
+        ? ((totals.wins / decisiveGames) * 100).toFixed(1) + '%'
+        : '—';
 
-      const values   = filledDays.map(d => d.profitUnits);
-      const maxAbs   = Math.max(Math.abs(Math.min(...values)), Math.abs(Math.max(...values)), 1);
-      const zeroY    = PAD.top + chartH / 2;
-      const barW     = Math.floor(chartW / filledDays.length) - 8;
-      const barGap   = Math.floor(chartW / filledDays.length);
+      const units    = Math.round(totals.units * 100) / 100;
+      const unitsEl  = document.getElementById('l7-units');
+      unitsEl.textContent = `${units >= 0 ? '+' : ''}${units.toFixed(2)}u`;
+      unitsEl.className   = 'clv-stat-value ' + (units > 0 ? 'green-text' : units < 0 ? 'red-text' : '');
 
-      const isDark   = document.documentElement.getAttribute('data-theme') === 'dark';
-      const colGreen = isDark ? '#22c48a' : '#1D9E75';
-      const colRed   = isDark ? '#F07050' : '#D85A30';
-      const colText  = isDark ? '#9898a4' : '#9b9b9b';
-      const colZero  = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-
-      let html = '';
-
-      // Zero line
-      html += `<line x1="${PAD.left}" y1="${zeroY}" x2="${W - PAD.right}" y2="${zeroY}" stroke="${colZero}" stroke-width="1" class="bar-zero-line"/>`;
-
-      filledDays.forEach((day, i) => {
-        const x       = PAD.left + i * barGap + barGap / 2 - barW / 2;
-        const v       = day.profitUnits;
-        const ratio   = (v / maxAbs) * (chartH / 2 - 6);
-        const barH    = Math.max(Math.abs(ratio), v !== 0 ? 2 : 0);
-        const barY    = v >= 0 ? zeroY - barH : zeroY;
-        const color   = v >= 0 ? colGreen : colRed;
-
-        const dateLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const valLabel  = v !== 0 ? `${v >= 0 ? '+' : ''}${v.toFixed(2)}u` : '';
-        const labelY    = v >= 0 ? barY - 4 : barY + barH + 12;
-
-        html += `<rect x="${x}" y="${barY}" width="${barW}" height="${barH}" rx="3" fill="${color}" opacity="${day.bets > 0 ? 1 : 0.2}"/>`;
-        if (valLabel) {
-          html += `<text x="${x + barW / 2}" y="${labelY}" text-anchor="middle" font-size="9" font-family="'DM Mono',monospace" fill="${color}">${valLabel}</text>`;
-        }
-        html += `<text x="${x + barW / 2}" y="${H - PAD.bottom + 14}" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="${colText}">${dateLabel}</text>`;
-        if (day.bets > 0) {
-          html += `<text x="${x + barW / 2}" y="${H - PAD.bottom + 26}" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="${colText}">${day.bets}bet${day.bets !== 1 ? 's' : ''}</text>`;
-        }
-      });
-
-      svg.innerHTML = html;
+      document.getElementById('l7-bets').textContent    = totals.bets;
+      document.getElementById('l7-record').textContent  = `${totals.wins}-${totals.losses}-${totals.pushes}`;
+      document.getElementById('l7-winrate').textContent = winRate;
     }
 
     // ── Theme ─────────────────────────────────────────────────────────────────
@@ -537,7 +1028,293 @@
       if (icon) icon.textContent = saved === 'dark' ? '☀️' : '🌙';
     })();
 
-    loadStats();
+    // ── Picks history table ───────────────────────────────────────────────────
+    // Fetches resolved game picks (picks+results join) + pending game picks.
+    // Props excluded from this page — shown on a dedicated Props Record page.
+    // Runs independently of loadStats so it renders even when bets stats table is empty.
+    async function loadPicksHistory() {
+      let resolvedRows = [];
+      let pendingRows  = [];
+
+      try {
+        const res  = await fetch('/api/get-stats?type=record');
+        const data = await res.json();
+        resolvedRows = data.picks        || [];
+        pendingRows  = data.pendingPicks || [];
+        console.log('[Capy] picks history (type=record) — resolved:', resolvedRows.length,
+          '| pending:', pendingRows.length);
+      } catch (err) {
+        console.error('[Capy] Failed to load picks history:', err);
+      }
+
+      renderPicksHistory(resolvedRows, pendingRows);
+    }
+
+    function fmtOdds(american) {
+      if (american == null) return '—';
+      return american > 0 ? `+${american}` : String(american);
+    }
+
+    // Supabase returns timestamptz as '2026-04-16 15:42:27+00' — normalize before parsing.
+    function parseTs(iso) {
+      if (!iso) return null;
+      const s = iso.replace(' ', 'T').replace(/([+-]\d{2})$/, '$1:00');
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = parseTs(iso);
+      if (!d) return '—';
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return '';
+      const d = parseTs(iso);
+      if (!d) return '';
+      return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+        .toLowerCase().replace(' ', '');
+    }
+
+    // Vegas time: "Apr 16 · 8:42 am"
+    function fmtPickedVegas(iso) {
+      if (!iso) return '—';
+      const d = parseTs(iso);
+      if (!d) return '—';
+      const datePart = d.toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric' });
+      const timePart = d.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit', hour12: true })
+        .toLowerCase().replace('\u202f', '').replace(' ', '');
+      return `${datePart} · ${timePart}`;
+    }
+
+    function fmtEvPick(ev) {
+      // picks table: ev_percent stored as plain % (2.1 = 2.1%)
+      // bets table: ev_percent stored as decimal (0.021 = 2.1%)
+      // Detect by magnitude: if |ev| < 1 it's decimal form
+      if (ev == null) return '<span class="dim-text">—</span>';
+      const pct = Math.abs(ev) < 1 ? ev * 100 : ev;
+      const cls = pct >= 0 ? 'green-text' : 'red-text';
+      return `<span class="${cls}">${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%</span>`;
+    }
+
+    function fmtClvPick(clv) {
+      // CLV stored as decimal ratio (0.023 = +2.3%). Skip outliers > ±50%.
+      if (clv == null || Math.abs(clv) > 0.5) return '<span class="dim-text">—</span>';
+      const pct = clv * 100;
+      const cls = pct >= 0 ? 'green-text' : 'red-text';
+      return `<span class="${cls}">${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%</span>`;
+    }
+
+    function fmtUnitsResult(u) {
+      if (u == null) return '<span class="dim-text">—</span>';
+      const cls = u > 0 ? 'green-text' : u < 0 ? 'red-text' : '';
+      return `<span class="${cls}">${u >= 0 ? '+' : ''}${u.toFixed(2)}u</span>`;
+    }
+
+    function fmtResult(outcome) {
+      if (!outcome || outcome === 'pending') {
+        return '<span class="result-badge result-pending">Pending</span>';
+      }
+      const norm = outcome.toLowerCase();
+      if (norm === 'win')  return '<span class="result-badge result-win">Win ✓</span>';
+      if (norm === 'loss') return '<span class="result-badge result-loss">Loss ✗</span>';
+      if (norm === 'push') return '<span class="result-badge result-push">Push</span>';
+      return `<span class="result-badge result-pending">${outcome}</span>`;
+    }
+
+    let _allPickRows  = [];
+    let _pickFilter   = 'completed';
+
+    function renderPicksHistoryFiltered() {
+      const tbody   = document.getElementById('picks-history-tbody');
+      const countEl = document.getElementById('picks-history-count');
+      const f = _pickFilter;
+
+      const visible = _allPickRows.filter(row => {
+        if (f === 'all')       return true;
+        if (f === 'completed') return ['win','loss','push'].includes(row.resultType);
+        if (f === 'pending')   return row.resultType === 'pending';
+        return row.resultType === f;
+      });
+
+      countEl.textContent = `${visible.length} pick${visible.length !== 1 ? 's' : ''}`;
+      tbody.innerHTML = visible.map(r => r.html).join('') ||
+        '<tr><td colspan="11" class="picks-empty">No picks match this filter.</td></tr>';
+    }
+
+    function renderPicksHistory(resolvedRows, pendingRows) {
+      const section = document.getElementById('picks-history-section');
+
+      // ── Dedup: resolved row wins over pending for the same pick/sport/game_time ──
+      const resolvedKeys = new Set(
+        resolvedRows.map(r => {
+          const p = r.picks || r;
+          return `${(p.pick||'').toLowerCase()}|${p.sport}|${(p.game_time||'').slice(0,16)}`;
+        })
+      );
+      const dedupedPending = pendingRows.filter(p => {
+        const key = `${(p.pick||'').toLowerCase()}|${p.sport}|${(p.game_time||'').slice(0,16)}`;
+        return !resolvedKeys.has(key);
+      });
+
+      // ── Sport filter: only show major leagues ─────────────────────────────────
+      const ALLOWED = ['basketball_nba','americanfootball_nfl','baseball_mlb','icehockey_nhl'];
+      const filteredResolved = resolvedRows.filter(r => ALLOWED.includes(r.picks?.sport || r.sport) && !r.picks?.archived);
+      const filteredPending  = dedupedPending.filter(p => ALLOWED.includes(p.sport) && !p.archived);
+
+      const totalCount = filteredResolved.length + filteredPending.length;
+
+      if (totalCount === 0) {
+        section.style.display = 'block';
+        document.getElementById('picks-history-count').textContent = '';
+        document.getElementById('picks-history-tbody').innerHTML =
+          '<tr><td colspan="11" class="picks-empty">No picks yet — check back after tonight\'s games.</td></tr>';
+        return;
+      }
+
+      section.style.display = 'block';
+
+      // Normalize all rows to { sortTs, resultType, html } so we can sort and filter
+      _allPickRows = [];
+
+      // ── Resolved game picks (results join — have outcome + score) ─────────────
+      for (const r of filteredResolved) {
+        const p      = r.picks || r;
+        const sport  = fmtSport(p?.sport || r.sport);
+        const pick   = p?.pick || '—';
+        const game   = (p?.away_team && p?.home_team) ? `${p.away_team} @ ${p.home_team}` : '';
+        const odds   = fmtOdds(p?.odds);
+        const ev     = fmtEvPick(p?.ev_percent);
+        const clv    = fmtClvPick(r.bets_clv);
+        const units  = fmtUnitsResult(p?.units_result);
+        const result = fmtResult(r.outcome);
+        const score  = (r.score_away != null && r.score_home != null) ? `${r.score_away}–${r.score_home}` : '—';
+        const date   = fmtDate(p?.game_time || r.recorded_at);
+        const capTime = fmtTime(p?.game_time);
+        // Prefer bets.closing_odds (written by CLV cron) over results.closing_line.
+        const closingRaw = r.bets_closing_odds ?? r.closing_line ?? null;
+        const closing = closingRaw != null
+          ? (closingRaw > 0 ? `+${closingRaw}` : `${closingRaw}`)
+          : '<span class="dim-text">—</span>';
+        const badge  = p?.pick_type === 'longshot' ? ' <span style="font-size:10px;color:var(--amber);">🎲</span>' : '';
+        const sortTs = new Date(p?.game_time || r.recorded_at || 0).getTime();
+        const book   = r.bets_book || p?.book || null;
+        const clvPct = r.bets_clv != null ? r.bets_clv * 100 : null;
+        const clvTip = (p?.odds != null && closingRaw != null && clvPct != null)
+          ? `Placed: ${fmtOdds(p.odds)}&#10;Pinnacle closing: ${fmtOdds(closingRaw)}&#10;CLV: ${clvPct >= 0 ? '+' : ''}${clvPct.toFixed(2)}%`
+          : '';
+        const resultType = (r.outcome || '').toLowerCase() || 'pending';
+
+        _allPickRows.push({ sortTs, resultType, html: `<tr>
+          <td class="mono" style="white-space:nowrap;">${date}${capTime ? `<div class="game-teams">${capTime}</div>` : ''}</td>
+          <td>
+            <div class="pick-team">${pick}${badge}</div>
+            <div class="game-teams"><span class="sport-tag">${sport}</span></div>
+          </td>
+          <td><div class="matchup-text">${game || '—'}</div></td>
+          <td>${book ? `<span class="book-tag">${book}</span>` : '<span class="dim-text">—</span>'}</td>
+          <td class="right">${odds}</td>
+          <td class="right">${ev}</td>
+          <td class="right mono">${closing}</td>
+          <td class="right"${clvTip ? ` title="${clvTip}"` : ''}>${clv}</td>
+          <td>${result}</td>
+          <td class="right">${units}</td>
+          <td class="right mono">${score}</td>
+        </tr>` });
+      }
+
+      // ── Pending game picks (no result yet) ────────────────────────────────────
+      for (const p of filteredPending) {
+        const sport   = fmtSport(p.sport);
+        const pick    = p.pick || '—';
+        const game    = (p.away_team && p.home_team) ? `${p.away_team} @ ${p.home_team}` : '';
+        const odds    = fmtOdds(p.odds);
+        const ev      = fmtEvPick(p.ev_percent);
+        const date    = fmtDate(p.game_time);
+        const capTime = fmtTime(p.game_time);
+        const badge   = p.pick_type === 'longshot' ? ' <span style="font-size:10px;color:var(--amber);">🎲</span>' : '';
+        const sortTs  = new Date(p.game_time || p.created_at || 0).getTime();
+        const book    = p.bets_book || p.book || null;
+
+        _allPickRows.push({ sortTs, resultType: 'pending', html: `<tr>
+          <td class="mono" style="white-space:nowrap;">${date}${capTime ? `<div class="game-teams">${capTime}</div>` : ''}</td>
+          <td>
+            <div class="pick-team">${pick}${badge}</div>
+            <div class="game-teams"><span class="sport-tag">${sport}</span></div>
+          </td>
+          <td><div class="matchup-text">${game || '—'}</div></td>
+          <td>${book ? `<span class="book-tag">${book}</span>` : '<span class="dim-text">—</span>'}</td>
+          <td class="right">${odds}</td>
+          <td class="right">${ev}</td>
+          <td class="right mono"><span class="dim-text">—</span></td>
+          <td class="right"><span class="dim-text">—</span></td>
+          <td><span class="result-badge result-pending">Pending</span></td>
+          <td class="right"><span class="dim-text">—</span></td>
+          <td class="right mono"><span class="dim-text">—</span></td>
+        </tr>` });
+      }
+
+      // Sort newest-first across all pick types
+      _allPickRows.sort((a, b) => b.sortTs - a.sortTs);
+
+      renderPicksHistoryFiltered();
+    }
+
+    // ── Filter bar click handler ──────────────────────────────────────────────
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        _pickFilter = btn.dataset.result;
+        renderPicksHistoryFiltered();
+      });
+    });
+
+    // ── Stripe checkout ──────────────────────────────────────────────────────
+    const PRICE_IDS = {
+      monthly: 'price_1TK8ryC0lSwQdgAs9Uy8rDxA',
+      annual:  'price_1TK8tDC0lSwQdgAsmk7FpoiO',
+    };
+
+    async function startCheckout(tier, btn) {
+      const priceId = PRICE_IDS[tier];
+      if (!priceId) return;
+      const isBtn = btn && (btn.tagName === 'BUTTON' || btn.tagName === 'A');
+      const originalHTML = isBtn ? btn.innerHTML : null;
+      if (isBtn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
+      try {
+        const res = await fetch('/api/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ priceId }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error(data.error || 'No checkout URL returned');
+        }
+      } catch (err) {
+        console.error('[Capy] Checkout error:', err.message);
+        if (isBtn) { btn.disabled = false; btn.innerHTML = originalHTML; }
+        alert('Something went wrong starting checkout. Please try again.');
+      }
+    }
+
+    // ── Mobile hamburger menu ─────────────────────────────────────────────
+    function openMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) { menu.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) { menu.classList.remove('open'); document.body.style.overflow = ''; }
+    }
+    document.getElementById('mobile-menu')?.addEventListener('click', function(e) {
+      if (e.target === this) closeMobileMenu();
+    });
   </script>
 </body>
 </html>
